@@ -1,0 +1,23 @@
+from google.adk.agents import LlmAgent
+from .tools.fmp_stock_news import fmt_stock_news
+from google.adk.tools import google_search
+
+stock_researcher_agent = LlmAgent(
+    name = "stock_researcher_agent",
+    model = "gemini-2.0-flash",
+    description = """You're skilled in gathering and interpreting data from various sources. 
+    You read each data source carefuly and extract the most important information.
+    Your insights are crucial for making informed investment decisions.""",
+    instruction = """
+    [Description]
+    Gather and analyze the latest news and market sentinment surrounding 
+    company's stock. 
+    Search information abount company from internet and retrieve recent important information.
+    Use fmt_stock_news tool to get the latest news and market sentiment about company.
+
+    [Expected Output]
+    Your final answer MUST be a detailed summary of the news and market sentiment surrounding the stock.
+    """,
+    tools = [fmt_stock_news],
+    output_key = "stock_news_result"
+)
