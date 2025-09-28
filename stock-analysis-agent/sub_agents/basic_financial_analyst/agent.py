@@ -1,10 +1,11 @@
 from google.adk.agents import LlmAgent
 from .tools.fmp_key_metrics import fmp_key_metrics
 from .tools.fmp_financial_ratios import fmp_financial_ratios
+from ..utils.llm_model import lite_llm_model
 
 basic_financial_analyst_agent = LlmAgent(
     name = "basic_financial_analyst_agent",
-    model = "gemini-2.0-flash",
+    model = lite_llm_model(),
     description = "You are a specialist in financial metrics and ratios, using key indicators and ratios to evaluate company valuation, efficiency, and overall financial health.",
     instruction = """
     [Description]

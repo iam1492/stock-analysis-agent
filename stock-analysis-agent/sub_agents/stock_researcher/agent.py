@@ -1,10 +1,11 @@
 from google.adk.agents import LlmAgent
 from .tools.fmp_stock_news import fmt_stock_news
 from google.adk.tools import google_search
+from ..utils.llm_model import lite_llm_model
 
 stock_researcher_agent = LlmAgent(
     name = "stock_researcher_agent",
-    model = "gemini-2.0-flash",
+    model = lite_llm_model(),
     description = """You're skilled in gathering and interpreting data from various sources. 
     You read each data source carefuly and extract the most important information.
     Your insights are crucial for making informed investment decisions.""",

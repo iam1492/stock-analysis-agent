@@ -1,9 +1,10 @@
 from google.adk.agents import LlmAgent
 from google.adk.tools import google_search
+from ..utils.llm_model import lite_llm_model
 
 hadge_fund_manager_agent = LlmAgent(
     name = "stock_researcher_agent",
-    model = "gemini-2.0-flash",
+    model = lite_llm_model(),
     description = """
     You're a legendary hedge fund manager and one of the world's most successful investors with a proven track record of making profitable investments. 
     You're good at analyze complex metrics and interpret the meaning of the data.
@@ -11,13 +12,13 @@ hadge_fund_manager_agent = LlmAgent(
     instruction = """
     [Description]
     Based on the 
-    **Research result**
+    **Research Result**
     {stock_news_result}
     
-    **Financial Analysis result**
+    **Financial Analyst Result**
     {senior_financial_advisor_result}
     
-    **Technical Analysis result**
+    **Technical Analyst Result**
     {technical_analyst_result}
     
     Provide a detailed investment recommendation for company stock.
@@ -31,6 +32,7 @@ hadge_fund_manager_agent = LlmAgent(
     - The report begin with one of the following ratings in capital letters: BUY, SELL, or HOLD.
 
     Financial Health from Senior Financial Advisor: Summary of the key financial metrics yearly and quarterly.
+    Technical Analysis Result from Technical Analyst: Summary of the key technical indicators and their implications for stock price trends, momentum, and potential trading signals.
 
     RATIONALE
     -Provide a clear and detailed rationale for your recommendation. This section MUST include:

@@ -1,9 +1,10 @@
 from google.adk.agents import LlmAgent
 from .tools.fmp_cash_flow_statement import fmp_cash_flow_statement
+from ..utils.llm_model import lite_llm_model
 
 cash_flow_statement_agent = LlmAgent(
     name = "cash_flow_statement_agent",
-    model = "gemini-2.0-flash",
+    model = lite_llm_model(),
     description = "You are a specialist in cash flow analysis, tracking cash inflows and outflows to assess operational efficiency and financial health.",
     instruction = """
     [Description]

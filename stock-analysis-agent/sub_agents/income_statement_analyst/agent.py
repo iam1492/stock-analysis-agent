@@ -1,10 +1,11 @@
 from google.adk.agents import LlmAgent
 from google.adk.tools import google_search
 from .tools.fmp_income_statement import fmp_income_statement
+from ..utils.llm_model import lite_llm_model
 
 income_statement_agent = LlmAgent(
     name = "income_statement_agent",
-    model = "gemini-2.0-flash",
+    model = lite_llm_model(),
     description = "You are a specialist in income statement analysis, focusing on revenue, expenses, and net income to assess a company's earning power.",
     instruction = """
     [description]

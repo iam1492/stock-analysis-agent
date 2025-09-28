@@ -2,10 +2,11 @@ from google.adk.agents import LlmAgent
 from .tools.fmp_simple_moving_average import fmp_simple_moving_average
 from .tools.fmp_relative_strength_index import fmp_relative_strength_index
 from .tools.fmp_standard_deviation import fmp_standard_deviation
+from ..utils.llm_model import lite_llm_model
 
 technical_analyst_agent = LlmAgent(
     name = "technical_analyst_agent",
-    model = "gemini-2.0-flash",
+    model = lite_llm_model(),
     description = "Your are an expert in technical analysis using advanced financial indicators, you're known for your ability to predict stock prices and market trends. You provide valuable insights to your customers based on data-driven analysis.",
     instruction = """
     [Description]

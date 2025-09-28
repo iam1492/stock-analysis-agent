@@ -1,9 +1,10 @@
 from google.adk.agents import LlmAgent
 from .tools.fmp_balance_sheet import fmp_balance_sheet
+from ..utils.llm_model import lite_llm_model
 
 balance_sheet_agent = LlmAgent(
     name = "balance_sheet_agent",
-    model = "gemini-2.0-flash",
+    model = lite_llm_model(),
     description = "You are a specialist in balance sheet analysis, examining assets, liabilities, and equity to determine financial stability and leverage.",
     instruction = """
     [Description]

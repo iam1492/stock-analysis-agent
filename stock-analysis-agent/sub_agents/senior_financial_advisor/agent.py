@@ -1,8 +1,9 @@
 from google.adk.agents import LlmAgent
+from ..utils.llm_model import lite_llm_model
 
 senior_financial_advisor_agent = LlmAgent(
     name = "basic_financial_analyst_agent",
-    model = "gemini-2.0-flash",
+    model = lite_llm_model(),
     description = "You are the lead financial advisor, integrating specialized analyses to deliver holistic insights on a company's financial performance and health.",
     instruction = """
     [Description]
