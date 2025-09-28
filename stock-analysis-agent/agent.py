@@ -7,6 +7,25 @@ from .sub_agents.hedge_fund_manager import hadge_fund_manager_agent
 from .sub_agents.senior_financial_advisor import senior_financial_advisor_agent
 from .sub_agents.basic_financial_analyst import basic_financial_analyst_agent
 from .sub_agents.technical_analyst import technical_analyst_agent
+from .sub_agents.intrinsic_value_analyst import instrinsic_value_agent
+from .sub_agents.senior_quantitative_advisor import senior_quantitative_advisor_agent
+from .sub_agents.growth_analyst import growth_analyst_agent
+from google.adk.agents.callback_context import CallbackContext
+import uuid
+import datetime
+from zoneinfo import ZoneInfo
+
+
+def set_session(callback_context: CallbackContext):
+    """
+    Sets a unique ID and timestamp in the callback context's state.
+    This function is called before the main_loop_agent executes.
+    """
+
+    callback_context.state["unique_id"] = str(uuid.uuid4())
+    callback_context.state["timestamp"] = datetime.datetime.now(
+        ZoneInfo("UTC")
+    ).isoformat()
 
 fundamental_analysis_agents = ParallelAgent(
     name = "parallel_financial_agent",
@@ -20,16 +39,29 @@ financial_team = SequentialAgent(
     sub_agents = [fundamental_analysis_agents, senior_financial_advisor_agent]
 )
 
+quantitative_analysis_agents = ParallelAgent(
+    name = "quantitative_analysis_agents",
+    description = "내재 가치 분석과 성장성 분석을 병렬적으로 수행하는 에이전트 입니다.",
+    sub_agents = [instrinsic_value_agent, growth_analyst_agent]  # Add intrinsic value analyst and growth analyst agents here when available
+)
+
+quantitative_analysis_team = SequentialAgent(
+    name = "quantitative_analysis_team",
+    description = "Quantitative Analysis 팀의 여러 에이전트를 순차적으로 실행하여 정보를 취합하는 에이전트 입니다.",
+    sub_agents = [quantitative_analysis_agents, senior_quantitative_advisor_agent]
+)
+
 stock_analysis_department = ParallelAgent(
     name = "stock_analysis_department",
-    description = "주식 리서치, 재무팀 분석, 기술적 분석을 병렬적으로 수행하는 에이전트 입니다.",
-    sub_agents = [stock_researcher_agent, financial_team, technical_analyst_agent]
+    description = "주식 리서치, 재무팀 분석, 기술적 분석 그리고 정량적 분석을 병렬적으로 수행하는 에이전트 입니다.",
+    sub_agents = [stock_researcher_agent, financial_team, technical_analyst_agent, quantitative_analysis_team]
 )
 
 stock_analysis_company = SequentialAgent(
     name = "root_agent",
     description = "여러 서브 에이전트의 결과를 종합하여 최종 투자 권고안을 작성하는 에이전트 입니다.",
-    sub_agents = [stock_analysis_department, hadge_fund_manager_agent]
+    sub_agents = [stock_analysis_department, hadge_fund_manager_agent],
+    before_agent_callback=set_session
 )
 
 root_agent = stock_analysis_company

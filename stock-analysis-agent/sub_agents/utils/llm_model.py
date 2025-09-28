@@ -14,6 +14,7 @@ def lite_llm_model(model_name: str = "gemini/gemini-2.0-flash"):
     if model_name is None:
         model_name = "gemini/gemini-2.0-flash"
 
-    model_name = "gemini/gemini-2.5-flash-preview-09-2025"
+    #model_name = "gemini/gemini-2.5-flash-preview-09-2025"
+    #model_name = "openrouter/x-ai/grok-4-fast"
 
     return LiteLlm(model=model_name)

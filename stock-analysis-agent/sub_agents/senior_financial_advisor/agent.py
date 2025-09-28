@@ -26,6 +26,8 @@ senior_financial_advisor_agent = LlmAgent(
     
 
     [Expected Output]
+    리포트 작성 날짜: {timestamp} (읽기 쉬운 한국 현지 시간대로 표기)
+    
     Your final report MUST be a comprehensive analysis of company's financial health based on the specialist reports.
     Include detailed reports on income statements, balance sheets, cash flow statements, key metrics, and financial ratios.
     Hedge fund manager will use your report to make investment decisions.
