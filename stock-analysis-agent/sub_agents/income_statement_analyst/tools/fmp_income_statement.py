@@ -1,6 +1,5 @@
-import os
-import requests
-fmp_api_base_url = "https://financialmodelingprep.com/stable/"
+from ...utils.fmp_api_client import make_fmp_api_request
+
 def fmp_income_statement(ticker: str, limit: int, period: str):
     """
     FMP 실시간 손익계산서 API를 사용하여 상장 기업, 비상장 기업 및 ETF의 실시간 손익계산서 데이터를 접근하세요.
@@ -10,10 +9,9 @@ def fmp_income_statement(ticker: str, limit: int, period: str):
     - limit(type:int): 반환할 결과의 수.
     - period(type:str): Q1,Q2,Q3,Q4,FY,annual,quarter
     """
-    api_key = os.environ["FMP_API_KEY"]
-    url = f"{fmp_api_base_url}/income-statement?symbol={ticker}&limit={limit}&period={period}&apikey={api_key}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return {"error": f"Failed to fetch data: {response.status_code}"}
+    params = {
+        "symbol": ticker,
+        "limit": limit,
+        "period": period
+    }
+    return make_fmp_api_request("income-statement", params)

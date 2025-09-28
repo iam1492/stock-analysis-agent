@@ -1,18 +1,13 @@
-import os
-import requests
+from ...utils.fmp_api_client import make_fmp_api_request
 
-fmp_api_base_url = "https://financialmodelingprep.com/stable/"
 def fmp_financial_ratios(ticker: str):
     """
-    Analyze a company's financial performance using the Financial Ratios API. 
-    This API provides detailed profitability, liquidity, and efficiency ratios, enabling users to assess a company's operational and financial health across various metrics.
+    Access essential financial ratios for a company with the FMP Financial Ratios API. 
+    Evaluate profitability, liquidity, leverage, and efficiency ratios to assess performance and compare it to competitors.
     Input paramter:
     - ticker(type:str): The ticker of a company.
     """
-    api_key = os.environ["FMP_API_KEY"]
-    url = f"{fmp_api_base_url}/ratios?symbol={ticker}&apikey={api_key}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return {"error": f"Failed to fetch data: {response.status_code}"}
+    params = {
+        "symbol": ticker
+    }
+    return make_fmp_api_request("ratios", params)

@@ -1,7 +1,5 @@
-import os
-import requests
+from ...utils.fmp_api_client import make_fmp_api_request
 
-fmp_api_base_url = "https://financialmodelingprep.com/stable/"
 def fmp_balance_sheet(ticker: str, limit: int, period: str):
     """
     Balance Sheet Data API를 사용하여 상장 기업의 상세한 대차대조표를 접근하세요.
@@ -11,10 +9,9 @@ def fmp_balance_sheet(ticker: str, limit: int, period: str):
     - limit(type:int): 반환할 결과의 수.
     - period(type:str): Q1,Q2,Q3,Q4,FY,annual,quarter
     """
-    api_key = os.environ["FMP_API_KEY"]
-    url = f"{fmp_api_base_url}/balance-sheet-statement?symbol={ticker}&limit={limit}&period={period}&apikey={api_key}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return {"error": f"Failed to fetch data: {response.status_code}"}
+    params = {
+        "symbol": ticker,
+        "limit": limit,
+        "period": period
+    }
+    return make_fmp_api_request("balance-sheet-statement", params)

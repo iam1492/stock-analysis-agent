@@ -1,7 +1,5 @@
-import os
-import requests
+from ...utils.fmp_api_client import make_fmp_api_request
 
-fmp_api_base_url = "https://financialmodelingprep.com/stable/"
 def fmp_cash_flow_statement(ticker: str, limit: int, period: str):
     """
     Gain insights into a company's cash flow activities with the Cash Flow Statements API. 
@@ -11,10 +9,9 @@ def fmp_cash_flow_statement(ticker: str, limit: int, period: str):
     - limit(type:int): The number of results to return.
     - period(type:str): Q1,Q2,Q3,Q4,FY,annual,quarter
     """
-    api_key = os.environ["FMP_API_KEY"]
-    url = f"{fmp_api_base_url}/cash-flow-statement?symbol={ticker}&limit={limit}&period={period}&apikey={api_key}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return {"error": f"Failed to fetch data: {response.status_code}"}
+    params = {
+        "symbol": ticker,
+        "limit": limit,
+        "period": period
+    }
+    return make_fmp_api_request("cash-flow-statement", params)

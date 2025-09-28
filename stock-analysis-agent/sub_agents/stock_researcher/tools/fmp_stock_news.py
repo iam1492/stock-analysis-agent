@@ -1,7 +1,5 @@
-import os
-import requests
+from ...utils.fmp_api_client import make_fmp_api_request
 
-fmp_api_base_url = "https://financialmodelingprep.com/stable/"
 def fmt_stock_news(ticker: str):
     """
     FMP Search Stock News API를 사용하여 주식 관련 뉴스를 검색합니다.
@@ -9,10 +7,8 @@ def fmt_stock_news(ticker: str):
     입력 매개변수:
     - ticker(type:str): 회사의 티커.
     """
-    api_key = os.environ["FMP_API_KEY"]
-    url = f"{fmp_api_base_url}/news/stock?symbols={ticker}&limit=50&apikey={api_key}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return {"error": f"Failed to fetch data: {response.status_code}"}
+    params = {
+        "symbols": ticker,
+        "limit": 50
+    }
+    return make_fmp_api_request("news/stock", params)
