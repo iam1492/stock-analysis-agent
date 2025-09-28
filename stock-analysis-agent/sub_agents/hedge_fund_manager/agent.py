@@ -17,6 +17,9 @@ hadge_fund_manager_agent = LlmAgent(
     **Financial Analysis result**
     {senior_financial_advisor_result}
     
+    **Technical Analysis result**
+    {technical_analyst_result}
+    
     Provide a detailed investment recommendation for company stock.
     Your Report MUST include the following sections:
     

@@ -6,6 +6,7 @@ from .sub_agents.stock_researcher import stock_researcher_agent
 from .sub_agents.hedge_fund_manager import hadge_fund_manager_agent
 from .sub_agents.senior_financial_advisor import senior_financial_advisor_agent
 from .sub_agents.basic_financial_analyst import basic_financial_analyst_agent
+from .sub_agents.technical_analyst import technical_analyst_agent
 
 fundamental_analysis_agents = ParallelAgent(
     name = "parallel_financial_agent",
@@ -21,8 +22,8 @@ financial_team = SequentialAgent(
 
 stock_analysis_department = ParallelAgent(
     name = "stock_analysis_department",
-    description = "주식 리서치, 재무팀 분석을 병렬적으로 수행하는 에이전트 입니다.",
-    sub_agents = [stock_researcher_agent, financial_team]
+    description = "주식 리서치, 재무팀 분석, 기술적 분석을 병렬적으로 수행하는 에이전트 입니다.",
+    sub_agents = [stock_researcher_agent, financial_team, technical_analyst_agent]
 )
 
 stock_analysis_company = SequentialAgent(
