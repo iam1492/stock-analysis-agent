@@ -6,12 +6,13 @@ from cachetools import cached, TTLCache
 @cached(cache=TTLCache(maxsize=1024, ttl=86400))
 def fmp_economic_indicators(name: str, ticker: str):
     """
-    Access real-time and historical economic data for key indicators like GDP, unemployment, and inflation with the FMP Economic Indicators API. Use this data to measure economic performance and identify growth trends.
-    3 years of historical data is provided.
-    Use this data to measure economic performance and and it's impact on company's({ticker}) stock.
+    FMP 경제 지표 API를 사용하여 GDP, 실업률, 인플레이션과 같은 주요 지표에 대한 실시간 및 과거 경제 데이터에 접근합니다. 이 데이터를 사용하여 경제 성과를 측정하고 성장 추세를 식별합니다.
+    3년 간의 과거 데이터가 제공됩니다.
+    이 데이터를 사용하여 경제 성과를 측정하고 회사({ticker}) 주식에 미치는 영향을 분석합니다.
+    입력매개변수를 최대한 활용해서 다양한 경제 지표를 분석합니다.
     
-    Input paramter:
-    - name(type:str): The name of economic indicator.(e.g, federalFunds,CPI,inflationRate, totalNonfarmPayroll, unemploymentRate,realGDP,consumerSentiment, retailSales,industrialProductionTotalIndex, initialClaims, inflation)
+    입력 매개변수:
+    - name(type:str): 경제 지표의 이름입니다.(예: federalFunds,CPI,inflationRate, totalNonfarmPayroll, unemploymentRate,realGDP,consumerSentiment, retailSales,industrialProductionTotalIndex, initialClaims, inflation)
     """
 
     # Set from_date to 3 years ago from today with format 'YYYY-MM-DD'

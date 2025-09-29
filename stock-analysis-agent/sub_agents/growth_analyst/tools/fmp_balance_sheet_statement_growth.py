@@ -2,10 +2,10 @@ from ...utils.fmp_api_client import make_fmp_api_request
 
 def fmp_balance_sheet_statement_growth(ticker: str):
     """
-    Analyze the growth of key balance sheet items over time with the Balance Sheet Statement Growth API. 
-    Track changes in assets, liabilities, and equity to understand the financial evolution of a company.
-    Input paramter:
-    - ticker(type:str): The ticker of a company.
+    대차대조표 성장(balance sheet statement growth) API를 사용하여 주요 대차대조표 항목의 시간 경과에 따른 성장을 분석합니다. 
+    자산, 부채 및 자본의 변화를 추적하여 회사의 재무 변화를 이해합니다.
+    입력 매개변수:
+    - ticker(type:str): 회사의 티커(종목 코드).
     """
     params = {
         "symbol": ticker,

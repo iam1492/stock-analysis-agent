@@ -2,9 +2,9 @@ from ...utils.fmp_api_client import make_fmp_api_request
 
 def fmp_simple_moving_average(ticker: str):
     """
-    Get historical simple moving average data for a stock ticker.
-    Input paramter:
-    - ticker(type:str): The ticker of a company.
+    주식 티커에 대한 과거 단순 이동 평균 데이터를 가져옵니다.
+    입력 매개변수:
+    - ticker(type:str): 회사의 티커(종목 코드).
     """
     params = {
         "symbol": ticker,

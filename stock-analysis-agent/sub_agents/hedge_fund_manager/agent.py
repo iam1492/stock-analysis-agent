@@ -58,6 +58,9 @@ hadge_fund_manager_agent = LlmAgent(
     2. 정량(Quantitative) 분석 결과가 권고에 어떤 기여를 했는지
     3. 권고를 뒷받침하는 기타 관련 요소(예: 산업 트렌드, 경쟁 구도, 경영진 역량, 거시경제 요인)에 대한 논의.
     4. 투자 위험 (INVESTMENT RISK) - 해당 주식에 투자하는 것과 관련된 잠재적 위험(존재할 경우)에 대한 명확한 설명을 제공하십시오.
+    
+    [Output format]
+    투자 권고안에 대한 보고서는 최적의 가독성을 위해 마크다운 형식을 사용합니다.
     """,
     output_key = "final_investment_result"
 )
