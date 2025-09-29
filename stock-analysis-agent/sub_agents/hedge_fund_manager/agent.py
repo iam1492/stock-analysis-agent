@@ -26,6 +26,9 @@ hadge_fund_manager_agent = LlmAgent(
     [퀀트 분석가 결과]
     {senior_quantitative_advisor_result}
     
+    [매크로 경제 분석가 결과]
+    {economic_indicators_result}
+    
     해당 기업 주식에 대한 상세 투자 권고안을 제시하십시오.
 
     귀하의 보고서에는 반드시 다음 섹션이 포함되어야 합니다:
@@ -45,6 +48,9 @@ hadge_fund_manager_agent = LlmAgent(
 
     [선임 퀀트 어드바이저 의견 (정량적 분석 결과)]
     주식의 내재 가치 및 성장 잠재력 요약.
+    
+    [매크로 경제 분석가 의견 (경제 환경 분석 결과)]
+    미국 경제 환경, 시장 동향 및 글로벌 이벤트가 주식 시장과 해당 기업 주식에 미치는 영향에 대한 요약.
 
     [권고 근거 (RATIONALE)]
     귀하의 권고에 대한 명확하고 상세한 근거를 제시하십시오. 이 섹션에는 반드시 다음 내용이 포함되어야 합니다:

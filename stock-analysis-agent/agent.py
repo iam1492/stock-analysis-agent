@@ -10,6 +10,7 @@ from .sub_agents.technical_analyst import technical_analyst_agent
 from .sub_agents.intrinsic_value_analyst import instrinsic_value_agent
 from .sub_agents.senior_quantitative_advisor import senior_quantitative_advisor_agent
 from .sub_agents.growth_analyst import growth_analyst_agent
+from .sub_agents.macro_economy_analyst import economic_indiators_agent
 from google.adk.agents.callback_context import CallbackContext
 import uuid
 import datetime
@@ -53,8 +54,8 @@ quantitative_analysis_team = SequentialAgent(
 
 stock_analysis_department = ParallelAgent(
     name = "stock_analysis_department",
-    description = "주식 리서치, 재무팀 분석, 기술적 분석 그리고 정량적 분석을 병렬적으로 수행하는 에이전트 입니다.",
-    sub_agents = [stock_researcher_agent, financial_team, technical_analyst_agent, quantitative_analysis_team]
+    description = "주식 리서치, 재무팀 분석, 기술적 분석, 정량적 분석 그리고 매크로경제분석을 병렬적으로 수행하는 에이전트 입니다.",
+    sub_agents = [stock_researcher_agent, financial_team, technical_analyst_agent, quantitative_analysis_team, economic_indiators_agent]
 )
 
 stock_analysis_company = SequentialAgent(
