@@ -5,6 +5,9 @@ from .tools.fmp_price_target_news import fmp_price_target_news
 from .tools.fmp_historical_stock_grade import fmp_historical_stock_grade
 from google.adk.tools import google_search
 from ..utils.llm_model import lite_llm_model
+from google.genai import types
+from google.adk.planners import BuiltInPlanner
+
 
 stock_researcher_agent = LlmAgent(
     name = "stock_researcher_agent",
@@ -25,5 +28,11 @@ stock_researcher_agent = LlmAgent(
     최종 답변은 주식을 둘러싼 뉴스 및 시장 심리, 분석가들의 목표주가에 대한 상세한 요약이어야 합니다.
     """,
     tools = [fmt_stock_news, fmp_price_target_summary, fmp_price_target_news, fmp_historical_stock_grade],
-    output_key = "stock_researcher_result"
+    output_key = "stock_researcher_result",
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True,
+            thinking_budget=1024,
+        )
+    )
 )

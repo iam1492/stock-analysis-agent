@@ -1,6 +1,8 @@
 from google.adk.agents import LlmAgent
 from .tools.fmp_balance_sheet import fmp_balance_sheet
 from ..utils.llm_model import lite_llm_model
+from google.genai import types
+from google.adk.planners import BuiltInPlanner
 
 balance_sheet_agent = LlmAgent(
     name = "balance_sheet_agent",
@@ -19,5 +21,11 @@ balance_sheet_agent = LlmAgent(
     Markdown 형식을 사용하세요.
     """,
     tools = [fmp_balance_sheet],
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True,
+            thinking_budget=1024,
+        )
+    ),
     output_key = "balance_sheet_result"
 )

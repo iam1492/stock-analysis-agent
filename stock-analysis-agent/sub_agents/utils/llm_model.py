@@ -14,7 +14,11 @@ def lite_llm_model(model_name: str = "gemini/gemini-2.0-flash"):
     if model_name is None:
         model_name = "gemini/gemini-2.0-flash"
 
-    #model_name = "gemini/gemini-2.5-flash"
+    model_name = "gemini-2.5-flash"
     #model_name = "openrouter/x-ai/grok-4-fast"
-
-    return LiteLlm(model=model_name)
+    #model_name = "openrouter/anthropic/claude-sonnet-4.5"
+    
+    if model_name.startswith("gemini"):
+        return model_name
+    else:
+        return LiteLlm(model=model_name)

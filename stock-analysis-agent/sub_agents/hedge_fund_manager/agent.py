@@ -1,6 +1,9 @@
 from google.adk.agents import LlmAgent
 from google.adk.tools import google_search
 from ..utils.llm_model import lite_llm_model
+from google.genai import types
+from google.adk.planners import BuiltInPlanner
+
 
 hadge_fund_manager_agent = LlmAgent(
     name = "hedge_fund_manager_agent",
@@ -62,5 +65,11 @@ hadge_fund_manager_agent = LlmAgent(
     [Output format]
     투자 권고안에 대한 보고서는 최적의 가독성을 위해 마크다운 형식을 사용합니다.
     """,
-    output_key = "final_investment_result"
+    output_key = "final_investment_result",
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True,
+            thinking_budget=1024,
+        )
+    )
 )

@@ -2,6 +2,9 @@ from google.adk.agents import LlmAgent
 from google.adk.tools import google_search
 from .tools.fmp_income_statement import fmp_income_statement
 from ..utils.llm_model import lite_llm_model
+from google.genai import types
+from google.adk.planners import BuiltInPlanner
+
 
 income_statement_agent = LlmAgent(
     name = "income_statement_agent",
@@ -20,5 +23,11 @@ income_statement_agent = LlmAgent(
     Markdown 형식을 사용하세요.
     """,
     tools = [fmp_income_statement],
-    output_key = "income_statement_result"
+    output_key = "income_statement_result",
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True,
+            thinking_budget=1024,
+        )
+    )
 )

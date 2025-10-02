@@ -1,5 +1,8 @@
 from google.adk.agents import LlmAgent
 from ..utils.llm_model import lite_llm_model
+from google.genai import types
+from google.adk.planners import BuiltInPlanner
+
 
 senior_quantitative_advisor_agent = LlmAgent(
     name = "senior_quantitative_advisor",
@@ -26,5 +29,11 @@ senior_quantitative_advisor_agent = LlmAgent(
     최적의 가독성을 위해 마크다운 형식을 사용합니다.
     """,
     
-    output_key = "senior_quantitative_advisor_result"
+    output_key = "senior_quantitative_advisor_result",
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True,
+            thinking_budget=1024,
+        )
+    )
 )

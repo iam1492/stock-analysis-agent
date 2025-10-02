@@ -1,6 +1,9 @@
 from google.adk.agents import LlmAgent
 from .tools.fmp_cash_flow_statement import fmp_cash_flow_statement
-from ..utils.llm_model import lite_llm_model
+from ..utils.llm_model import lite_llm_model    
+from google.genai import types
+from google.adk.planners import BuiltInPlanner
+
 
 cash_flow_statement_agent = LlmAgent(
     name = "cash_flow_statement_agent",
@@ -19,5 +22,11 @@ cash_flow_statement_agent = LlmAgent(
     마크다운 형식을 사용합니다.
     """,
     tools = [fmp_cash_flow_statement],
-    output_key = "cash_flow_statement_result"
+    output_key = "cash_flow_statement_result",
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True,
+            thinking_budget=1024,
+        )
+    )
 )

@@ -3,6 +3,9 @@ from .tools.fmp_balance_sheet_statement_growth import fmp_balance_sheet_statemen
 from .tools.fmp_cash_flow_statement_growth import fmp_cash_flow_statement_growth
 from .tools.fmp_income_statement_growth import fmp_income_statement_growth
 from ..utils.llm_model import lite_llm_model
+from google.genai import types
+from google.adk.planners import BuiltInPlanner
+
 
 growth_analyst_agent = LlmAgent(
     name = "growth_analyst_agent",
@@ -46,5 +49,11 @@ growth_analyst_agent = LlmAgent(
     - 의견(OPINION): 성장 순위 점수에 대한 분석 및 해석.
     """,
     tools = [fmp_balance_sheet_statement_growth, fmp_cash_flow_statement_growth, fmp_income_statement_growth],
-    output_key = "growth_analyst_result"
+    output_key = "growth_analyst_result",
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True,
+            thinking_budget=1024,
+        )
+    )
 )

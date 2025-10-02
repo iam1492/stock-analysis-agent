@@ -3,6 +3,8 @@ from .tools.fmp_dcf_valuation import fmp_dcf_valuation
 from .tools.fmp_owner_earnings import fmp_owner_earnings
 from .tools.fmp_enterprise_value import fmp_enterprise_value
 from ..utils.llm_model import lite_llm_model
+from google.genai import types
+from google.adk.planners import BuiltInPlanner
 
 instrinsic_value_agent = LlmAgent(
     name = "intrinsic_value_agent",
@@ -29,5 +31,11 @@ instrinsic_value_agent = LlmAgent(
     - [매우 중요] 분석을 기반으로 주식이 저평가, 적정 가치 또는 고평가되었는지에 대한 평가.
     """,
     tools = [fmp_dcf_valuation, fmp_owner_earnings, fmp_enterprise_value],
-    output_key = "intrinsic_value_result"
+    output_key = "intrinsic_value_result",
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True,
+            thinking_budget=1024,
+        )
+    )
 )

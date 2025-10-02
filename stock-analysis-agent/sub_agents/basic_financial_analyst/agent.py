@@ -2,6 +2,8 @@ from google.adk.agents import LlmAgent
 from .tools.fmp_key_metrics import fmp_key_metrics
 from .tools.fmp_financial_ratios import fmp_financial_ratios
 from ..utils.llm_model import lite_llm_model
+from google.genai import types
+from google.adk.planners import BuiltInPlanner
 
 basic_financial_analyst_agent = LlmAgent(
     name = "basic_financial_analyst_agent",
@@ -19,5 +21,11 @@ basic_financial_analyst_agent = LlmAgent(
     마크다운 형식을 사용합니다.
     """,
     tools = [fmp_key_metrics, fmp_financial_ratios],
-    output_key = "basic_financial_analyst_result"
+    output_key = "basic_financial_analyst_result",
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True,
+            thinking_budget=1024,
+        )
+    )
 )

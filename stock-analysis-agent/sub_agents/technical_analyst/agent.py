@@ -3,6 +3,9 @@ from .tools.fmp_simple_moving_average import fmp_simple_moving_average
 from .tools.fmp_relative_strength_index import fmp_relative_strength_index
 from .tools.fmp_standard_deviation import fmp_standard_deviation
 from ..utils.llm_model import lite_llm_model
+from google.genai import types
+from google.adk.planners import BuiltInPlanner
+
 
 technical_analyst_agent = LlmAgent(
     name = "technical_analyst_agent",
@@ -27,5 +30,11 @@ technical_analyst_agent = LlmAgent(
     
     """,
     tools = [fmp_simple_moving_average, fmp_relative_strength_index, fmp_standard_deviation],
-    output_key = "technical_analyst_result"
+    output_key = "technical_analyst_result",
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True,
+            thinking_budget=1024,
+        )
+    ) 
 )

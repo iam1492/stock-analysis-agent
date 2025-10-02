@@ -1,5 +1,8 @@
 from google.adk.agents import LlmAgent
 from ..utils.llm_model import lite_llm_model
+from google.genai import types
+from google.adk.planners import BuiltInPlanner
+
 
 senior_financial_advisor_agent = LlmAgent(
     name = "basic_financial_analyst_agent",
@@ -34,5 +37,11 @@ senior_financial_advisor_agent = LlmAgent(
     보고서를 사실(FACT) 및 의견(OPINION) 섹션으로 구분합니다.
     최적의 가독성을 위해 마크다운 형식을 사용합니다.
     """,
-    output_key = "senior_financial_advisor_result"
+    output_key = "senior_financial_advisor_result",
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True,
+            thinking_budget=1024,
+        )
+    )
 )
