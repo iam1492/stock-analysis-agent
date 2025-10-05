@@ -138,8 +138,11 @@ export class AdkSessionService {
 
         const responseData = await response.json();
 
+        console.log('[ADK SESSION SERVICE] responseData:', responseData);
+
         // Agent Engine sessions API returns sessions with 'name' field, need to extract ID
-        const rawSessions = responseData.sessions || responseData || [];
+        const rawSessions = Array.isArray(responseData.sessions)
+        ? responseData.sessions: Array.isArray(responseData)? responseData: [];
         const sessions: AdkSession[] = rawSessions.map(
           (session: {
             name?: string;
