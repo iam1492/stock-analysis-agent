@@ -1,6 +1,6 @@
 from google.adk.models.lite_llm import LiteLlm
 
-def lite_llm_model(model_name: str = "gemini/gemini-2.0-flash"):
+def lite_llm_model(model_name: str = "gemini-2.0-flash"):
     """
     Returns a language model instance based on the provided model name.
 
@@ -11,12 +11,10 @@ def lite_llm_model(model_name: str = "gemini/gemini-2.0-flash"):
         An instance of the specified language model.
     """
 
-    if model_name is None:
-        model_name = "gemini/gemini-2.0-flash"
-
+    #model_name = "gemini-2.5-pro"
     model_name = "gemini-2.5-flash"
-    #model_name = "openrouter/x-ai/grok-4-fast"
-    #model_name = "openrouter/anthropic/claude-sonnet-4.5"
+    #model_name = "openrouter/z-ai/glm-4.6"
+    #model_name = "openrouter/qwen/qwen3-max"
     
     if model_name.startswith("gemini"):
         return model_name

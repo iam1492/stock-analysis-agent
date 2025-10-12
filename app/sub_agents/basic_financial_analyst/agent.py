@@ -3,6 +3,7 @@ from .tools.fmp_key_metrics import fmp_key_metrics
 from .tools.fmp_financial_ratios import fmp_financial_ratios
 from ..utils.llm_model import lite_llm_model
 from google.genai import types
+from google.adk.planners import BuiltInPlanner
 
 basic_financial_analyst_agent = LlmAgent(
     name = "basic_financial_analyst_agent",
