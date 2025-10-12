@@ -306,6 +306,18 @@ export function ChatProvider({
     }
   }, [messages]);
 
+  // Auto-scroll to bottom when new events arrive
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollViewport = scrollAreaRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]"
+      );
+      if (scrollViewport) {
+        scrollViewport.scrollTop = scrollViewport.scrollHeight;
+      }
+    }
+  }, [messageEvents]);
+
   // Handle message submission
   const handleSubmit = useCallback(
     async (

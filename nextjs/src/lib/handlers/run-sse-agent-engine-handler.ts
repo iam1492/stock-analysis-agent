@@ -429,6 +429,22 @@ export async function handleAgentEngineStreamRequest(
 
           await pump();
         } catch (error) {
+          // Handle various stream termination errors gracefully
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          
+          if (errorMessage.includes('GeneratorExit') || 
+              errorMessage.includes('was created in a different Context') ||
+              errorMessage.includes('BaseExceptionGroup')) {
+            console.log("📡 [AGENT ENGINE] Stream terminated gracefully:", errorMessage);
+            try {
+              processor.finalize();
+              controller.close();
+            } catch (finalizeError) {
+              console.error("❌ [AGENT ENGINE] Error during graceful shutdown:", finalizeError);
+            }
+            return;
+          }
+
           console.error(
             "❌ [AGENT ENGINE] JSON fragment processing error:",
             error
@@ -444,10 +460,22 @@ export async function handleAgentEngineStreamRequest(
             );
           }
 
-          controller.error(error);
+          // Only send error if stream is still active and it's not a context error
+          if (isStreamActive && !errorMessage.includes('Context')) {
+            try {
+              controller.error(error);
+            } catch (controllerError) {
+              console.error("❌ [AGENT ENGINE] Error sending to controller:", controllerError);
+            }
+          }
         } finally {
           isStreamActive = false;
-          reader.releaseLock();
+          try {
+            reader.releaseLock();
+          } catch (releaseError) {
+            // Ignore release lock errors as they're expected during stream termination
+            console.debug("📡 [AGENT ENGINE] Reader lock release (expected during termination)");
+          }
         }
       },
     });

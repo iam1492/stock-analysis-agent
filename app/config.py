@@ -18,6 +18,16 @@ import vertexai
 
 def load_environment_variables() -> None:
     """Load environment variables from .env file if it exists."""
+    # Disable OpenTelemetry tracing BEFORE any imports
+    os.environ["OTEL_SDK_DISABLED"] = "true"
+    os.environ["OTEL_TRACES_EXPORTER"] = "none"
+    os.environ["OTEL_METRICS_EXPORTER"] = "none"
+    os.environ["OTEL_LOGS_EXPORTER"] = "none"
+    os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = ""
+    os.environ["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"] = ""
+    os.environ["OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"] = ""
+    os.environ["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"] = ""
+    
     try:
         from dotenv import load_dotenv
 
@@ -29,6 +39,8 @@ def load_environment_variables() -> None:
             print(f"ℹ️  No .env file found at {env_file}")
     except ImportError:
         print("ℹ️  python-dotenv not installed, skipping .env file loading")
+    
+    print("🚫 OpenTelemetry tracing completely disabled to prevent context errors")
 
 
 # =============================================================================

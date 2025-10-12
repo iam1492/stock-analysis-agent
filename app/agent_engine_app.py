@@ -14,16 +14,19 @@ from typing import Any
 import vertexai
 from google.adk.artifacts import GcsArtifactService
 from google.cloud import logging as google_cloud_logging
-from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider, export
 from vertexai import agent_engines
 from vertexai.preview.reasoning_engines import AdkApp
 
 from app.agent import root_agent
 from app.config import config, get_deployment_config
 from app.engine_utils.gcs import create_bucket_if_not_exists
-from app.engine_utils.tracing import CloudTraceLoggingSpanExporter
 from app.engine_utils.typing import Feedback
+
+# Disable OpenTelemetry completely to prevent context issues
+os.environ["OTEL_SDK_DISABLED"] = "true"
+os.environ["OTEL_TRACES_EXPORTER"] = "none"
+os.environ["OTEL_METRICS_EXPORTER"] = "none"
+os.environ["OTEL_LOGS_EXPORTER"] = "none"
 
 
 class AgentEngineApp(AdkApp):
@@ -34,20 +37,12 @@ class AgentEngineApp(AdkApp):
     """
 
     def set_up(self) -> None:
-        """Set up logging and tracing for the agent engine app."""
+        """Set up logging for the agent engine app."""
         super().set_up()
         logging_client = google_cloud_logging.Client()
         self.logger = logging_client.logger(__name__)
-        provider = TracerProvider()
-        processor = export.BatchSpanProcessor(
-            CloudTraceLoggingSpanExporter(
-                project_id=os.environ.get("GOOGLE_CLOUD_PROJECT"),
-                service_name=f"{config.deployment_name}-service",
-            )
-        )
-        provider.add_span_processor(processor)
-        trace.set_tracer_provider(provider)
-        self.enable_tracing = True
+        # Temporarily disable tracing to avoid context issues
+        self.enable_tracing = False
 
     def register_feedback(self, feedback: dict[str, Any]) -> None:
         """Collect and log feedback from users."""

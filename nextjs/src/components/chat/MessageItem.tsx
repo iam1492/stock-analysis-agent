@@ -7,7 +7,7 @@ import {
   ActivityTimeline,
   ProcessedEvent,
 } from "@/components/ActivityTimeline";
-import { Copy, CopyCheck, Loader2, Bot, User } from "lucide-react";
+import { Copy, CopyCheck, Loader2, Bot, User, Brain, Info, Code, FileText } from "lucide-react";
 import { Message } from "@/types";
 
 interface MessageItemProps {
@@ -108,71 +108,131 @@ export function MessageItem({
     messageEvents.has(message.id) &&
     messageEvents.get(message.id)!.length > 0;
 
-  // AI message loading with timeline events - show thinking indicator
-  // Show this when loading AND we have timeline events (even if content started arriving)
-  if (isLoading && hasTimelineEvents) {
-    return (
-      <div className="flex items-start gap-3 max-w-[90%]">
-        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
-          <Bot className="h-4 w-4 text-white" />
-        </div>
-
-        <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg">
-          {/* Activity Timeline during thinking */}
-          {hasTimelineEvents && (
-            <ActivityTimeline
-              processedEvents={messageEvents.get(message.id) || []}
-              isLoading={isLoading}
-            />
-          )}
-
-          {/* Show content if it exists while loading */}
-          {message.content && (
-            <div className="prose prose-invert max-w-none mb-3">
-              <MarkdownRenderer content={message.content} />
-            </div>
-          )}
-
-          {/* Loading indicator */}
-          <div className="flex items-center gap-2 bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2">
-            <Loader2 className="h-4 w-4 animate-spin text-emerald-400" />
-            <span className="text-sm text-slate-400">
-              {message.content
-                ? "🚀 Still processing..."
-                : "🤔 Thinking and planning..."}
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // AI message with no content and not loading - show timeline if available
-  if (!message.content) {
-    // If we have timeline events, show them even without content
-    if (hasTimelineEvents) {
+  // Render individual event bubbles instead of timeline container
+  const renderEventBubbles = () => {
+    if (!hasTimelineEvents) return null;
+    
+    const events = messageEvents.get(message.id) || [];
+    
+    return events.map((event, index) => {
+      const isThinking = event.title.includes("Thinking") || event.title.startsWith("🤔");
+      const isFunctionCall = event.title.includes("Function Call");
+      const isFunctionResponse = event.title.includes("Function Response");
+      
+      let bubbleStyle = "bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600/50";
+      let icon = <Info className="h-4 w-4" />;
+      let iconBg = "bg-slate-600";
+      
+      if (isThinking) {
+        bubbleStyle = "bg-gradient-to-br from-cyan-900/30 to-cyan-800/30 border border-cyan-600/30";
+        icon = <Brain className="h-4 w-4 text-cyan-400" />;
+        iconBg = "bg-cyan-600/20";
+      } else if (isFunctionCall) {
+        bubbleStyle = "bg-gradient-to-br from-blue-900/30 to-blue-800/30 border border-blue-600/30";
+        icon = <Code className="h-4 w-4 text-blue-400" />;
+        iconBg = "bg-blue-600/20";
+      } else if (isFunctionResponse) {
+        bubbleStyle = "bg-gradient-to-br from-green-900/30 to-green-800/30 border border-green-600/30";
+        icon = <FileText className="h-4 w-4 text-green-400" />;
+        iconBg = "bg-green-600/20";
+      }
+      
       return (
-        <div className="flex items-start gap-3 max-w-[90%]">
-          <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
-            <Bot className="h-4 w-4 text-white" />
+        <div key={index} className="flex items-start gap-3 max-w-[90%]">
+          <div className={`flex-shrink-0 w-6 h-6 ${iconBg} rounded-full flex items-center justify-center`}>
+            {icon}
           </div>
-
-          <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg">
-            <ActivityTimeline
-              processedEvents={messageEvents.get(message.id) || []}
-              isLoading={isLoading}
-            />
-
-            {/* Show thinking indicator */}
-            <div className="flex items-center gap-2 bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2 mt-2">
-              <span className="text-sm text-slate-400">🤔 Thinking...</span>
+          <div className={`flex-1 ${bubbleStyle} rounded-2xl rounded-tl-sm p-3 shadow-lg`}>
+            <div className="text-sm font-medium mb-1 text-slate-300">
+              {event.title}
+            </div>
+            <div className="text-xs text-slate-400">
+              {typeof event.data === 'string' ? (
+                <ReactMarkdown>{event.data}</ReactMarkdown>
+              ) : (
+                <pre className="whitespace-pre-wrap font-mono">
+                  {JSON.stringify(event.data, null, 2)}
+                </pre>
+              )}
             </div>
           </div>
         </div>
       );
-    }
+    });
+  };
 
-    // Otherwise show no content indicator
+  // AI message with events - render as individual bubbles
+  if (hasTimelineEvents) {
+    return (
+      <div className="space-y-3">
+        {renderEventBubbles()}
+        
+        {/* Show content if it exists */}
+        {message.content && (
+          <div className="flex items-start gap-3 max-w-[90%]">
+            <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
+              <Bot className="h-4 w-4 text-white" />
+            </div>
+            <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg relative group">
+              <div className="prose prose-invert max-w-none">
+                <MarkdownRenderer content={message.content} />
+              </div>
+              
+              {/* Copy button */}
+              {onCopy && (
+                <button
+                  onClick={() => handleCopy(message.content, message.id)}
+                  className="absolute top-3 right-3 p-2 hover:bg-slate-700/50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                  title="Copy message"
+                >
+                  {copiedMessageId === message.id ? (
+                    <CopyCheck className="h-4 w-4 text-emerald-400" />
+                  ) : (
+                    <Copy className="h-4 w-4 text-slate-400 hover:text-slate-300" />
+                  )}
+                </button>
+              )}
+              
+              {/* Loading indicator */}
+              {isLoading && (
+                <div className="flex items-center gap-2 bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2 mt-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-emerald-400" />
+                  <span className="text-sm text-slate-400">
+                    🚀 Still processing...
+                  </span>
+                </div>
+              )}
+              
+              {/* Timestamp */}
+              <div className="mt-3 pt-2 border-t border-slate-700/50">
+                <span className="text-xs text-slate-400">
+                  {message.timestamp.toLocaleTimeString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Loading indicator when no content yet */}
+        {!message.content && isLoading && (
+          <div className="flex items-start gap-3 max-w-[90%]">
+            <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
+              <Bot className="h-4 w-4 text-white" />
+            </div>
+            <div className="flex items-center gap-2 bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2">
+              <Loader2 className="h-4 w-4 animate-spin text-emerald-400" />
+              <span className="text-sm text-slate-400">
+                🤔 Thinking and planning...
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // AI message with no content and not loading
+  if (!message.content) {
     return (
       <div className="flex items-start gap-3 max-w-[90%]">
         <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
@@ -193,14 +253,6 @@ export function MessageItem({
       </div>
 
       <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg relative group">
-        {/* Activity Timeline */}
-        {messageEvents && messageEvents.has(message.id) && (
-          <ActivityTimeline
-            processedEvents={messageEvents.get(message.id) || []}
-            isLoading={isLoading}
-          />
-        )}
-
         {/* Message content */}
         <div className="prose prose-invert max-w-none">
           <MarkdownRenderer content={message.content} />
