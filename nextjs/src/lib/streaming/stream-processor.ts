@@ -43,14 +43,7 @@ export async function processSseEventData(
   const { textParts, thoughtParts, agent, functionCall, functionResponse } =
     extractDataFromSSE(jsonData);
 
-  // Only show hedge_fund_manager_agent responses in UI
-  // Filter out all other agents including root_agent
-  if (agent && agent !== "hedge_fund_manager_agent") {
-    console.log(`🚫 [STREAM PROCESSOR] Filtering out agent: ${agent}`);
-    return;
-  }
-
-  // Use original message ID for hedge_fund_manager_agent (no agent suffix)
+  // Show all agent activities in timeline, but only show hedge_fund_manager_agent text in UI
   const actualMessageId = aiMessageId;
 
   // Update current agent if changed
@@ -59,12 +52,12 @@ export async function processSseEventData(
     setCurrentAgent(agent);
   }
 
-  // Process function calls
+  // Process function calls (show all in timeline)
   if (functionCall) {
     processFunctionCall(functionCall, actualMessageId, callbacks.onEventUpdate);
   }
 
-  // Process function responses
+  // Process function responses (show all in timeline)
   if (functionResponse) {
     processFunctionResponse(
       functionResponse,
@@ -73,7 +66,7 @@ export async function processSseEventData(
     );
   }
 
-  // Process AI thoughts - show in timeline for transparency
+  // Process AI thoughts (show all in timeline)
   console.log("🔍 [STREAM PROCESSOR] Checking for thoughts:", {
     thoughtPartsLength: thoughtParts.length,
     thoughtParts: thoughtParts.map((t) => t.substring(0, 50) + "..."),
@@ -98,15 +91,19 @@ export async function processSseEventData(
     console.log("⚠️ [STREAM PROCESSOR] No thoughts to process");
   }
 
-  // Process text content using OFFICIAL ADK TERMINATION SIGNAL PATTERN
+  // Process text content only for hedge_fund_manager_agent
   if (textParts.length > 0) {
-    await processTextContent(
-      textParts,
-      agent,
-      actualMessageId,
-      accumulatedTextRef,
-      callbacks.onMessageUpdate
-    );
+    if (agent === "hedge_fund_manager_agent" || !agent) {
+      await processTextContent(
+        textParts,
+        agent,
+        actualMessageId,
+        accumulatedTextRef,
+        callbacks.onMessageUpdate
+      );
+    } else {
+      console.log(`🚫 [STREAM PROCESSOR] Filtering out text content from agent: ${agent}`);
+    }
   }
 }
 
@@ -122,7 +119,28 @@ function processFunctionCall(
   aiMessageId: string,
   onEventUpdate: (messageId: string, event: ProcessedEvent) => void
 ): void {
-  const functionCallTitle = `Function Call: ${functionCall.name}`;
+  // Create user-friendly function call messages
+  const friendlyFunctionNames: Record<string, string> = {
+    'fmp_cash_flow_statement': '현금흐름 분석',
+    'fmp_balance_sheet': '대차대조표 분석', 
+    'fmp_income_statement': '손익계산서 분석',
+    'fmp_financial_ratios': '재무 비율 분석',
+    'fmp_key_metrics': '주요 지표 분석',
+    'fmp_dcf_valuation': 'DCF 가치 평가',
+    'fmp_enterprise_value': '기업 가치 분석',
+    'fmp_owner_earnings': '주주 이익 분석',
+    'fmp_economic_indicators': '경제 지표 분석',
+    'fmp_stock_news': '뉴스 분석',
+    'fmp_price_target_summary': '목표 주가 분석',
+    'fmp_historical_stock_grade': '주식 등급 분석',
+    'fmp_simple_moving_average': '이동평균선 분석',
+    'fmp_relative_strength_index': 'RSI 분석',
+    'fmp_standard_deviation': '변동성 분석'
+  };
+
+  const friendlyName = friendlyFunctionNames[functionCall.name] || functionCall.name;
+  const functionCallTitle = `🔧 ${friendlyName} 도구 사용중...`;
+
   createDebugLog(
     "SSE HANDLER",
     "Adding Function Call timeline event:",
@@ -134,6 +152,7 @@ function processFunctionCall(
     data: {
       type: "functionCall",
       name: functionCall.name,
+      friendlyName: friendlyName,
       args: functionCall.args,
       id: functionCall.id,
     },
@@ -156,7 +175,28 @@ function processFunctionResponse(
   aiMessageId: string,
   onEventUpdate: (messageId: string, event: ProcessedEvent) => void
 ): void {
-  const functionResponseTitle = `Function Response: ${functionResponse.name}`;
+  // Create user-friendly function response messages
+  const friendlyFunctionNames: Record<string, string> = {
+    'fmp_cash_flow_statement': '현금흐름 분석',
+    'fmp_balance_sheet': '대차대조표 분석', 
+    'fmp_income_statement': '손익계산서 분석',
+    'fmp_financial_ratios': '재무 비율 분석',
+    'fmp_key_metrics': '주요 지표 분석',
+    'fmp_dcf_valuation': 'DCF 가치 평가',
+    'fmp_enterprise_value': '기업 가치 분석',
+    'fmp_owner_earnings': '주주 이익 분석',
+    'fmp_economic_indicators': '경제 지표 분석',
+    'fmp_stock_news': '뉴스 분석',
+    'fmp_price_target_summary': '목표 주가 분석',
+    'fmp_historical_stock_grade': '주식 등급 분석',
+    'fmp_simple_moving_average': '이동평균선 분석',
+    'fmp_relative_strength_index': 'RSI 분석',
+    'fmp_standard_deviation': '변동성 분석'
+  };
+
+  const friendlyName = friendlyFunctionNames[functionResponse.name] || functionResponse.name;
+  const functionResponseTitle = `✅ ${friendlyName} 도구 사용 완료`;
+
   createDebugLog(
     "SSE HANDLER",
     "Adding Function Response timeline event:",
@@ -168,6 +208,7 @@ function processFunctionResponse(
     data: {
       type: "functionResponse",
       name: functionResponse.name,
+      friendlyName: friendlyName,
       response: functionResponse.response,
       id: functionResponse.id,
     },
@@ -241,6 +282,25 @@ function processThoughts(
     { thoughts: thoughtParts }
   );
 
+  // Create user-friendly agent names
+  const friendlyAgentNames: Record<string, string> = {
+    'balance_sheet_analyst': '대차대조표 분석가',
+    'income_statement_analyst': '손익계산서 분석가', 
+    'cash_flow_analyst': '현금흐름 분석가',
+    'basic_financial_analyst': '기본 재무 분석가',
+    'growth_analyst': '성장성 분석가',
+    'intrinsic_value_analyst': '본질가치 분석가',
+    'technical_analyst': '기술적 분석가',
+    'stock_researcher': '주식 연구원',
+    'macro_economy_analyst': '경제 분석가',
+    'senior_financial_advisor': '선임 재무 연구원',
+    'senior_quantitative_advisor': '선임 퀀트 분석가',
+    'hedge_fund_manager': '헤지펀드 매니저',
+    'goal_planning_agent': '목표 계획 에이전트'
+  };
+
+  const friendlyAgentName = friendlyAgentNames[agent] || agent;
+
   // Create AI message to enable timeline display - but preserve any existing content
   if (onMessageUpdate) {
     createDebugLog(
@@ -286,9 +346,14 @@ function processThoughts(
       flushSync(() => {
         onEventUpdate(aiMessageId, {
           title: section.title
-            ? `🤔 ${section.title}`
-            : `🤔 ${agent} is thinking...`,
-          data: { type: "thinking", content: section.content },
+            ? `🤔 ${friendlyAgentName}이(가) "${section.title}" 생각중...`
+            : `🤔 ${friendlyAgentName}이(가) 생각중...`,
+          data: { 
+            type: "thinking", 
+            content: section.content,
+            agent: agent,
+            friendlyAgentName: friendlyAgentName
+          },
         });
       });
     });

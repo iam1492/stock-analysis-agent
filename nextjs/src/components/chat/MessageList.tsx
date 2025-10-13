@@ -58,11 +58,11 @@ export function MessageList({
           />
         ))}
 
-        {/* Show "Planning..." if the last message is human and we are loading */}
+        {/* Show "Analyzing..." if the last message is human and we are loading */}
         {isLoading &&
           messages.length > 0 &&
           messages[messages.length - 1].type === "human" && (
-            <div className="flex items-start gap-3 max-w-[90%]">
+            <div className="flex items-start gap-3 max-w-[90%] animate-in slide-in-from-bottom-2 duration-300">
               <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
                 <Bot className="h-4 w-4 text-white" />
               </div>
@@ -70,7 +70,7 @@ export function MessageList({
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin text-emerald-400" />
                   <span className="text-sm text-slate-400">
-                    Planning your goal...
+                    📊 주식 분석을 시작합니다...
                   </span>
                 </div>
               </div>
