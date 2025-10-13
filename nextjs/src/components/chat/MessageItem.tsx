@@ -16,7 +16,6 @@ interface MessageItemProps {
   isLoading?: boolean;
   onCopy?: (text: string, messageId: string) => void;
   copiedMessageId?: string | null;
-  agentName?: string; // Add agent name prop
 }
 
 /**
@@ -29,7 +28,6 @@ export function MessageItem({
   isLoading = false,
   onCopy,
   copiedMessageId,
-  agentName,
 }: MessageItemProps) {
   const handleCopy = (text: string, messageId: string) => {
     if (onCopy) {
@@ -178,13 +176,6 @@ export function MessageItem({
               <Bot className="h-4 w-4 text-white" />
             </div>
             <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg relative group">
-              {/* Agent name header */}
-              {agentName && (
-                <div className="text-sm font-medium text-emerald-400 mb-2">
-                  {agentName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                </div>
-              )}
-              
               <div className="prose prose-invert max-w-none">
                 <MarkdownRenderer content={message.content} />
               </div>
@@ -254,13 +245,6 @@ export function MessageItem({
       </div>
 
       <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg relative group">
-        {/* Agent name header */}
-        {agentName && (
-          <div className="text-sm font-medium text-emerald-400 mb-2">
-            {agentName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-          </div>
-        )}
-        
         {/* Message content */}
         <div className="prose prose-invert max-w-none">
           <MarkdownRenderer content={message.content} />

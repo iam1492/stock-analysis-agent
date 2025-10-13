@@ -43,8 +43,15 @@ export async function processSseEventData(
   const { textParts, thoughtParts, agent, functionCall, functionResponse } =
     extractDataFromSSE(jsonData);
 
-  // Generate agent-specific message ID for separate bubbles
-  const agentMessageId = agent ? `${aiMessageId}_${agent}` : aiMessageId;
+  // Only show hedge_fund_manager_agent responses in UI
+  // Filter out all other agents including root_agent
+  if (agent && agent !== "hedge_fund_manager_agent") {
+    console.log(`🚫 [STREAM PROCESSOR] Filtering out agent: ${agent}`);
+    return;
+  }
+
+  // Use original message ID for hedge_fund_manager_agent (no agent suffix)
+  const actualMessageId = aiMessageId;
 
   // Update current agent if changed
   if (agent && agent !== currentAgentRef.current) {
@@ -54,14 +61,14 @@ export async function processSseEventData(
 
   // Process function calls
   if (functionCall) {
-    processFunctionCall(functionCall, agentMessageId, callbacks.onEventUpdate);
+    processFunctionCall(functionCall, actualMessageId, callbacks.onEventUpdate);
   }
 
   // Process function responses
   if (functionResponse) {
     processFunctionResponse(
       functionResponse,
-      agentMessageId,
+      actualMessageId,
       callbacks.onEventUpdate
     );
   }
@@ -77,13 +84,13 @@ export async function processSseEventData(
     console.log("🧠 [STREAM PROCESSOR] Processing thoughts:", {
       thoughtCount: thoughtParts.length,
       agent,
-      messageId: agentMessageId,
+      messageId: actualMessageId,
     });
 
     processThoughts(
       thoughtParts,
       agent,
-      agentMessageId,
+      actualMessageId,
       callbacks.onEventUpdate,
       callbacks.onMessageUpdate // Create AI message so timeline has somewhere to attach
     );
@@ -96,7 +103,7 @@ export async function processSseEventData(
     await processTextContent(
       textParts,
       agent,
-      agentMessageId,
+      actualMessageId,
       accumulatedTextRef,
       callbacks.onMessageUpdate
     );

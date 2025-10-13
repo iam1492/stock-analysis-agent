@@ -46,25 +46,17 @@ export function MessageList({
   return (
     <ScrollArea ref={scrollAreaRef} className="flex-1 px-4 py-6">
       <div className="space-y-6 max-w-4xl mx-auto w-full">
-        {messages.map((message, index) => {
-          // Extract agent name from message ID if it contains agent suffix
-          const agentName = message.id.includes('_') 
-            ? message.id.split('_').slice(1).join('_') 
-            : undefined;
-            
-          return (
-            <MessageItem
-              key={message.id}
-              message={message}
-              messageEvents={messageEvents}
-              // Only show loading for the last message
-              isLoading={isLoading && index === messages.length - 1}
-              onCopy={onCopy}
-              copiedMessageId={copiedMessageId}
-              agentName={agentName}
-            />
-          );
-        })}
+        {messages.map((message, index) => (
+          <MessageItem
+            key={message.id}
+            message={message}
+            messageEvents={messageEvents}
+            // Only show loading for the last message
+            isLoading={isLoading && index === messages.length - 1}
+            onCopy={onCopy}
+            copiedMessageId={copiedMessageId}
+          />
+        ))}
 
         {/* Show "Planning..." if the last message is human and we are loading */}
         {isLoading &&
