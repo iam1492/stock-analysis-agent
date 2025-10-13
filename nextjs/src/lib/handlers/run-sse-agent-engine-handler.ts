@@ -291,16 +291,16 @@ class JSONFragmentProcessor {
 }
 
 /**
- * Handle Agent Engine streaming request with JSON fragment processing
+ * Handle Agent Engine query request (non-streaming)
  *
  * @param requestData - Processed request data
- * @returns Streaming SSE Response with processed JSON fragments
+ * @returns SSE Response with complete agent response
  */
-export async function handleAgentEngineStreamRequest(
+export async function handleAgentEngineQueryRequest(
   requestData: ProcessedStreamRequest
 ): Promise<Response> {
   console.log(
-    "🚀🚀🚀 [AGENT ENGINE] NEW JSON FRAGMENT HANDLER STARTING 🚀🚀🚀"
+    "🚀🚀🚀 [AGENT ENGINE] QUERY HANDLER STARTING 🚀🚀🚀"
   );
   console.log(
     `📊 [AGENT ENGINE] Request data:`,
@@ -311,8 +311,8 @@ export async function handleAgentEngineStreamRequest(
     // Format payload for Agent Engine
     const agentEnginePayload = formatAgentEnginePayload(requestData);
 
-    // Build Agent Engine URL with the streamQuery endpoint
-    const agentEngineUrl = getEndpointForPath("", "streamQuery");
+    // Build Agent Engine URL with the query endpoint (non-streaming)
+    const agentEngineUrl = getEndpointForPath("", "query");
 
     // Log operation start
     logStreamStart(agentEngineUrl, agentEnginePayload, "agent_engine");
@@ -320,7 +320,7 @@ export async function handleAgentEngineStreamRequest(
     // Get authentication headers
     const authHeaders = await getAuthHeaders();
 
-    // Forward request to Agent Engine streaming endpoint
+    // Forward request to Agent Engine query endpoint (non-streaming)
     const response = await fetch(agentEngineUrl, {
       method: "POST",
       headers: {
@@ -362,125 +362,39 @@ export async function handleAgentEngineStreamRequest(
       );
     }
 
-    // Create streaming response that processes JSON fragments
+    // Parse the complete response from Agent Engine
+    let responseData;
+    try {
+      const responseText = await response.text();
+      console.log("✅ [AGENT ENGINE] Received complete response:", responseText);
+      responseData = JSON.parse(responseText);
+    } catch (error) {
+      console.error("❌ [AGENT ENGINE] Failed to parse response:", error);
+      return createInternalServerError(
+        "agent_engine",
+        error,
+        "Failed to parse Agent Engine response"
+      );
+    }
+
+    // Create a simple SSE response with the complete data
     const stream = new ReadableStream({
       async start(controller) {
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-
-        if (!reader) {
-          controller.error(new Error("No readable stream from Agent Engine"));
-          return;
-        }
-
-        console.log(
-          "🚀🚀🚀 [AGENT ENGINE] Starting JSON fragment processing 🚀🚀🚀"
-        );
-        console.log(
-          "📋 [AGENT ENGINE] This is the NEW handler with JSONFragmentProcessor"
-        );
-
-        // Initialize JSON fragment processor
-        const processor = new JSONFragmentProcessor(controller);
-
-        // Set up timeout mechanism (5 minutes max)
-        const timeoutMs = 5 * 60 * 1000; // 5 minutes
-        const startTime = Date.now();
-        let isStreamActive = true;
-
         try {
-          // Read and process JSON fragments using recursive pump pattern with timeout
-          const pump = async (): Promise<void> => {
-            // Check for timeout
-            if (Date.now() - startTime > timeoutMs) {
-              console.error("❌ [AGENT ENGINE] Stream timeout after 5 minutes");
-              processor.finalize();
-              controller.close();
-              return;
-            }
-
-            if (!isStreamActive) {
-              return;
-            }
-
-            const { done, value } = await reader.read();
-
-            if (value) {
-              const chunk = decoder.decode(value, { stream: true });
-              console.log(
-                `⏰ [STREAMING] Received chunk at ${new Date().toISOString()}, size: ${
-                  chunk.length
-                } bytes`
-              );
-              processor.processChunk(chunk);
-            }
-
-            if (done) {
-              console.log("✅ [AGENT ENGINE] JSON fragment stream completed");
-              processor.finalize();
-              controller.close();
-              isStreamActive = false;
-              return;
-            }
-
-            // Continue processing next chunk
-            return pump();
-          };
-
-          await pump();
-        } catch (error) {
-          // Handle various stream termination errors gracefully
-          const errorMessage = error instanceof Error ? error.message : String(error);
+          // Send the complete response as a single SSE event
+          const sseEvent = `data: ${JSON.stringify(responseData)}\n\n`;
+          controller.enqueue(Buffer.from(sseEvent));
           
-          if (errorMessage.includes('GeneratorExit') || 
-              errorMessage.includes('was created in a different Context') ||
-              errorMessage.includes('BaseExceptionGroup')) {
-            console.log("📡 [AGENT ENGINE] Stream terminated gracefully:", errorMessage);
-            try {
-              processor.finalize();
-              controller.close();
-            } catch (finalizeError) {
-              console.error("❌ [AGENT ENGINE] Error during graceful shutdown:", finalizeError);
-            }
-            return;
-          }
-
-          console.error(
-            "❌ [AGENT ENGINE] JSON fragment processing error:",
-            error
-          );
-
-          // Attempt graceful error recovery
-          try {
-            processor.finalize();
-          } catch (finalizeError) {
-            console.error(
-              "❌ [AGENT ENGINE] Error during finalization:",
-              finalizeError
-            );
-          }
-
-          // Only send error if stream is still active and it's not a context error
-          if (isStreamActive && !errorMessage.includes('Context')) {
-            try {
-              controller.error(error);
-            } catch (controllerError) {
-              console.error("❌ [AGENT ENGINE] Error sending to controller:", controllerError);
-            }
-          }
-        } finally {
-          isStreamActive = false;
-          try {
-            reader.releaseLock();
-          } catch (releaseError) {
-            // Ignore release lock errors as they're expected during stream termination
-            console.debug("📡 [AGENT ENGINE] Reader lock release (expected during termination)");
-          }
+          console.log("✅ [AGENT ENGINE] Sent complete response as SSE event");
+          controller.close();
+        } catch (error) {
+          console.error("❌ [AGENT ENGINE] Error sending response:", error);
+          controller.error(error);
         }
       },
     });
 
-    // Return streaming SSE response with proper headers
+    // Return SSE response with proper headers
     return new Response(stream, {
       status: 200,
       headers: SSE_HEADERS,

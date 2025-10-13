@@ -18,15 +18,29 @@ import vertexai
 
 def load_environment_variables() -> None:
     """Load environment variables from .env file if it exists."""
-    # Disable OpenTelemetry tracing BEFORE any imports
-    os.environ["OTEL_SDK_DISABLED"] = "true"
-    os.environ["OTEL_TRACES_EXPORTER"] = "none"
-    os.environ["OTEL_METRICS_EXPORTER"] = "none"
-    os.environ["OTEL_LOGS_EXPORTER"] = "none"
-    os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = ""
-    os.environ["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"] = ""
-    os.environ["OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"] = ""
-    os.environ["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"] = ""
+    # Disable OpenTelemetry tracing BEFORE any imports - more aggressive approach
+    tracing_env_vars = [
+        "OTEL_SDK_DISABLED",
+        "OTEL_TRACES_EXPORTER", 
+        "OTEL_METRICS_EXPORTER",
+        "OTEL_LOGS_EXPORTER",
+        "OTEL_EXPORTER_OTLP_ENDPOINT",
+        "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", 
+        "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT",
+        "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT",
+        "OTEL_RESOURCE_ATTRIBUTES",
+        "OTEL_SERVICE_NAME",
+        "OTEL_EXPORTER_JAEGER_ENDPOINT",
+        "OTEL_EXPORTER_ZIPKIN_ENDPOINT",
+        "OTEL_EXPORTER_PROMETHEUS_ENDPOINT",
+        "OTEL_PYTHON_DISABLED_INSTRUMENTATIONS"
+    ]
+    
+    for var in tracing_env_vars:
+        os.environ[var] = "none" if var != "OTEL_SDK_DISABLED" else "true"
+    
+    # Additional aggressive disabling
+    os.environ["OTEL_PYTHON_DISABLED_INSTRUMENTATIONS"] = "opentelemetry.instrumentation.auto_instrumentation,opentelemetry.instrumentation.urllib3,opentelemetry.instrumentation.requests,opentelemetry.instrumentation.httpx"
     
     try:
         from dotenv import load_dotenv
@@ -34,13 +48,13 @@ def load_environment_variables() -> None:
         env_file = Path(__file__).parent / ".env"
         if env_file.exists():
             load_dotenv(env_file)
-            print(f"✅ Loaded environment variables from {env_file}")
+            print(f"Loaded environment variables from {env_file}")
         else:
-            print(f"ℹ️  No .env file found at {env_file}")
+            print(f"No .env file found at {env_file}")
     except ImportError:
-        print("ℹ️  python-dotenv not installed, skipping .env file loading")
+        print("python-dotenv not installed, skipping .env file loading")
     
-    print("🚫 OpenTelemetry tracing completely disabled to prevent context errors")
+    print("OpenTelemetry tracing aggressively disabled to prevent context errors")
 
 
 # =============================================================================
@@ -139,7 +153,7 @@ class DeploymentConfiguration:
 def initialize_vertex_ai(config: AgentConfiguration) -> None:
     """Initialize Vertex AI with the provided configuration."""
     try:
-        print("\n🔧 Initializing Vertex AI...")
+        print("\nInitializing Vertex AI...")
         print(f"  Project: {config.project_id}")
         print(f"  Location: {config.location}")
         print(f"  Staging Bucket: {config.staging_bucket or 'Not set'}")
@@ -154,16 +168,16 @@ def initialize_vertex_ai(config: AgentConfiguration) -> None:
         else:
             vertexai.init(project=config.project_id, location=config.location)
 
-        print(f"✅ Vertex AI initialized successfully!")
+        print(f"Vertex AI initialized successfully!")
 
         if not config.staging_bucket:
             print(
-                "ℹ️  Add GOOGLE_CLOUD_STAGING_BUCKET to .env for Agent Engine deployment"
+                "Add GOOGLE_CLOUD_STAGING_BUCKET to .env for Agent Engine deployment"
             )
 
     except Exception as e:
-        print(f"❌ Failed to initialize Vertex AI: {e}")
-        print("\n🔧 Setup checklist:")
+        print(f"Failed to initialize Vertex AI: {e}")
+        print("\nSetup checklist:")
         print("  1. Set GOOGLE_CLOUD_PROJECT in .env file")
         print("  2. Run: gcloud auth application-default login")
         print("  3. Run: gcloud config set project YOUR_PROJECT_ID")
@@ -180,7 +194,7 @@ def get_deployment_config() -> DeploymentConfiguration:
     project_id = config.project_id
     if not project_id:
         raise ValueError(
-            "❌ Project ID validation failed. This should not happen after __post_init__."
+            "Project ID validation failed. This should not happen after __post_init__."
         )
 
     if not config.staging_bucket:
@@ -243,7 +257,7 @@ config = AgentConfiguration()
 initialize_vertex_ai(config)
 
 # Print summary
-print("\n📋 Configuration Summary:")
+print("\nConfiguration Summary:")
 print(f"  Agent Name: {config.deployment_name}")
 print(f"  Internal Name: {config.internal_agent_name}")
 print(f"  Model: {config.model}")

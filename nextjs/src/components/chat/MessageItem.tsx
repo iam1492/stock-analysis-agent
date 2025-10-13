@@ -16,6 +16,7 @@ interface MessageItemProps {
   isLoading?: boolean;
   onCopy?: (text: string, messageId: string) => void;
   copiedMessageId?: string | null;
+  agentName?: string; // Add agent name prop
 }
 
 /**
@@ -28,6 +29,7 @@ export function MessageItem({
   isLoading = false,
   onCopy,
   copiedMessageId,
+  agentName,
 }: MessageItemProps) {
   const handleCopy = (text: string, messageId: string) => {
     if (onCopy) {
@@ -108,6 +110,8 @@ export function MessageItem({
     messageEvents.has(message.id) &&
     messageEvents.get(message.id)!.length > 0;
 
+
+
   // Render individual event bubbles instead of timeline container
   const renderEventBubbles = () => {
     if (!hasTimelineEvents) return null;
@@ -174,6 +178,13 @@ export function MessageItem({
               <Bot className="h-4 w-4 text-white" />
             </div>
             <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg relative group">
+              {/* Agent name header */}
+              {agentName && (
+                <div className="text-sm font-medium text-emerald-400 mb-2">
+                  {agentName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </div>
+              )}
+              
               <div className="prose prose-invert max-w-none">
                 <MarkdownRenderer content={message.content} />
               </div>
@@ -191,16 +202,6 @@ export function MessageItem({
                     <Copy className="h-4 w-4 text-slate-400 hover:text-slate-300" />
                   )}
                 </button>
-              )}
-              
-              {/* Loading indicator */}
-              {isLoading && (
-                <div className="flex items-center gap-2 bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2 mt-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-emerald-400" />
-                  <span className="text-sm text-slate-400">
-                    🚀 Still processing...
-                  </span>
-                </div>
               )}
               
               {/* Timestamp */}
@@ -253,6 +254,13 @@ export function MessageItem({
       </div>
 
       <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg relative group">
+        {/* Agent name header */}
+        {agentName && (
+          <div className="text-sm font-medium text-emerald-400 mb-2">
+            {agentName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+          </div>
+        )}
+        
         {/* Message content */}
         <div className="prose prose-invert max-w-none">
           <MarkdownRenderer content={message.content} />

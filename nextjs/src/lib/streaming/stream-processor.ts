@@ -43,9 +43,8 @@ export async function processSseEventData(
   const { textParts, thoughtParts, agent, functionCall, functionResponse } =
     extractDataFromSSE(jsonData);
 
-  // Use frontend-generated aiMessageId for consistent message correlation
-  // Backend sends different IDs for each SSE event, which would create separate messages
-  const actualMessageId = aiMessageId;
+  // Generate agent-specific message ID for separate bubbles
+  const agentMessageId = agent ? `${aiMessageId}_${agent}` : aiMessageId;
 
   // Update current agent if changed
   if (agent && agent !== currentAgentRef.current) {
@@ -55,14 +54,14 @@ export async function processSseEventData(
 
   // Process function calls
   if (functionCall) {
-    processFunctionCall(functionCall, actualMessageId, callbacks.onEventUpdate);
+    processFunctionCall(functionCall, agentMessageId, callbacks.onEventUpdate);
   }
 
   // Process function responses
   if (functionResponse) {
     processFunctionResponse(
       functionResponse,
-      actualMessageId,
+      agentMessageId,
       callbacks.onEventUpdate
     );
   }
@@ -78,13 +77,13 @@ export async function processSseEventData(
     console.log("🧠 [STREAM PROCESSOR] Processing thoughts:", {
       thoughtCount: thoughtParts.length,
       agent,
-      messageId: actualMessageId,
+      messageId: agentMessageId,
     });
 
     processThoughts(
       thoughtParts,
       agent,
-      actualMessageId,
+      agentMessageId,
       callbacks.onEventUpdate,
       callbacks.onMessageUpdate // Create AI message so timeline has somewhere to attach
     );
@@ -97,7 +96,7 @@ export async function processSseEventData(
     await processTextContent(
       textParts,
       agent,
-      actualMessageId,
+      agentMessageId,
       accumulatedTextRef,
       callbacks.onMessageUpdate
     );

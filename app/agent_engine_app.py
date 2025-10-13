@@ -83,14 +83,14 @@ def deploy_agent_engine_app() -> agent_engines.AgentEngine:
     Returns:
         The deployed agent engine instance
     """
-    print("🚀 Starting Agent Engine deployment...")
+    print("Starting Agent Engine deployment...")
 
     # Step 1: Get deployment configuration
     deployment_config = get_deployment_config()
-    print(f"📋 Deploying agent: {deployment_config.agent_name}")
-    print(f"📋 Project: {deployment_config.project}")
-    print(f"📋 Location: {deployment_config.location}")
-    print(f"📋 Staging bucket: {deployment_config.staging_bucket}")
+    print(f"Deploying agent: {deployment_config.agent_name}")
+    print(f"Project: {deployment_config.project}")
+    print(f"Location: {deployment_config.location}")
+    print(f"Staging bucket: {deployment_config.staging_bucket}")
 
     # Step 2: Set up environment variables for the deployed agent
     env_vars = {}
@@ -180,11 +180,11 @@ def deploy_agent_engine_app() -> agent_engines.AgentEngine:
 if __name__ == "__main__":
     print(
         """
-    ╔═══════════════════════════════════════════════════════════╗
-    ║                                                           ║
-    ║   🤖 DEPLOYING AGENT TO VERTEX AI AGENT ENGINE 🤖         ║
-    ║                                                           ║
-    ╚═══════════════════════════════════════════════════════════╝
+    ==========================================================
+                                                             
+       DEPLOYING AGENT TO VERTEX AI AGENT ENGINE             
+                                                             
+    ==========================================================
     """
     )
 
