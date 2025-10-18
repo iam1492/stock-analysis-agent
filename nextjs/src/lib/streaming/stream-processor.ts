@@ -130,12 +130,16 @@ function processFunctionCall(
     'fmp_enterprise_value': '기업 가치 분석',
     'fmp_owner_earnings': '주주 이익 분석',
     'fmp_economic_indicators': '경제 지표 분석',
-    'fmp_stock_news': '뉴스 분석',
+    'fmt_stock_news': '뉴스 분석',
     'fmp_price_target_summary': '목표 주가 분석',
+    'fmp_price_target_news': '목표 주가 뉴스 분석',
     'fmp_historical_stock_grade': '주식 등급 분석',
     'fmp_simple_moving_average': '이동평균선 분석',
     'fmp_relative_strength_index': 'RSI 분석',
-    'fmp_standard_deviation': '변동성 분석'
+    'fmp_standard_deviation': '변동성 분석',
+    'fmp_balance_sheet_statement_growth': '대차대조표 성장 분석',
+    'fmp_cash_flow_statement_growth': '현금흐름 성장 분석',
+    'fmp_income_statement_growth': '손익계산서 성장 분석'
   };
 
   const friendlyName = friendlyFunctionNames[functionCall.name] || functionCall.name;
@@ -186,12 +190,16 @@ function processFunctionResponse(
     'fmp_enterprise_value': '기업 가치 분석',
     'fmp_owner_earnings': '주주 이익 분석',
     'fmp_economic_indicators': '경제 지표 분석',
-    'fmp_stock_news': '뉴스 분석',
+    'fmt_stock_news': '뉴스 분석',
     'fmp_price_target_summary': '목표 주가 분석',
+    'fmp_price_target_news': '목표 주가 뉴스 분석',
     'fmp_historical_stock_grade': '주식 등급 분석',
     'fmp_simple_moving_average': '이동평균선 분석',
     'fmp_relative_strength_index': 'RSI 분석',
-    'fmp_standard_deviation': '변동성 분석'
+    'fmp_standard_deviation': '변동성 분석',
+    'fmp_balance_sheet_statement_growth': '대차대조표 성장 분석',
+    'fmp_cash_flow_statement_growth': '현금흐름 성장 분석',
+    'fmp_income_statement_growth': '손익계산서 성장 분석'
   };
 
   const friendlyName = friendlyFunctionNames[functionResponse.name] || functionResponse.name;
@@ -284,18 +292,18 @@ function processThoughts(
 
   // Create user-friendly agent names
   const friendlyAgentNames: Record<string, string> = {
-    'balance_sheet_analyst': '대차대조표 분석가',
-    'income_statement_analyst': '손익계산서 분석가', 
-    'cash_flow_analyst': '현금흐름 분석가',
-    'basic_financial_analyst': '기본 재무 분석가',
-    'growth_analyst': '성장성 분석가',
-    'intrinsic_value_analyst': '본질가치 분석가',
-    'technical_analyst': '기술적 분석가',
-    'stock_researcher': '주식 연구원',
-    'macro_economy_analyst': '경제 분석가',
-    'senior_financial_advisor': '선임 재무 연구원',
+    'balance_sheet_agent': '대차대조표 분석가',
+    'income_statement_agent': '손익계산서 분석가', 
+    'cash_flow_statement_agent': '현금흐름 분석가',
+    'basic_financial_analyst_agent': '기본 재무 분석가',
+    'growth_analyst_agent': '기업 성장 분석가',
+    'intrinsic_value_agent': '내제가치 분석가',
+    'technical_analyst_agent': '기술적 분석가',
+    'stock_researcher_agent': '기본 종목 분석 연구원',
+    'economic_indiators_agent': '매크로 경제 분석가',
+    'senior_financial_advisor_agent': '선임 재무 연구원',
     'senior_quantitative_advisor': '선임 퀀트 분석가',
-    'hedge_fund_manager': '헤지펀드 매니저',
+    'hedge_fund_manager_agent': '헤지펀드 매니저',
     'goal_planning_agent': '목표 계획 에이전트'
   };
 
