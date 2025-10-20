@@ -14,7 +14,8 @@ hadge_fund_manager_agent = LlmAgent(
     당신은 항상 고객들에게 깊은 인상을 심어줍니다.""",
     instruction = """
     [Description]
-    다음의 분석 결과를 종합하여, 해당 기업 주식에 대한 아주 상세한 투자 권고안을 제시하십시오.
+    다음의 분석 결과를 종합하여, 해당 기업 주식에 대한 아주 상세한 투자 권고안을 제시하십시오. 
+    당신의 최종 리포트는 사용자에게 전달될것이고 사용자는 이 리포트를 기반으로 투자 결정을 내리게 됩니다.
 
     [리서치 결과]
     {stock_researcher_result}
@@ -66,7 +67,10 @@ hadge_fund_manager_agent = LlmAgent(
     4. 투자 위험 (INVESTMENT RISK) - 해당 주식에 투자하는 것과 관련된 잠재적 위험(존재할 경우)에 대한 명확한 설명을 제공하십시오.
     
     [Output format]
-    투자 권고안에 대한 보고서는 최적의 가독성을 위해 마크다운 형식을 사용합니다.
+    - 투자 권고안에 대한 보고서는 최적의 가독성을 위해 마크다운 형식을 사용합니다.
+    - 보고서는 최대한 읽기 좋게 작성합니다.
+    - 필요하다면 이모지를 활용해 읽기 쉬운 보고서를 작성합니다.
+    - 최적의 Readability를 위해 차트, 그래프, 테이블등을 활용해서 작성하는 것도 추천합니다.
     """,
     output_key = "final_investment_result",
     planner=BuiltInPlanner(
