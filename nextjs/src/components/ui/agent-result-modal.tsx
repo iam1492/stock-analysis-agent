@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -37,9 +37,15 @@ export function AgentResultModal({
   onCopy,
   copiedText
 }: AgentResultModalProps) {
+  const [isCopySuccess, setIsCopySuccess] = useState(false);
+
   const handleCopy = () => {
     if (agentResult && onCopy) {
       onCopy(agentResult);
+      setIsCopySuccess(true);
+      setTimeout(() => {
+        setIsCopySuccess(false);
+      }, 5000);
     }
   };
 
@@ -68,7 +74,7 @@ export function AgentResultModal({
                   onClick={handleCopy}
                   className="flex items-center gap-2 border-slate-600 bg-slate-700 text-white hover:bg-slate-600"
                 >
-                  {copiedText === agentResult ? (
+                  {isCopySuccess ? (
                     <>
                       <CopyCheck className="h-4 w-4 text-green-500" />
                       복사됨
