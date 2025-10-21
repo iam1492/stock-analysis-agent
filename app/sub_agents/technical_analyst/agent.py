@@ -27,7 +27,7 @@ technical_analyst_agent = LlmAgent(
     - 변동성 평가를 위한 표준 편차 분석.
     - 지표를 기반으로 한 지지 및 저항 수준 식별.
     - [중요] 잠재적 진입점, 목표 가격 및 위험 평가.
-    
+
     """,
     tools = [fmp_simple_moving_average, fmp_relative_strength_index, fmp_standard_deviation],
     output_key = "technical_analyst_result",
@@ -36,5 +36,7 @@ technical_analyst_agent = LlmAgent(
             include_thoughts=True,
             thinking_budget=1024,
         )
-    ) 
+    )
 )
+
+

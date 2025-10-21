@@ -4,11 +4,11 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { MarkdownRenderer, mdComponents } from "./MarkdownRenderer";
 import {
-  ActivityTimeline,
   ProcessedEvent,
 } from "@/components/ActivityTimeline";
 import { Copy, CopyCheck, Loader2, Bot, User, Brain, Info, Code, FileText } from "lucide-react";
 import { Message } from "@/types";
+import { AgentResultButtons } from "./AgentResultButtons";
 
 interface MessageItemProps {
   message: Message;
@@ -16,6 +16,8 @@ interface MessageItemProps {
   isLoading?: boolean;
   onCopy?: (text: string, messageId: string) => void;
   copiedMessageId?: string | null;
+  userId?: string;
+  isAnalysisComplete?: boolean;
 }
 
 /**
@@ -28,6 +30,7 @@ export function MessageItem({
   isLoading = false,
   onCopy,
   copiedMessageId,
+  isAnalysisComplete = false,
 }: MessageItemProps) {
   const handleCopy = (text: string, messageId: string) => {
     if (onCopy) {
@@ -140,7 +143,7 @@ export function MessageItem({
       }
       
       // Extract friendly name from event data if available
-      const friendlyName = event.data?.friendlyName || event.data?.friendlyAgentName;
+      const data = event.data as Record<string, unknown>;
       
       return (
         <div key={index} className="flex items-start gap-3 max-w-[90%] animate-in slide-in-from-bottom-2 duration-300">
@@ -152,15 +155,15 @@ export function MessageItem({
               {event.title}
             </div>
             {/* Show additional context for function calls/responses */}
-            {event.data && (event.data.type === 'functionCall' || event.data.type === 'functionResponse') && (
+            {data && (data.type === 'functionCall' || data.type === 'functionResponse') && data.name && typeof data.name === 'string' && (
               <div className="text-xs text-slate-500 mb-2">
-                {event.data.name}
+                {data.name}
               </div>
             )}
             {/* Show agent info for thoughts */}
-            {event.data && event.data.type === 'thinking' && event.data.friendlyAgentName && (
+            {data && data.type === 'thinking' && data.friendlyAgentName && typeof data.friendlyAgentName === 'string' && (
               <div className="text-xs text-slate-500 mb-2">
-                {event.data.friendlyAgentName}
+                {data.friendlyAgentName}
               </div>
             )}
             {/* Don't show detailed data for cleaner UI - just show the progress */}
@@ -207,6 +210,13 @@ export function MessageItem({
                 </button>
               )}
               
+              {/* Agent Result Buttons */}
+              <AgentResultButtons
+                isAnalysisComplete={isAnalysisComplete}
+                onCopy={onCopy ? (text) => onCopy(text, message.id) : undefined}
+                copiedText={copiedMessageId === message.id ? message.content : undefined}
+              />
+
               {/* Timestamp */}
               <div className="mt-3 pt-2 border-t border-slate-700/50">
                 <span className="text-xs text-slate-400">

@@ -80,6 +80,7 @@ export interface StreamProcessingCallbacks {
   onMessageUpdate: (message: Message) => void;
   onEventUpdate: (messageId: string, event: ProcessedEvent) => void;
   onWebsiteCountUpdate: (count: number) => void;
+  onAnalysisComplete?: () => void;
 }
 
 /**

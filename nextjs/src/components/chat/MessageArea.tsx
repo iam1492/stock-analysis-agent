@@ -22,8 +22,10 @@ export function MessageArea(): React.JSX.Element {
     isLoadingHistory,
     userId,
     sessionId,
+    isAnalysisComplete,
     scrollAreaRef,
   } = useChatContext();
+
 
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
 
@@ -58,6 +60,7 @@ export function MessageArea(): React.JSX.Element {
         onCopy={handleCopy}
         copiedMessageId={copiedMessageId}
         scrollAreaRef={scrollAreaRef}
+        isAnalysisComplete={isAnalysisComplete}
       />
     </div>
   );

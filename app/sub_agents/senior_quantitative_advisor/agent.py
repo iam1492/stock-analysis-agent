@@ -5,7 +5,7 @@ from google.adk.planners import BuiltInPlanner
 
 
 senior_quantitative_advisor_agent = LlmAgent(
-    name = "senior_quantitative_advisor",
+    name = "senior_quantitative_advisor_agent",
     model = lite_llm_model(),
     description = "당신은 정량적 재무 분석(quantitative financial analysis)의 선도적인 전문가입니다.",
     instruction = """

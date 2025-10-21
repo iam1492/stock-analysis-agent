@@ -28,6 +28,25 @@ def set_session(callback_context: CallbackContext):
         ZoneInfo("UTC")
     ).isoformat()
 
+    # Initialize agent result storage tracking
+    callback_context.state["agent_results"] = {}
+    callback_context.state["user_id"] = None
+    callback_context.state["stock_symbol"] = None
+
+
+def update_session_context(callback_context: CallbackContext, user_id: str, stock_symbol: str):
+    """
+    Update session context with user and stock information.
+    This is called from the streaming handler when a new analysis starts.
+    """
+    callback_context.state["user_id"] = user_id
+    callback_context.state["stock_symbol"] = stock_symbol
+    print(f"📝 Updated session context: user_id={user_id}, stock_symbol={stock_symbol}")
+
+
+# Note: Agent result saving is now handled through streaming detection
+# rather than direct agent callbacks to avoid Pydantic validation issues
+
 fundamental_analysis_agents = ParallelAgent(
     name = "parallel_financial_agent",
     description = "Balance Sheet, Income Statement, Cash Flow Statement분석을 병렬로 수행하는 에이전트 입니다.",
@@ -55,7 +74,13 @@ quantitative_analysis_team = SequentialAgent(
 stock_analysis_department = ParallelAgent(
     name = "stock_analysis_department",
     description = "주식 리서치, 재무팀 분석, 기술적 분석, 정량적 분석 그리고 매크로경제분석을 병렬적으로 수행하는 에이전트 입니다.",
-    sub_agents = [stock_researcher_agent, financial_team, technical_analyst_agent, quantitative_analysis_team, economic_indiators_agent]
+    sub_agents = [
+        stock_researcher_agent,
+        financial_team,
+        technical_analyst_agent,
+        quantitative_analysis_team,
+        economic_indiators_agent
+    ]
 )
 
 stock_analysis_company = SequentialAgent(

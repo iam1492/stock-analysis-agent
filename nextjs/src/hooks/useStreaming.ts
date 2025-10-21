@@ -19,7 +19,8 @@ export interface UseStreamingReturn {
     apiPayload: { message: string; userId: string; sessionId: string },
     onMessageUpdate: (message: Message) => void,
     onEventUpdate: (messageId: string, event: ProcessedEvent) => void,
-    onWebsiteCountUpdate: (count: number) => void
+    onWebsiteCountUpdate: (count: number) => void,
+    onAnalysisComplete?: () => void
   ) => Promise<void>;
 
   getEventTitle: (agentName: string) => string;
@@ -56,7 +57,8 @@ export function useStreaming(
       apiPayload: { message: string; userId: string; sessionId: string },
       onMessageUpdate: (message: Message) => void,
       onEventUpdate: (messageId: string, event: ProcessedEvent) => void,
-      onWebsiteCountUpdate: (count: number) => void
+      onWebsiteCountUpdate: (count: number) => void,
+      onAnalysisComplete?: () => void
     ): Promise<void> => {
       if (!connectionManager.current) {
         throw new Error("Connection manager not initialized");
@@ -87,7 +89,8 @@ export function useStreaming(
         currentAgentRef,
         setCurrentAgent,
         setIsLoading,
-        aiMessageId
+        aiMessageId,
+        onAnalysisComplete
       );
     },
     []

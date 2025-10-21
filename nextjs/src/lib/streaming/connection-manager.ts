@@ -54,7 +54,8 @@ export class StreamingConnectionManager {
     currentAgentRef: RefObject<string>,
     setCurrentAgent: (agent: string) => void,
     setIsLoading: (loading: boolean) => void,
-    aiMessageId: string
+    aiMessageId: string,
+    onAnalysisComplete?: () => void
   ): Promise<void> {
     this.connectionState = "connecting";
     setIsLoading(true);
@@ -93,7 +94,8 @@ export class StreamingConnectionManager {
         callbacks,
         accumulatedTextRef,
         currentAgentRef,
-        setCurrentAgent
+        setCurrentAgent,
+        onAnalysisComplete
       );
 
       this.connectionState = "idle";
@@ -151,6 +153,7 @@ export class StreamingConnectionManager {
    * @param accumulatedTextRef - Reference to accumulated text
    * @param currentAgentRef - Reference to current agent state
    * @param setCurrentAgent - Agent state setter
+   * @param onAnalysisComplete - Callback for when analysis is complete
    */
   private async handleSSEStream(
     response: Response,
@@ -158,7 +161,8 @@ export class StreamingConnectionManager {
     callbacks: StreamProcessingCallbacks,
     accumulatedTextRef: RefObject<string>,
     currentAgentRef: RefObject<string>,
-    setCurrentAgent: (agent: string) => void
+    setCurrentAgent: (agent: string) => void,
+    onAnalysisComplete?: () => void
   ): Promise<void> {
     const contentType = response.headers.get("content-type") || "";
 
@@ -230,7 +234,8 @@ export class StreamingConnectionManager {
                 callbacks,
                 accumulatedTextRef,
                 currentAgentRef,
-                setCurrentAgent
+                setCurrentAgent,
+                onAnalysisComplete
               );
 
               // 🔑 CRITICAL: Force immediate UI update by yielding to event loop
@@ -280,7 +285,8 @@ export class StreamingConnectionManager {
               callbacks,
               accumulatedTextRef,
               currentAgentRef,
-              setCurrentAgent
+              setCurrentAgent,
+              onAnalysisComplete
             );
 
             // 🔑 CRITICAL: Force immediate UI update by yielding to event loop

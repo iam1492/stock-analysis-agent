@@ -21,6 +21,7 @@ export interface ProcessedStreamRequest {
   message: string;
   userId: string;
   sessionId: string;
+  stockSymbol?: string; // Extracted stock symbol from message
 }
 
 /**
@@ -32,6 +33,7 @@ export interface AgentEnginePayload {
     user_id: string;
     session_id: string;
     message: string;
+    stock_symbol?: string;
   };
 }
 
@@ -42,6 +44,7 @@ export interface LocalBackendPayload {
   appName: string;
   userId: string;
   sessionId: string;
+  stockSymbol?: string;
   newMessage: {
     parts: { text: string }[];
     role: "user";
@@ -84,6 +87,34 @@ export const CORS_HEADERS = {
 } as const;
 
 /**
+ * Extract stock symbol from user message
+ * Simple pattern matching for common stock references
+ */
+function extractStockSymbol(message: string): string {
+  // Common patterns for stock mentions
+  const patterns = [
+    /([A-Z]{1,5})\s+(?:종목|주식|주가|주)/,  // AAPL 종목, TSLA 주식
+    /([A-Z]{1,5})\s+(?:을|를)\s+분석/,  // AAPL을 분석
+    /([A-Z]{1,5})\s+(?:에\s+대해|에\s+대한)/,  // AAPL에 대해
+    /([가-힣a-zA-Z]+)\s+(?:종목|주식|주가|주)/,  // 삼성전자 종목, Tesla 주식
+    /([가-힣a-zA-Z]+)\s+(?:을|를)\s+분석/,  // 삼성전자를 분석
+    /([가-힣a-zA-Z]+)\s+(?:에\s+대해|에\s+대한)/,  // 삼성전자에 대해
+  ];
+
+  for (const pattern of patterns) {
+    const match = message.match(pattern);
+    if (match) {
+      let symbol = match[1].toLowerCase();
+      // Clean up Korean company names
+      symbol = symbol.replace(/[가-힣]/g, '');
+      return symbol.trim() || "unknown";
+    }
+  }
+
+  return "unknown";
+}
+
+/**
  * Parse and validate the incoming stream request body
  *
  * @param request - The incoming HTTP request
@@ -106,11 +137,15 @@ export async function parseStreamRequest(request: NextRequest): Promise<{
       return { data: null, validation };
     }
 
+    const message = requestBody.message!;
+    const stockSymbol = extractStockSymbol(message);
+
     return {
       data: {
-        message: requestBody.message!,
+        message,
         userId: requestBody.userId!,
         sessionId: requestBody.sessionId!,
+        stockSymbol,
       },
       validation: { isValid: true },
     };
@@ -176,6 +211,7 @@ export function formatAgentEnginePayload(
       user_id: requestData.userId,
       session_id: requestData.sessionId,
       message: requestData.message,
+      stock_symbol: requestData.stockSymbol,
     },
   };
 }
@@ -193,6 +229,7 @@ export function formatLocalBackendPayload(
     appName: getAdkAppName(),
     userId: requestData.userId,
     sessionId: requestData.sessionId,
+    stockSymbol: requestData.stockSymbol,
     newMessage: {
       parts: [{ text: requestData.message }],
       role: "user",

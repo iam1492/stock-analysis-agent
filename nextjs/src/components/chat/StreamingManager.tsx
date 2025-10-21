@@ -13,6 +13,7 @@ interface StreamingManagerProps {
   onEventUpdate: (messageId: string, event: ProcessedEvent) => void;
   onWebsiteCountUpdate: (count: number) => void;
   onLoadingChange?: (isLoading: boolean) => void;
+  onAnalysisComplete?: () => void;
 }
 
 export interface StreamingManagerReturn {
@@ -32,6 +33,7 @@ export function useStreamingManager({
   onEventUpdate,
   onWebsiteCountUpdate,
   onLoadingChange,
+  onAnalysisComplete,
 }: StreamingManagerProps): StreamingManagerReturn {
   const { retryWithBackoff } = useBackendHealth();
 
@@ -63,7 +65,8 @@ export function useStreamingManager({
           apiPayload,
           onMessageUpdate,
           onEventUpdate,
-          onWebsiteCountUpdate
+          onWebsiteCountUpdate,
+          onAnalysisComplete
         );
       } catch (error) {
         console.error("Streaming error:", error);
@@ -77,6 +80,7 @@ export function useStreamingManager({
       onMessageUpdate,
       onEventUpdate,
       onWebsiteCountUpdate,
+      onAnalysisComplete,
     ]
   );
 

@@ -18,6 +18,23 @@ import { StreamProcessingCallbacks } from "./types";
 import { extractDataFromSSE } from "./sse-parser";
 import { createDebugLog } from "../handlers/run-sse-common";
 
+// Global callback for saving agent results to memory
+let saveAgentResultCallback: ((agentName: string, content: string) => void) | null = null;
+
+export function setAgentResultSaveCallback(callback: (agentName: string, content: string) => void) {
+  saveAgentResultCallback = callback;
+  console.log(`🔄 Set agent result save callback`);
+}
+
+async function saveAgentResultFromStream(agentName: string, content: string) {
+  if (saveAgentResultCallback) {
+    console.log(`💾 [STREAM PROCESSOR] Saving ${agentName} result to memory`);
+    saveAgentResultCallback(agentName, content);
+  } else {
+    console.log(`⚠️ Cannot save ${agentName} result - no save callback set`);
+  }
+}
+
 /**
  * Processes SSE event data and triggers appropriate callbacks
  *
@@ -38,7 +55,8 @@ export async function processSseEventData(
   callbacks: StreamProcessingCallbacks,
   accumulatedTextRef: { current: string },
   currentAgentRef: { current: string },
-  setCurrentAgent: (agent: string) => void
+  setCurrentAgent: (agent: string) => void,
+  onAnalysisComplete?: () => void
 ): Promise<void> {
   const { textParts, thoughtParts, agent, functionCall, functionResponse } =
     extractDataFromSSE(jsonData);
@@ -99,10 +117,20 @@ export async function processSseEventData(
         agent,
         actualMessageId,
         accumulatedTextRef,
-        callbacks.onMessageUpdate
+        callbacks.onMessageUpdate,
+        onAnalysisComplete
       );
     } else {
-      console.log(`🚫 [STREAM PROCESSOR] Filtering out text content from agent: ${agent}`);
+      // Save results for other agents
+      await saveAgentResultFromStream(agent, textParts.join(""));
+      console.log(`💾 [STREAM PROCESSOR] Saved result for agent: ${agent}`);
+
+      // Check if this is senior_financial_advisor_agent or senior_quantitative_advisor completing
+      if ((agent === "senior_financial_advisor_agent" || agent === "senior_quantitative_advisor_agent") && onAnalysisComplete) {
+        console.log(`🎯 [STREAM PROCESSOR] ${agent} analysis completed - triggering completion callback`);
+        // Use setTimeout to ensure UI updates are processed first
+        setTimeout(() => onAnalysisComplete(), 100);
+      }
     }
   }
 }
@@ -302,7 +330,7 @@ function processThoughts(
     'stock_researcher_agent': '기본 종목 분석 연구원',
     'economic_indiators_agent': '매크로 경제 분석가',
     'senior_financial_advisor_agent': '선임 재무 연구원',
-    'senior_quantitative_advisor': '선임 퀀트 분석가',
+    'senior_quantitative_advisor_agent': '선임 퀀트 분석가',
     'hedge_fund_manager_agent': '헤지펀드 매니저',
     'goal_planning_agent': '목표 계획 에이전트'
   };
@@ -354,8 +382,8 @@ function processThoughts(
       flushSync(() => {
         onEventUpdate(aiMessageId, {
           title: section.title
-            ? `🤔 ${friendlyAgentName}이(가) "${section.title}" 생각중...`
-            : `🤔 ${friendlyAgentName}이(가) 생각중...`,
+            ? `🤔 ${friendlyAgentName} "${section.title}" 생각중...`
+            : `🤔 ${friendlyAgentName} 생각중...`,
           data: { 
             type: "thinking", 
             content: section.content,
@@ -382,7 +410,8 @@ async function processTextContent(
   agent: string,
   aiMessageId: string,
   accumulatedTextRef: { current: string },
-  onMessageUpdate: (message: Message) => void
+  onMessageUpdate: (message: Message) => void,
+  onAnalysisComplete?: () => void
 ): Promise<void> {
   // Process each text chunk using OFFICIAL ADK TERMINATION SIGNAL PATTERN
   for (const text of textParts) {
@@ -412,6 +441,13 @@ async function processTextContent(
       flushSync(() => {
         onMessageUpdate(finalMessage);
       });
+
+      // Check if this is hedge_fund_manager_agent completing - signal analysis complete
+      if (agent === "hedge_fund_manager_agent" && onAnalysisComplete) {
+        console.log("🎯 [STREAM PROCESSOR] Hedge fund manager analysis completed - triggering completion callback");
+        // Use setTimeout to ensure UI updates are processed first
+        setTimeout(() => onAnalysisComplete(), 100);
+      }
 
       return;
     }

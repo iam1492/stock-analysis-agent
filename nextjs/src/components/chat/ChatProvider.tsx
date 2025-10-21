@@ -16,6 +16,7 @@ import { Message } from "@/types";
 import { ProcessedEvent } from "@/components/ActivityTimeline";
 import { toast } from "sonner";
 import { loadSessionHistoryAction } from "@/lib/actions/session-history-actions";
+import { setAgentResultSaveCallback } from "@/lib/streaming/stream-processor";
 
 // Context value interface - consolidates all chat state and actions
 export interface ChatContextValue {
@@ -32,6 +33,12 @@ export interface ChatContextValue {
   isLoading: boolean;
   isLoadingHistory: boolean; // New loading state for session history
   currentAgent: string;
+  isAnalysisComplete: boolean;
+
+  // Agent results storage
+  agentResults: Record<string, string>;
+  saveAgentResult: (agentName: string, content: string) => void;
+  getAgentResult: (agentName: string) => string | undefined;
 
   // Session actions
   handleUserIdChange: (newUserId: string) => void;
@@ -89,6 +96,33 @@ export function ChatProvider({
     setMessageEvents,
     updateWebsiteCount,
   } = useMessages();
+
+  // Analysis completion state
+  const [isAnalysisComplete, setIsAnalysisComplete] = useState(false);
+  
+  // Agent results storage (in-memory)
+  const [agentResults, setAgentResults] = useState<Record<string, string>>({});
+
+  // Agent result management functions
+  const saveAgentResult = useCallback((agentName: string, content: string) => {
+    console.log(`💾 [CHAT_PROVIDER] Saving ${agentName} result to memory`);
+    setAgentResults(prev => ({
+      ...prev,
+      [agentName]: content
+    }));
+  }, []);
+
+  const getAgentResult = useCallback((agentName: string) => {
+    return agentResults[agentName];
+  }, [agentResults]);
+
+  // Set up the save callback for stream processor
+  useEffect(() => {
+    setAgentResultSaveCallback(saveAgentResult);
+    return () => {
+      setAgentResultSaveCallback(() => {});
+    };
+  }, [saveAgentResult]);
 
   // Streaming management
   const streamingManager = useStreamingManager({
@@ -212,6 +246,10 @@ export function ChatProvider({
       });
     },
     onWebsiteCountUpdate: updateWebsiteCount,
+    onAnalysisComplete: () => {
+      console.log("🎯 [CHAT_PROVIDER] Analysis completed - showing agent result buttons");
+      setIsAnalysisComplete(true);
+    },
   });
 
   // Load session history when session changes
@@ -318,6 +356,31 @@ export function ChatProvider({
     }
   }, [messageEvents]);
 
+  // Extract stock symbol from query
+  const extractStockSymbol = useCallback((query: string): string => {
+    // Common patterns for stock mentions
+    const patterns = [
+      /([A-Z]{1,5})\s+(?:종목|주식|주가|주)/,  // AAPL 종목, TSLA 주식
+      /([A-Z]{1,5})\s+(?:을|를)\s+분석/,  // AAPL을 분석
+      /([A-Z]{1,5})\s+(?:에\s+대해|에\s+대한)/,  // AAPL에 대해
+      /([가-힣a-zA-Z]+)\s+(?:종목|주식|주가|주)/,  // 삼성전자 종목, Tesla 주식
+      /([가-힣a-zA-Z]+)\s+(?:을|를)\s+분석/,  // 삼성전자를 분석
+      /([가-힣a-zA-Z]+)\s+(?:에\s+대해|에\s+대한)/,  // 삼성전자에 대해
+    ];
+
+    for (const pattern of patterns) {
+      const match = query.match(pattern);
+      if (match) {
+        let symbol = match[1].toLowerCase();
+        // Clean up Korean company names
+        symbol = symbol.replace(/[가-힣]/g, '');
+        return symbol.trim() || "unknown";
+      }
+    }
+
+    return "unknown";
+  }, []);
+
   // Handle message submission
   const handleSubmit = useCallback(
     async (
@@ -343,6 +406,15 @@ export function ChatProvider({
           );
         }
 
+        // Extract stock symbol from query
+        const stockSymbol = extractStockSymbol(query);
+
+        // Agent result context is now handled by the save callback
+        console.log(`🔄 [CHAT_PROVIDER] Starting analysis for ${stockSymbol}`);
+
+        // Reset analysis complete state for new analysis
+        setIsAnalysisComplete(false);
+
         // Add user message to chat immediately
         const userMessage: Message = {
           type: "human",
@@ -360,7 +432,7 @@ export function ChatProvider({
         throw error;
       }
     },
-    [userId, sessionId, addMessage, streamingManager]
+    [userId, sessionId, addMessage, streamingManager, extractStockSymbol]
   );
 
   // Context value
@@ -378,6 +450,12 @@ export function ChatProvider({
     isLoading: streamingManager.isLoading,
     isLoadingHistory,
     currentAgent: streamingManager.currentAgent,
+    isAnalysisComplete,
+
+    // Agent results storage
+    agentResults,
+    saveAgentResult,
+    getAgentResult,
 
     // Session actions
     handleUserIdChange,

@@ -13,6 +13,7 @@ interface MessageListProps {
   onCopy?: (text: string, messageId: string) => void;
   copiedMessageId?: string | null;
   scrollAreaRef?: React.RefObject<HTMLDivElement | null>;
+  isAnalysisComplete?: boolean;
 }
 
 /**
@@ -26,6 +27,7 @@ export function MessageList({
   onCopy,
   copiedMessageId,
   scrollAreaRef,
+  isAnalysisComplete = false,
 }: MessageListProps) {
   // If no messages, show empty state
   if (messages.length === 0) {
@@ -55,6 +57,7 @@ export function MessageList({
             isLoading={isLoading && index === messages.length - 1}
             onCopy={onCopy}
             copiedMessageId={copiedMessageId}
+            isAnalysisComplete={isAnalysisComplete}
           />
         ))}
 
