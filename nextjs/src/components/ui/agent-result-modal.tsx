@@ -66,7 +66,7 @@ export function AgentResultModal({
                   variant="outline"
                   size="sm"
                   onClick={handleCopy}
-                  className="flex items-center gap-2 border-slate-600 text-slate-300 hover:bg-slate-800"
+                  className="flex items-center gap-2 border-slate-600 bg-slate-700 text-white hover:bg-slate-600"
                 >
                   {copiedText === agentResult ? (
                     <>
@@ -81,34 +81,25 @@ export function AgentResultModal({
                   )}
                 </Button>
               )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-800"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              
             </div>
           </div>
         </DialogHeader>
 
-        <div className="flex-1 min-h-0 mt-4 overflow-hidden">
-          <div className="h-full overflow-y-auto pr-4 pb-4">
-            {agentResult ? (
-              <div className="prose prose-invert max-w-none text-slate-100">
-                <MarkdownRenderer content={agentResult} />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-32 text-slate-400">
-                <p>결과를 불러오는 중...</p>
-              </div>
-            )}
-          </div>
+        <div className="flex-1 min-h-0 mt-4 overflow-y-auto overflow-x-hidden pr-4 pb-4">
+          {agentResult ? (
+            <div className="prose prose-invert max-w-none text-slate-100">
+              <MarkdownRenderer content={agentResult} />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-32 text-slate-400">
+              <p>결과를 불러오는 중...</p>
+            </div>
+          )}
         </div>
 
         <div className="flex-shrink-0 flex justify-end gap-2 mt-4 pt-4 border-t border-slate-700">
-          <Button variant="outline" onClick={onClose} className="border-slate-600 text-slate-300 hover:bg-slate-800">
+          <Button variant="outline" onClick={onClose} className="border-slate-600 bg-slate-700 text-white hover:bg-slate-600">
             닫기
           </Button>
         </div>
