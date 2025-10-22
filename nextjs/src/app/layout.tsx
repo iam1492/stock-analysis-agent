@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI Agent Chat",
-  description: "Chat with AI agents powered by Google Gemini",
+  title: "AI Agentic Stock Analysis",
+  description: "AI agents analyze stocks from multiple perspectives to provide comprehensive investment insights",
   icons: {
     icon: "/favicon.ico",
   },

@@ -1,6 +1,6 @@
 "use client";
 
-import { Target, ListChecks, CheckCircle } from "lucide-react";
+import { TrendingUp, BarChart3, PieChart, Brain, Users, Zap } from "lucide-react";
 
 /**
  * EmptyState - AI Goal Planner welcome screen
@@ -14,56 +14,56 @@ export function EmptyState(): React.JSX.Element {
         {/* Main header */}
         <div className="space-y-4">
           <div className="flex items-center justify-center space-x-3">
-            <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
-              <Target className="w-6 h-6 text-green-500" />
+            <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-emerald-500" />
             </div>
             <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
-              <ListChecks className="w-6 h-6 text-blue-500" />
+              <BarChart3 className="w-6 h-6 text-blue-500" />
             </div>
             <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-purple-500" />
+              <Brain className="w-6 h-6 text-purple-500" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-white">AI Goal Planner</h1>
-          <p className="text-xl text-neutral-300">Powered by Google Gemini</p>
+          <h1 className="text-4xl font-bold text-white">AI Agentic Stock Analysis</h1>
+          <p className="text-xl text-neutral-300">Powered by Ramus Corp</p>
         </div>
 
         {/* Description */}
         <div className="space-y-4">
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
-            Transform your goals into actionable plans with structured task
-            breakdown, clear priorities, and step-by-step guidance to achieve
-            success.
+            AI agents analyze stocks from multiple specialized perspectives to
+            provide comprehensive investment insights and data-driven
+            recommendations.
           </p>
         </div>
 
         {/* Feature highlights */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
           <div className="space-y-3">
-            <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mx-auto">
-              <Target className="w-6 h-6 text-green-500" />
+            <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mx-auto">
+              <TrendingUp className="w-6 h-6 text-emerald-500" />
             </div>
-            <h3 className="font-semibold text-green-400">Goal Planning</h3>
+            <h3 className="font-semibold text-emerald-400">Multi-Agent Analysis</h3>
             <p className="text-sm text-neutral-400">
-              Strategic breakdown and clear roadmap creation
+              Specialized AI agents analyze stocks from different perspectives
             </p>
           </div>
           <div className="space-y-3">
             <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mx-auto">
-              <ListChecks className="w-6 h-6 text-blue-500" />
+              <BarChart3 className="w-6 h-6 text-blue-500" />
             </div>
-            <h3 className="font-semibold text-blue-400">Task Breakdown</h3>
+            <h3 className="font-semibold text-blue-400">Comprehensive Data</h3>
             <p className="text-sm text-neutral-400">
-              Organized tasks and subtasks with priorities
+              Financial statements, technical indicators, and market data
             </p>
           </div>
           <div className="space-y-3">
             <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mx-auto">
-              <CheckCircle className="w-6 h-6 text-purple-500" />
+              <Brain className="w-6 h-6 text-purple-500" />
             </div>
-            <h3 className="font-semibold text-purple-400">Achievement Path</h3>
+            <h3 className="font-semibold text-purple-400">AI-Powered Insights</h3>
             <p className="text-sm text-neutral-400">
-              Clear steps and milestones to reach your goals
+              Intelligent recommendations based on advanced analysis
             </p>
           </div>
         </div>
@@ -73,16 +73,16 @@ export function EmptyState(): React.JSX.Element {
           <p className="text-neutral-400">Try asking about:</p>
           <div className="flex flex-wrap gap-2 justify-center">
             <span className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded-full text-sm">
-              Goal setting strategies
+              Stock analysis for AAPL
             </span>
             <span className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded-full text-sm">
-              Project planning methods
+              Quant Analysis
             </span>
             <span className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded-full text-sm">
-              Task prioritization
+              Market trends analysis
             </span>
             <span className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded-full text-sm">
-              Achievement milestones
+              Investment recommendations
             </span>
           </div>
         </div>

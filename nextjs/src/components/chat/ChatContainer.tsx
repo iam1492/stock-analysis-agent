@@ -16,6 +16,9 @@ export function ChatContainer(): React.JSX.Element {
       <BackendHealthChecker>
         {/* Fixed background */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pointer-events-none"></div>
+        {/* Stock market themed accent elements */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-20 right-10 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
         {/* Fixed Header - stays at top */}
         <div className="relative z-10 flex-shrink-0">
