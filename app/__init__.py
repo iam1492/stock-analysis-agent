@@ -1,8 +1,12 @@
-# Disable OpenTelemetry tracing before any imports
-import os
-os.environ["OTEL_SDK_DISABLED"] = "true"
-os.environ["OTEL_TRACES_EXPORTER"] = "none"
-os.environ["OTEL_METRICS_EXPORTER"] = "none"
-os.environ["OTEL_LOGS_EXPORTER"] = "none"
+# Import centralized tracing configuration first
+from .disable_tracing import TracingConfig
+
+# Initialize tracing configuration
+tracing_config = TracingConfig()
+tracing_config.apply_configuration()
+
+# Set up logging configuration
+from .logging_config import setup_logging
+setup_logging()
 
 from . import agent

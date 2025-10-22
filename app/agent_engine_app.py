@@ -22,12 +22,6 @@ from app.config import config, get_deployment_config
 from app.engine_utils.gcs import create_bucket_if_not_exists
 from app.engine_utils.typing import Feedback
 
-# Disable OpenTelemetry completely to prevent context issues
-os.environ["OTEL_SDK_DISABLED"] = "true"
-os.environ["OTEL_TRACES_EXPORTER"] = "none"
-os.environ["OTEL_METRICS_EXPORTER"] = "none"
-os.environ["OTEL_LOGS_EXPORTER"] = "none"
-
 
 class AgentEngineApp(AdkApp):
     """
@@ -122,7 +116,7 @@ def deploy_agent_engine_app() -> agent_engines.AgentEngine:
     with open(deployment_config.requirements_file) as f:
         requirements = f.read().strip().split("\n")
 
-    # Step 6: Create the agent engine app
+    # Step 6: Create the agent engine app with safe SSE handling
     agent_engine = AgentEngineApp(
         agent=root_agent,
         artifact_service_builder=lambda: GcsArtifactService(
@@ -148,7 +142,7 @@ def deploy_agent_engine_app() -> agent_engines.AgentEngine:
     existing_agents = list(
         agent_engines.list(filter=f"display_name={deployment_config.agent_name}")
     )
-    
+
     print(f"agent config:{agent_config}")
 
     if existing_agents:
@@ -184,12 +178,12 @@ def deploy_agent_engine_app() -> agent_engines.AgentEngine:
 if __name__ == "__main__":
     print(
         """
-    ==========================================================
-                                                             
-       DEPLOYING AGENT TO VERTEX AI AGENT ENGINE             
-                                                             
-    ==========================================================
-    """
+        ==========================================================
+
+            DEPLOYING AGENT TO VERTEX AI AGENT ENGINE
+
+        ==========================================================
+        """
     )
 
     deploy_agent_engine_app()
