@@ -21,7 +21,7 @@ export function ChatContainer(): React.JSX.Element {
         <div className="absolute bottom-20 right-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         {/* Fixed Header - stays at top */}
-        <div className="relative z-10 flex-shrink-0">
+        <div className="relative z-20 flex-shrink-0">
           <ChatHeader />
         </div>
 

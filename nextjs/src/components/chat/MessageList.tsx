@@ -32,8 +32,8 @@ export function MessageList({
   // If no messages, show empty state
   if (messages.length === 0) {
     return (
-      <ScrollArea ref={scrollAreaRef} className="flex-1 px-4 py-6">
-        <div className="flex items-center justify-center h-full">
+      <ScrollArea ref={scrollAreaRef} className="flex-1">
+        <div className="flex items-center justify-center h-full px-4 py-6">
           <div className="text-center space-y-3">
             <div className="text-slate-500 text-lg">💬</div>
             <p className="text-slate-400 text-sm">
@@ -46,8 +46,8 @@ export function MessageList({
   }
 
   return (
-    <ScrollArea ref={scrollAreaRef} className="flex-1 px-4 py-6">
-      <div className="space-y-6 max-w-4xl mx-auto w-full">
+    <ScrollArea ref={scrollAreaRef} className="flex-1">
+      <div className="space-y-6 max-w-4xl mx-auto w-full px-4 py-6">
         {messages.map((message, index) => (
           <MessageItem
             key={message.id}
