@@ -48,7 +48,7 @@ export function InputForm({
       <form onSubmit={handleSubmit} className="relative">
         <div
           className={`
-          relative flex items-end gap-3 p-3 rounded-2xl border transition-all duration-200
+          relative flex items-center gap-3 p-3 rounded-2xl border transition-all duration-200
           ${
             isFocused
               ? "border-emerald-400/50 bg-cream-25 shadow-lg shadow-emerald-500/10"
@@ -71,9 +71,9 @@ export function InputForm({
               className="
                 resize-none border-0 bg-transparent text-gray-900 placeholder-gray-500
                 focus:ring-0 focus:outline-none focus:border-0 focus:shadow-none
-                min-h-[80px] max-h-48
+                min-h-[40px] max-h-48
                 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-400
-                px-0 py-3
+                px-0 py-2
               "
               style={{
                 fontSize: "16px",
