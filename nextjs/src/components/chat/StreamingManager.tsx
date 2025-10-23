@@ -19,7 +19,7 @@ interface StreamingManagerProps {
 export interface StreamingManagerReturn {
   isLoading: boolean;
   currentAgent: string;
-  submitMessage: (message: string) => Promise<void>;
+  submitMessage: (message: string, model?: string) => Promise<void>;
 }
 
 /**
@@ -49,7 +49,7 @@ export function useStreamingManager({
 
   // Submit a message for streaming
   const submitMessage = useCallback(
-    async (message: string): Promise<void> => {
+    async (message: string, model?: string): Promise<void> => {
       if (!message.trim() || !userId || !sessionId) {
         throw new Error("Message, userId, and sessionId are required");
       }
@@ -58,6 +58,7 @@ export function useStreamingManager({
         message: message.trim(),
         userId,
         sessionId,
+        ...(model && { model }),
       };
 
       try {

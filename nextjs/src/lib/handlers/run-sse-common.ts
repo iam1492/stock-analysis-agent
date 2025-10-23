@@ -21,6 +21,7 @@ export interface ProcessedStreamRequest {
   message: string;
   userId: string;
   sessionId: string;
+  model?: string; // Selected LLM model
   stockSymbol?: string; // Extracted stock symbol from message
 }
 
@@ -33,6 +34,7 @@ export interface AgentEnginePayload {
     user_id: string;
     session_id: string;
     message: string;
+    model?: string;
     stock_symbol?: string;
   };
 }
@@ -44,6 +46,7 @@ export interface LocalBackendPayload {
   appName: string;
   userId: string;
   sessionId: string;
+  model?: string;
   stockSymbol?: string;
   newMessage: {
     parts: { text: string }[];
@@ -129,6 +132,7 @@ export async function parseStreamRequest(request: NextRequest): Promise<{
       message?: string;
       userId?: string;
       sessionId?: string;
+      model?: string;
     };
 
     // Validate the request structure
@@ -145,6 +149,7 @@ export async function parseStreamRequest(request: NextRequest): Promise<{
         message,
         userId: requestBody.userId!,
         sessionId: requestBody.sessionId!,
+        model: requestBody.model,
         stockSymbol,
       },
       validation: { isValid: true },
@@ -171,6 +176,7 @@ export function validateStreamRequest(requestBody: {
   message?: string;
   userId?: string;
   sessionId?: string;
+  model?: string;
 }): StreamValidationResult {
   if (!requestBody.message?.trim()) {
     return {
@@ -211,6 +217,7 @@ export function formatAgentEnginePayload(
       user_id: requestData.userId,
       session_id: requestData.sessionId,
       message: requestData.message,
+      model: requestData.model,
       stock_symbol: requestData.stockSymbol,
     },
   };
@@ -229,6 +236,7 @@ export function formatLocalBackendPayload(
     appName: getAdkAppName(),
     userId: requestData.userId,
     sessionId: requestData.sessionId,
+    model: requestData.model,
     stockSymbol: requestData.stockSymbol,
     newMessage: {
       parts: [{ text: requestData.message }],

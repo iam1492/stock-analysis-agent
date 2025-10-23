@@ -6,16 +6,16 @@ def lite_llm_model(model_name: str = "gemini-2.0-flash"):
 
     Args:
         model_name (str): The name of the model to instantiate.
+                         If None or empty, defaults to "gemini-2.5-flash".
 
     Returns:
         An instance of the specified language model.
     """
 
-    #model_name = "gemini-2.5-pro"
-    model_name = "gemini-2.5-flash"
-    #model_name = "openrouter/z-ai/glm-4.6"
-    #model_name = "openrouter/qwen/qwen3-max"
-    
+    # Use provided model_name, fallback to default if not provided
+    if not model_name or model_name.strip() == "":
+        model_name = "gemini-2.5-flash"
+
     if model_name.startswith("gemini"):
         return model_name
     else:

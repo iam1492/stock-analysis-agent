@@ -24,6 +24,10 @@ export interface ChatContextValue {
   userId: string;
   sessionId: string;
 
+  // Model state
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
+
   // Message state
   messages: Message[];
   messageEvents: Map<string, ProcessedEvent[]>;
@@ -76,6 +80,50 @@ export function ChatProvider({
 
   // Session history loading state
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  // Model selection state with localStorage persistence
+  const [selectedModel, setSelectedModelState] = useState<string>("gemini-2.5-flash");
+
+  // Helper functions for localStorage management
+  const getModelKey = useCallback(() => {
+    return `selectedModel`;
+  }, []);
+
+  const saveModelToStorage = useCallback((model: string) => {
+    try {
+      const key = getModelKey();
+      localStorage.setItem(key, model);
+      console.log(`💾 [CHAT_PROVIDER] Saved selected model to localStorage: ${model}`);
+    } catch (error) {
+      console.error('Failed to save model to localStorage:', error);
+    }
+  }, [getModelKey]);
+
+  const loadModelFromStorage = useCallback((): string => {
+    try {
+      const key = getModelKey();
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        console.log(`📂 [CHAT_PROVIDER] Loaded selected model from localStorage: ${stored}`);
+        return stored;
+      }
+    } catch (error) {
+      console.error('Failed to load model from localStorage:', error);
+    }
+    return "gemini-2.5-flash"; // default
+  }, [getModelKey]);
+
+  // Model setter with persistence
+  const setSelectedModel = useCallback((model: string) => {
+    setSelectedModelState(model);
+    saveModelToStorage(model);
+  }, [saveModelToStorage]);
+
+  // Load saved model on mount
+  useEffect(() => {
+    const savedModel = loadModelFromStorage();
+    setSelectedModelState(savedModel);
+  }, [loadModelFromStorage]);
 
   // Consolidate all hooks
   const {
@@ -462,7 +510,7 @@ export function ChatProvider({
         const stockSymbol = extractStockSymbol(query);
 
         // Agent result context is now handled by the save callback
-        console.log(`🔄 [CHAT_PROVIDER] Starting analysis for ${stockSymbol}`);
+        console.log(`🔄 [CHAT_PROVIDER] Starting analysis for ${stockSymbol} with model ${selectedModel}`);
 
         // Reset analysis complete state for new analysis
         setIsAnalysisComplete(false);
@@ -479,15 +527,15 @@ export function ChatProvider({
         };
         addMessage(userMessage);
 
-        // Submit message for streaming - the backend will provide AI response
-        await streamingManager.submitMessage(query);
+        // Submit message for streaming with selected model - the backend will provide AI response
+        await streamingManager.submitMessage(query, selectedModel);
       } catch (error) {
         console.error("Error submitting message:", error);
         // Don't create fake error messages - let the UI handle the error state
         throw error;
       }
     },
-    [userId, sessionId, addMessage, streamingManager, extractStockSymbol]
+    [userId, sessionId, selectedModel, addMessage, streamingManager, extractStockSymbol]
   );
 
   // Context value
@@ -495,6 +543,10 @@ export function ChatProvider({
     // Session state
     userId,
     sessionId,
+
+    // Model state
+    selectedModel,
+    setSelectedModel,
 
     // Message state
     messages,
