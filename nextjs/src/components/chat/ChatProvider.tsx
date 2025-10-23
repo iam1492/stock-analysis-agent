@@ -99,18 +99,55 @@ export function ChatProvider({
 
   // Analysis completion state
   const [isAnalysisComplete, setIsAnalysisComplete] = useState(false);
-  
+
   // Agent results storage (in-memory)
   const [agentResults, setAgentResults] = useState<Record<string, string>>({});
+
+  // Helper functions for localStorage management
+  const getAgentResultsKey = useCallback((userId: string, sessionId: string) => {
+    return `agentResults_${userId}_${sessionId}`;
+  }, []);
+
+  const saveAgentResultsToStorage = useCallback((userId: string, sessionId: string, results: Record<string, string>) => {
+    try {
+      const key = getAgentResultsKey(userId, sessionId);
+      localStorage.setItem(key, JSON.stringify(results));
+      console.log(`💾 [CHAT_PROVIDER] Saved agent results to localStorage: ${key}`);
+    } catch (error) {
+      console.error('Failed to save agent results to localStorage:', error);
+    }
+  }, [getAgentResultsKey]);
+
+  const loadAgentResultsFromStorage = useCallback((userId: string, sessionId: string): Record<string, string> => {
+    try {
+      const key = getAgentResultsKey(userId, sessionId);
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        const results = JSON.parse(stored);
+        console.log(`📂 [CHAT_PROVIDER] Loaded agent results from localStorage: ${key}`);
+        return results;
+      }
+    } catch (error) {
+      console.error('Failed to load agent results from localStorage:', error);
+    }
+    return {};
+  }, [getAgentResultsKey]);
 
   // Agent result management functions
   const saveAgentResult = useCallback((agentName: string, content: string) => {
     console.log(`💾 [CHAT_PROVIDER] Saving ${agentName} result to memory`);
-    setAgentResults(prev => ({
-      ...prev,
-      [agentName]: content
-    }));
-  }, []);
+    setAgentResults(prev => {
+      const newResults = {
+        ...prev,
+        [agentName]: content
+      };
+      // Save to localStorage when results are updated
+      if (userId && sessionId) {
+        saveAgentResultsToStorage(userId, sessionId, newResults);
+      }
+      return newResults;
+    });
+  }, [userId, sessionId, saveAgentResultsToStorage]);
 
   const getAgentResult = useCallback((agentName: string) => {
     return agentResults[agentName];
@@ -270,6 +307,19 @@ export function ChatProvider({
           setMessageEvents(new Map());
           updateWebsiteCount(0);
 
+          // Clear agent results and analysis state for new session
+          setAgentResults({});
+          setIsAnalysisComplete(false);
+
+          // Load agent results from localStorage for this session
+          const storedAgentResults = loadAgentResultsFromStorage(userId, sessionId);
+          if (Object.keys(storedAgentResults).length > 0) {
+            setAgentResults(storedAgentResults);
+            // If we have stored results, assume analysis was complete
+            setIsAnalysisComplete(true);
+            console.log("✅ [CHAT_PROVIDER] Loaded agent results from localStorage");
+          }
+
           // Load session history using Server Action (keeps Google Auth on server)
           const result = await loadSessionHistoryAction(userId, sessionId);
 
@@ -322,6 +372,8 @@ export function ChatProvider({
           setMessages([]);
           setMessageEvents(new Map());
           updateWebsiteCount(0);
+          setAgentResults({});
+          setIsAnalysisComplete(false);
         } finally {
           setIsLoadingHistory(false);
         }
@@ -330,7 +382,7 @@ export function ChatProvider({
       // Load session history
       loadSessionHistory();
     }
-  }, [userId, sessionId, setMessages, setMessageEvents, updateWebsiteCount]);
+  }, [userId, sessionId, setMessages, setMessageEvents, updateWebsiteCount, loadAgentResultsFromStorage]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -414,6 +466,9 @@ export function ChatProvider({
 
         // Reset analysis complete state for new analysis
         setIsAnalysisComplete(false);
+
+        // Clear agent results for new analysis
+        setAgentResults({});
 
         // Add user message to chat immediately
         const userMessage: Message = {
