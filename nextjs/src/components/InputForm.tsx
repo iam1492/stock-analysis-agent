@@ -41,10 +41,7 @@ export function InputForm({
     }
   };
 
-  const placeholderText =
-    context === "chat"
-      ? "Add more details, ask questions, or request changes..."
-      : "What goal would you like to achieve? e.g., Build a mobile app, Plan a marketing campaign, Learn a new skill...";
+  const placeholderText = "분석하고 싶은 종목을 입력해주세요. (ex: Apple(APPL) 종목 분석해줘)"
 
   return (
     <div className="w-full">
@@ -54,8 +51,8 @@ export function InputForm({
           relative flex items-end gap-3 p-3 rounded-2xl border transition-all duration-200
           ${
             isFocused
-              ? "border-emerald-400/50 bg-slate-800/80 shadow-lg shadow-emerald-500/10"
-              : "border-slate-700/50 bg-slate-800/50 hover:border-slate-600/50"
+              ? "border-emerald-400/50 bg-cream-25 shadow-lg shadow-emerald-500/10"
+              : "border-gray-300 bg-cream-50 hover:border-gray-400"
           }
           backdrop-blur-sm
         `}
@@ -72,10 +69,10 @@ export function InputForm({
               placeholder={placeholderText}
               rows={1}
               className="
-                resize-none border-0 bg-transparent text-slate-200 placeholder-slate-400
+                resize-none border-0 bg-transparent text-gray-900 placeholder-gray-500
                 focus:ring-0 focus:outline-none focus:border-0 focus:shadow-none
                 min-h-[80px] max-h-48
-                scrollbar-thin scrollbar-track-transparent scrollbar-thumb-slate-600
+                scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-400
                 px-0 py-3
               "
               style={{
@@ -89,7 +86,7 @@ export function InputForm({
 
             {/* Character count for long messages */}
             {inputValue.length > 500 && (
-              <div className="absolute bottom-1 right-1 text-xs text-slate-500 bg-slate-800/80 rounded px-1">
+              <div className="absolute bottom-1 right-1 text-xs text-gray-600 bg-white/80 rounded px-1">
                 {inputValue.length}/2000
               </div>
             )}
@@ -101,10 +98,10 @@ export function InputForm({
             size="sm"
             disabled={!inputValue.trim() || isLoading}
             className="
-              h-9 px-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700
+              h-9 px-4 bg-sky-500 hover:bg-sky-600
               text-white border-0 shadow-lg transition-all duration-200
               disabled:opacity-50 disabled:cursor-not-allowed
-              disabled:bg-slate-600 disabled:from-slate-600 disabled:to-slate-600
+              disabled:bg-gray-400
               flex items-center gap-2
             "
           >

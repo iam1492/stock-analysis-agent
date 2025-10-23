@@ -21,7 +21,7 @@ export function ChatHeader(): React.JSX.Element {
   } = useChatContext();
 
   return (
-    <div className="relative z-10 flex-shrink-0 border-b border-slate-700/50 bg-slate-800/80 backdrop-blur-sm">
+    <div className="relative z-10 flex-shrink-0 border-b border-gray-200 bg-cream-25/80 backdrop-blur-sm">
       <div className="max-w-5xl mx-auto w-full flex justify-between items-center p-4">
         {/* Left side - App branding */}
         <div className="flex items-center gap-3">
@@ -29,10 +29,10 @@ export function ChatHeader(): React.JSX.Element {
             <Bot className="h-4 w-4 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-slate-100">
+            <h1 className="text-lg font-semibold text-gray-900">
               AI Agentic Stock Analysis
             </h1>
-            <p className="text-xs text-slate-400">Powered by Ramus Corp</p>
+            <p className="text-xs text-gray-500">Powered by Ramus Corp</p>
           </div>
         </div>
 

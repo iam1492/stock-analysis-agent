@@ -12,7 +12,7 @@ export function ChatInput(): React.JSX.Element {
   const { handleSubmit, isLoading } = useChatContext();
 
   return (
-    <div className="relative z-10 flex-shrink-0 border-t-2 border-slate-600/80 bg-slate-900/95 backdrop-blur-md shadow-2xl shadow-black/40">
+    <div className="relative z-10 flex-shrink-0 border-t-2 border-gray-300 bg-cream-25/95 backdrop-blur-md shadow-2xl shadow-gray-200/40">
       <div className="max-w-4xl mx-auto w-full p-4 pt-5">
         <InputForm
           onSubmit={handleSubmit}

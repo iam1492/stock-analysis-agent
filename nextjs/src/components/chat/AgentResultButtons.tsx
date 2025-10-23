@@ -85,9 +85,9 @@ export function AgentResultButtons({
 
   return (
     <>
-      <div className="flex flex-wrap gap-2 mt-4 p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
+      <div className="flex flex-wrap gap-2 mt-4 p-4 bg-gray-100 rounded-lg border border-gray-200">
         <div className="w-full mb-2">
-          <p className="text-sm text-slate-400 font-medium">상세 분석 결과 보기:</p>
+          <p className="text-sm text-gray-600 font-medium">상세 분석 결과 보기:</p>
         </div>
 
         {agentButtonConfig.map((config) => {

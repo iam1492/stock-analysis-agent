@@ -51,14 +51,14 @@ export function AgentResultModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col bg-slate-900 border-slate-700">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col bg-cream-25 border-gray-200">
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <DialogTitle className="text-xl font-semibold text-white">
+              <DialogTitle className="text-xl font-semibold text-gray-900">
                 {agentName ? agentDisplayNames[agentName] || agentName : 'Agent 결과'}
               </DialogTitle>
-              <DialogDescription className="text-sm text-slate-400 mt-1">
+              <DialogDescription className="text-sm text-gray-500 mt-1">
                 {agentName && (
                   <>
                     분석 시간: {new Date().toLocaleString('ko-KR')}
@@ -72,11 +72,11 @@ export function AgentResultModal({
                   variant="outline"
                   size="sm"
                   onClick={handleCopy}
-                  className="flex items-center gap-2 border-slate-600 bg-slate-700 text-white hover:bg-slate-600"
+                  className="flex items-center gap-2 border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100"
                 >
                   {isCopySuccess ? (
                     <>
-                      <CopyCheck className="h-4 w-4 text-green-500" />
+                      <CopyCheck className="h-4 w-4 text-green-600" />
                       복사됨
                     </>
                   ) : (
@@ -87,25 +87,25 @@ export function AgentResultModal({
                   )}
                 </Button>
               )}
-              
+
             </div>
           </div>
         </DialogHeader>
 
         <div className="flex-1 min-h-0 mt-4 overflow-y-auto overflow-x-hidden pr-4 pb-4">
           {agentResult ? (
-            <div className="prose prose-invert max-w-none text-slate-100">
+            <div className="prose prose-gray max-w-none">
               <MarkdownRenderer content={agentResult} />
             </div>
           ) : (
-            <div className="flex items-center justify-center h-32 text-slate-400">
+            <div className="flex items-center justify-center h-32 text-gray-500">
               <p>결과를 불러오는 중...</p>
             </div>
           )}
         </div>
 
-        <div className="flex-shrink-0 flex justify-end gap-2 mt-4 pt-4 border-t border-slate-700">
-          <Button variant="outline" onClick={onClose} className="border-slate-600 bg-slate-700 text-white hover:bg-slate-600">
+        <div className="flex-shrink-0 flex justify-end gap-2 mt-4 pt-4 border-t border-gray-200">
+          <Button variant="outline" onClick={onClose} className="border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100">
             닫기
           </Button>
         </div>

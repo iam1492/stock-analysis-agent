@@ -3,11 +3,11 @@
 import ReactMarkdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-// Enhanced markdown components for better styling with consistent dark theme
+// Enhanced markdown components for better styling with consistent light theme
 export const mdComponents: Partial<Components> = {
   h1: ({ children, ...props }) => (
     <h1
-      className="text-xl font-bold mb-3 text-slate-100 leading-tight"
+      className="text-xl font-bold mb-3 text-gray-800 leading-tight"
       {...props}
     >
       {children}
@@ -15,7 +15,7 @@ export const mdComponents: Partial<Components> = {
   ),
   h2: ({ children, ...props }) => (
     <h2
-      className="text-lg font-semibold mb-2 text-slate-100 leading-tight"
+      className="text-lg font-semibold mb-2 text-gray-800 leading-tight"
       {...props}
     >
       {children}
@@ -23,7 +23,7 @@ export const mdComponents: Partial<Components> = {
   ),
   h3: ({ children, ...props }) => (
     <h3
-      className="text-base font-medium mb-2 text-slate-100 leading-tight"
+      className="text-base font-medium mb-2 text-gray-800 leading-tight"
       {...props}
     >
       {children}
@@ -31,7 +31,7 @@ export const mdComponents: Partial<Components> = {
   ),
   h4: ({ children, ...props }) => (
     <h4
-      className="text-sm font-medium mb-1 text-slate-200 leading-tight"
+      className="text-sm font-medium mb-1 text-gray-700 leading-tight"
       {...props}
     >
       {children}
@@ -39,7 +39,7 @@ export const mdComponents: Partial<Components> = {
   ),
   h5: ({ children, ...props }) => (
     <h5
-      className="text-sm font-medium mb-1 text-slate-200 leading-tight"
+      className="text-sm font-medium mb-1 text-gray-700 leading-tight"
       {...props}
     >
       {children}
@@ -47,20 +47,20 @@ export const mdComponents: Partial<Components> = {
   ),
   h6: ({ children, ...props }) => (
     <h6
-      className="text-sm font-medium mb-1 text-slate-200 leading-tight"
+      className="text-sm font-medium mb-1 text-gray-700 leading-tight"
       {...props}
     >
       {children}
     </h6>
   ),
   p: ({ children, ...props }) => (
-    <p className="mb-2 leading-relaxed text-slate-200 last:mb-0" {...props}>
+    <p className="mb-2 leading-relaxed text-gray-700 last:mb-0" {...props}>
       {children}
     </p>
   ),
   ul: ({ children, ...props }) => (
     <ul
-      className="list-disc list-inside mb-2 space-y-1 text-slate-200"
+      className="list-disc list-inside mb-2 space-y-1 text-gray-800"
       {...props}
     >
       {children}
@@ -68,20 +68,20 @@ export const mdComponents: Partial<Components> = {
   ),
   ol: ({ children, ...props }) => (
     <ol
-      className="list-decimal list-inside mb-2 space-y-1 text-slate-200"
+      className="list-decimal list-inside mb-2 space-y-1 text-gray-800"
       {...props}
     >
       {children}
     </ol>
   ),
   li: ({ children, ...props }) => (
-    <li className="leading-relaxed text-slate-200" {...props}>
+    <li className="leading-relaxed text-gray-700" {...props}>
       {children}
     </li>
   ),
   blockquote: ({ children, ...props }) => (
     <blockquote
-      className="border-l-4 border-blue-400 pl-4 py-2 mb-2 bg-slate-800/30 rounded-r italic text-slate-300"
+      className="border-l-4 border-blue-500 pl-4 py-2 mb-2 bg-blue-50 rounded-r italic text-gray-700"
       {...props}
     >
       {children}
@@ -89,7 +89,7 @@ export const mdComponents: Partial<Components> = {
   ),
   code: ({ children, ...props }) => (
     <code
-      className="bg-slate-700 text-slate-200 px-1.5 py-0.5 rounded text-sm font-mono"
+      className="bg-gray-100 text-gray-900 px-1.5 py-0.5 rounded text-sm font-mono"
       {...props}
     >
       {children}
@@ -97,7 +97,7 @@ export const mdComponents: Partial<Components> = {
   ),
   pre: ({ children, ...props }) => (
     <pre
-      className="bg-slate-800 text-slate-200 p-3 rounded-lg mb-2 overflow-x-auto border border-slate-700"
+      className="bg-gray-100 text-gray-900 p-3 rounded-lg mb-2 overflow-x-auto border border-gray-200"
       {...props}
     >
       {children}
@@ -106,7 +106,7 @@ export const mdComponents: Partial<Components> = {
   table: ({ children, ...props }) => (
     <div className="mb-2 overflow-x-auto">
       <table
-        className="min-w-full border-collapse border border-slate-600 text-slate-200"
+        className="min-w-full border-collapse border border-gray-300 text-gray-900"
         {...props}
       >
         {children}
@@ -115,20 +115,20 @@ export const mdComponents: Partial<Components> = {
   ),
   th: ({ children, ...props }) => (
     <th
-      className="border border-slate-600 bg-slate-700 px-3 py-2 text-left font-medium"
+      className="border border-gray-300 bg-gray-100 px-3 py-2 text-left font-medium"
       {...props}
     >
       {children}
     </th>
   ),
   td: ({ children, ...props }) => (
-    <td className="border border-slate-600 px-3 py-2" {...props}>
+    <td className="border border-gray-300 px-3 py-2" {...props}>
       {children}
     </td>
   ),
   a: ({ children, href, ...props }) => (
     <a
-      className="text-blue-400 hover:text-blue-300 underline transition-colors"
+      className="text-blue-600 hover:text-blue-800 underline transition-colors"
       href={href}
       target="_blank"
       rel="noopener noreferrer"
@@ -138,12 +138,12 @@ export const mdComponents: Partial<Components> = {
     </a>
   ),
   strong: ({ children, ...props }) => (
-    <strong className="font-semibold text-slate-100" {...props}>
+    <strong className="font-semibold text-gray-800" {...props}>
       {children}
     </strong>
   ),
   em: ({ children, ...props }) => (
-    <em className="italic text-slate-200" {...props}>
+    <em className="italic text-gray-700" {...props}>
       {children}
     </em>
   ),
@@ -157,7 +157,7 @@ interface MarkdownRendererProps {
 
 /**
  * Dedicated markdown renderer component with consistent styling
- * Handles all markdown rendering with proper dark theme styling
+ * Handles all markdown rendering with proper light theme styling
  */
 export function MarkdownRenderer({
   content,

@@ -58,6 +58,10 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        cream: {
+          25: "#FDFCFA",
+          50: "#FAF9F5",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
