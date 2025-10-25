@@ -17,10 +17,10 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  // 개발 환경에서만 회원가입 허용
-  const isDevelopment = process.env.NODE_ENV === 'development'
+  // 관리자 계정에서만 회원가입 허용
+  const isAdmin = session?.user?.email === process.env.ADMIN_EMAIL
 
-  if (!isDevelopment) {
+  if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream-50 via-cream-25 to-cream-50 py-12 px-4 sm:px-6 lg:px-8">
         <Card className="w-full max-w-md bg-white/80 backdrop-blur-sm border-gray-200/50 shadow-xl">
@@ -34,7 +34,7 @@ export default function SignupPage() {
             </div>
             <CardTitle className="text-2xl text-center text-red-600">Access Denied</CardTitle>
             <CardDescription className="text-center text-gray-600">
-              User registration is not available in production environment.
+              Only administrators can create new user accounts.
             </CardDescription>
           </CardHeader>
         </Card>

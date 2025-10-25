@@ -1,33 +1,40 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
+import { prisma } from "@/lib/prisma"
 
-// 임시 사용자 저장소 (실제로는 데이터베이스를 사용해야 함)
-const users = [
-  {
-    id: "1",
-    email: "admin@example.com",
-    password: "$2b$12$LXhRUPp4nSn2jfEew1/qi.ESOdnt61.ZyVW8Hh4PeJRaRXvxc3msq", // 해시된 "password123"
-    name: "Admin User"
+// 개발자용 사용자 추가 함수 (관리자만 사용 가능)
+export async function addUser(email: string, password: string, name: string, adminEmail: string) {
+  // 관리자 권한 확인
+  if (adminEmail !== process.env.ADMIN_EMAIL) {
+    throw new Error('Unauthorized: Only admin can create users')
   }
-]
 
-// 개발자용 사용자 추가 함수 (개발 환경에서만 사용)
-export async function addUser(email: string, password: string, name: string) {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('User registration is not allowed in production')
+  // 이메일 중복 확인
+  const existingUser = await prisma.user.findUnique({
+    where: { email }
+  })
+
+  if (existingUser) {
+    throw new Error('User with this email already exists')
   }
 
   const hashedPassword = await bcrypt.hash(password, 12)
-  const newUser = {
-    id: (users.length + 1).toString(),
-    email,
-    password: hashedPassword,
-    name
-  }
 
-  users.push(newUser)
-  return newUser
+  const newUser = await prisma.user.create({
+    data: {
+      email,
+      password: hashedPassword,
+      name,
+      role: 'user'
+    }
+  })
+
+  return {
+    id: newUser.id,
+    email: newUser.email,
+    name: newUser.name
+  }
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -43,7 +50,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null
         }
 
-        const user = users.find(u => u.email === credentials.email)
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email }
+        })
 
         if (user && await bcrypt.compare(credentials.password as string, user.password)) {
           return {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { addUser } from "@/lib/auth"
+import { addUser, auth } from "@/lib/auth"
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,8 +37,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 관리자 권한 확인을 위한 세션 정보 필요
+    const session = await auth()
+    if (!session?.user?.email || session.user.email !== process.env.ADMIN_EMAIL) {
+      return NextResponse.json(
+        { error: "Unauthorized: Only admin can create users" },
+        { status: 403 }
+      )
+    }
+
     // 사용자 추가
-    const newUser = await addUser(email, password, name)
+    const newUser = await addUser(email, password, name, session.user.email)
 
     return NextResponse.json({
       message: "User created successfully",

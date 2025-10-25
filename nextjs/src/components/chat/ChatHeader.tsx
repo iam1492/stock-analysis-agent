@@ -1,7 +1,6 @@
 "use client";
 
 import { Bot, LogOut } from "lucide-react";
-import { UserIdInput } from "@/components/chat/UserIdInput";
 import { SessionSelector } from "@/components/chat/SessionSelector";
 import { ModelSelector } from "@/components/chat/ModelSelector";
 import { useChatContext } from "@/components/chat/ChatProvider";
@@ -16,10 +15,7 @@ import { Button } from "@/components/ui/button";
 export function ChatHeader(): React.JSX.Element {
   const { data: session } = useSession();
   const {
-    userId,
     sessionId,
-    handleUserIdChange,
-    handleUserIdConfirm,
     handleSessionSwitch,
     handleCreateNewSession,
   } = useChatContext();
@@ -56,23 +52,28 @@ export function ChatHeader(): React.JSX.Element {
           {/* Model Selection */}
           <ModelSelector />
 
-          {/* User ID Management */}
-          <UserIdInput
-            currentUserId={userId}
-            onUserIdChange={handleUserIdChange}
-            onUserIdConfirm={handleUserIdConfirm}
+          {/* Session Management */}
+          <SessionSelector
+            currentUserId={session?.user?.id || ""}
+            currentSessionId={sessionId}
+            onSessionSelect={handleSessionSwitch}
+            onCreateSession={handleCreateNewSession}
             className="text-xs"
           />
 
-          {/* Session Management */}
-          {userId && (
-            <SessionSelector
-              currentUserId={userId}
-              currentSessionId={sessionId}
-              onSessionSelect={handleSessionSwitch}
-              onCreateSession={handleCreateNewSession}
-              className="text-xs"
-            />
+          {/* Admin Actions */}
+          {session?.user?.email === 'iam1492@gmail.com' && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.location.href = '/signup'}
+              className="flex items-center gap-2 bg-emerald-50 border-emerald-300 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 shadow-sm"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Create Account
+            </Button>
           )}
 
           {/* Sign Out Button */}

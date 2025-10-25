@@ -110,5 +110,143 @@
       "updated": "2025-10-24T14:12:16.662Z",
       "description": "Tasks for master context"
     }
+  },
+  "database-integration": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Set Up Vercel Postgres Database",
+        "description": "Provision and configure a Vercel Postgres database instance for the application.",
+        "details": "Create a new Vercel Postgres database via the Vercel dashboard. Retrieve connection credentials and store them securely in environment variables (e.g., DATABASE_URL). Ensure the database is accessible from both local and Vercel environments. Document the connection string format and access policies.",
+        "testStrategy": "Connect to the database using a simple script or Prisma CLI to verify connectivity and permissions. Confirm environment variables are correctly loaded in both local and deployed environments.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Install and Configure Prisma ORM",
+        "description": "Integrate Prisma ORM with the Next.js project and connect it to Vercel Postgres.",
+        "details": "Install Prisma and @prisma/client via npm. Initialize Prisma in the project root. Configure the Prisma schema to use the DATABASE_URL from environment variables. Generate the initial Prisma client.",
+        "testStrategy": "Run `prisma generate` and `prisma db pull` to ensure Prisma can connect to the database. Validate that the generated client is usable in a test script.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Design and Implement User Table Schema",
+        "description": "Define the user table schema in Prisma, including fields for email, password hash, roles, and timestamps.",
+        "details": "Edit `prisma/schema.prisma` to define a User model with fields: id (UUID), email (unique), passwordHash, role (enum: 'user', 'admin'), createdAt, updatedAt. Add any necessary indexes and constraints. Use Prisma migrations to apply the schema.",
+        "testStrategy": "Run `prisma migrate dev` to apply the migration. Inspect the database to confirm the schema matches requirements. Attempt to insert and query user records using Prisma client.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Integrate NextAuth.js with Database Adapter",
+        "description": "Set up NextAuth.js (Auth.js) for email/password authentication using the Prisma adapter and Vercel Postgres.",
+        "details": "Install next-auth and configure it in the Next.js app. Use the Prisma adapter for database integration. Implement credential provider for email/password login. Configure session management and secure cookie settings. Store the admin email in an environment variable.",
+        "testStrategy": "Attempt login and session creation using test users in the database. Verify session persistence and correct user data retrieval. Check that only valid credentials allow login.",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Implement Secure Password Hashing and Validation",
+        "description": "Ensure all passwords are securely hashed using bcrypt before storage and validated during login.",
+        "details": "Install bcrypt or bcryptjs. In the user registration and authentication logic, hash passwords before saving to the database and compare hashes during login. Never store plaintext passwords.",
+        "testStrategy": "Register a user and verify the password is hashed in the database. Attempt login with correct and incorrect passwords to confirm validation logic.",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Develop Admin-Only Registration Endpoint and UI",
+        "description": "Create an API endpoint and frontend form for user registration, accessible only to the admin (iam1492@gmail.com).",
+        "details": "Implement an API route (e.g., /api/admin/register) that checks the session for the admin email before allowing access. Build a registration form in the frontend, visible only to the admin. On submission, validate input and create new users in the database.",
+        "testStrategy": "Login as admin and verify access to the registration form and endpoint. Attempt registration as a non-admin and confirm access is denied. Register a new user and check database entry.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Implement User and Session Management Logic",
+        "description": "Add logic for user session management, including login, logout, and session validation.",
+        "details": "Use NextAuth.js session APIs to manage user sessions. Protect routes and API endpoints by checking session validity. Implement logout functionality and session expiration handling.",
+        "testStrategy": "Login and navigate protected routes to confirm session enforcement. Logout and verify session termination. Attempt to access protected resources without a session.",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Enhance Input Validation and Security",
+        "description": "Strengthen input validation, prevent SQL injection, and ensure sensitive data is encrypted.",
+        "details": "Use server-side validation libraries (e.g., zod, yup) for all API inputs. Rely on Prisma's parameterized queries to prevent SQL injection. Ensure all sensitive environment variables are managed securely. Enforce HTTPS in production.",
+        "testStrategy": "Submit invalid and malicious inputs to all endpoints and verify proper rejection. Review logs for security errors. Confirm HTTPS enforcement in production.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Conduct Integration and End-to-End Testing",
+        "description": "Test the full authentication and registration flows, including database integration and session handling.",
+        "details": "Write integration tests using tools like Jest and Playwright/Cypress. Cover scenarios: login, logout, admin registration, session persistence, and error handling. Test both local and Vercel environments.",
+        "testStrategy": "Run automated test suites and manual exploratory tests. Validate all user and admin flows, including edge cases and error conditions.",
+        "priority": "medium",
+        "dependencies": [
+          7,
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Optimize for Production and Deploy to Vercel",
+        "description": "Finalize environment configuration, optimize for Vercel deployment, and implement backup strategies.",
+        "details": "Set all required environment variables in Vercel. Enable Vercel Postgres backups. Review and optimize serverless/edge function usage. Deploy the app to Vercel and monitor for issues.",
+        "testStrategy": "Deploy to Vercel and verify all features work as expected. Test failover and backup restoration procedures. Monitor logs and performance metrics post-deployment.",
+        "priority": "medium",
+        "dependencies": [
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-10-25T00:50:58.588Z",
+      "updated": "2025-10-25T00:59:10.230Z",
+      "description": "Tasks for database-integration context"
+    }
   }
 }

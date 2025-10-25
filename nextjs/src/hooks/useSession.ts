@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { useSession as useNextAuthSession } from "next-auth/react";
 
 export interface UseSessionReturn {
   // State
@@ -15,11 +16,19 @@ export interface UseSessionReturn {
 }
 
 /**
- * Custom hook for managing chat sessions and user ID (no localStorage persistence)
+ * Custom hook for managing chat sessions and user ID (integrated with NextAuth)
  */
 export function useSession(): UseSessionReturn {
+  const { data: session } = useNextAuthSession();
   const [sessionId, setSessionId] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
+
+  // Set userId from NextAuth session
+  useEffect(() => {
+    if (session?.user?.id) {
+      setUserId(session.user.id);
+    }
+  }, [session?.user?.id]);
 
   // Handle session switching
   const handleSessionSwitch = useCallback(
@@ -89,24 +98,16 @@ export function useSession(): UseSessionReturn {
     [handleSessionSwitch]
   );
 
-  // Handle user ID changes
+  // Handle user ID changes (now read-only from NextAuth session)
   const handleUserIdChange = useCallback((newUserId: string): void => {
-    setUserId(newUserId);
+    // User ID is now managed by NextAuth session, so this is a no-op
+    console.log("User ID change ignored - managed by NextAuth session");
   }, []);
 
-  // Handle user ID confirmation
+  // Handle user ID confirmation (now read-only from NextAuth session)
   const handleUserIdConfirm = useCallback((confirmedUserId: string): void => {
-    setUserId(confirmedUserId);
-    // Keep user ID in localStorage for convenience
-    localStorage.setItem("agent-engine-user-id", confirmedUserId);
-  }, []);
-
-  // Load user ID from localStorage on mount (but no session persistence)
-  useEffect(() => {
-    const savedUserId = localStorage.getItem("agent-engine-user-id");
-    if (savedUserId) {
-      setUserId(savedUserId);
-    }
+    // User ID is now managed by NextAuth session, so this is a no-op
+    console.log("User ID confirmation ignored - managed by NextAuth session");
   }, []);
 
   return {

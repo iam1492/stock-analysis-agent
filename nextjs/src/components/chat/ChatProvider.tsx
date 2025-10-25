@@ -135,6 +135,16 @@ export function ChatProvider({
     handleSessionSwitch,
   } = useSession();
 
+  // Auto-create session when user is authenticated but no session exists
+  useEffect(() => {
+    if (userId && !sessionId) {
+      console.log("🔄 Auto-creating session for authenticated user:", userId);
+      handleCreateNewSession(userId).catch(error => {
+        console.error("❌ Failed to auto-create session:", error);
+      });
+    }
+  }, [userId, sessionId, handleCreateNewSession]);
+
   const {
     messages,
     messageEvents,

@@ -100,17 +100,8 @@ export default function LoginPage() {
           </form>
           <div className="mt-6 text-center">
             <div className="text-sm text-gray-500 mb-2">
-              Demo credentials: <span className="font-mono text-gray-700">admin@example.com / password123</span>
+              Demo credentials: <span className="font-mono text-gray-700">iam1492@gmail.com / qjxms@0!0</span>
             </div>
-            {process.env.NODE_ENV === 'development' && (
-              <Button
-                variant="link"
-                onClick={() => router.push("/signup")}
-                className="text-emerald-600 hover:text-emerald-700 text-sm"
-              >
-                Create new account (dev only)
-              </Button>
-            )}
           </div>
         </CardContent>
       </Card>
