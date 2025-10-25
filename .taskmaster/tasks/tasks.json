@@ -1,0 +1,114 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Install and Configure NextAuth.js v5",
+        "description": "Set up NextAuth.js v5 in the Next.js 15 project, including installation, environment variables, and initial configuration.",
+        "details": "Run `pnpm i next-auth@beta` to install NextAuth.js v5. Generate a secure secret key using `openssl rand -base64 32` and add it to `.env` as `AUTH_SECRET`. Create `auth.config.ts` at the project root with the `pages` option to specify custom sign-in routes. Ensure the configuration is compatible with Next.js 15 and TypeScript. Reference the official migration guide for v5-specific changes.",
+        "testStrategy": "Verify that the NextAuth.js configuration loads without errors and that the `/api/auth/[...nextauth]` endpoint is available. Check that the secret is loaded from environment variables.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Implement Credentials Provider for Email/Password Authentication",
+        "description": "Configure NextAuth.js to use a credentials provider for email and password authentication.",
+        "details": "In the NextAuth.js configuration, add a credentials provider that accepts email and password. Implement the `authorize` callback to validate credentials against the user database (stub or mock for now, as DB is to be added later). Ensure passwords are hashed and compared securely using a library like bcrypt. Return user object on success, or null on failure.",
+        "testStrategy": "Test login attempts with valid and invalid credentials. Ensure correct error messages are returned and that no sensitive information is leaked.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Create Login Form UI Component",
+        "description": "Develop a simple, secure login form using Next.js, TypeScript, and Tailwind CSS.",
+        "details": "Build a login page at `/login` with email and password fields. Use a form that submits to the NextAuth.js sign-in endpoint. Style the form for clarity and accessibility using Tailwind CSS. Display error messages for failed logins and loading indicators during submission. Ensure the form is the first screen users see.",
+        "testStrategy": "Manually test the form for correct field validation, error handling, and accessibility. Use automated tests to check form submission and UI rendering.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Develop Developer-Only Signup Form Component",
+        "description": "Implement a signup form for developer use, hidden in production, to create new users.",
+        "details": "Create a signup page and form component with email and password fields. The form should call a backend API route to create a new user, hashing the password before storage. Use environment variables to conditionally render the signup form only in development. Hide or disable the route in production builds.",
+        "testStrategy": "Test signup in development mode, ensuring new users are created and passwords are hashed. Confirm the form is not accessible in production.",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Implement Session Management and Protected Routes",
+        "description": "Set up session management using NextAuth.js and protect routes that require authentication.",
+        "details": "Use NextAuth.js session hooks to check authentication status. Implement middleware or server-side checks to redirect unauthenticated users from protected pages (e.g., main chat interface) to the login page. Ensure session tokens are securely managed and refreshed as needed.",
+        "testStrategy": "Attempt to access protected routes while logged out and confirm redirection to login. Verify authenticated users can access protected content.",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Implement Environment-Based Conditional UI Rendering",
+        "description": "Control the visibility of the signup form and other UI elements based on environment (development or production).",
+        "details": "Use environment variables (e.g., `NODE_ENV`) to conditionally render the signup form and any developer-only features. Ensure that production builds do not expose developer-only UI. Add checks in both frontend and backend to enforce this.",
+        "testStrategy": "Build and run the app in both development and production modes. Confirm that developer-only features are hidden in production.",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Integrate Authentication Flow with Main Chat Interface",
+        "description": "Connect the authentication flow to the main chat interface, ensuring only authenticated users can access it.",
+        "details": "After successful login, redirect users to the main chat interface. Use session state to control access. Ensure logout returns users to the login page. Integrate session checks into the chat interface to prevent unauthorized access.",
+        "testStrategy": "Test end-to-end user flow: login, access chat, logout, and attempt to access chat while logged out. Confirm correct redirections and access control.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Comprehensive Integration Testing and Error Handling",
+        "description": "Test the complete authentication flow, error handling, and user feedback across environments.",
+        "details": "Write integration tests for login, signup (dev only), session management, and protected routes. Test error scenarios (invalid credentials, expired sessions, etc.). Ensure user-friendly error messages and feedback. Test both development and production builds for correct behavior.",
+        "testStrategy": "Automate tests using a framework like Jest and Playwright. Manually test edge cases and UI feedback. Review logs for security and error reporting.",
+        "priority": "medium",
+        "dependencies": [
+          6,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-10-24T14:12:16.662Z",
+      "updated": "2025-10-24T14:12:16.662Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

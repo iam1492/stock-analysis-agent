@@ -143,7 +143,7 @@ export function MessageItem({
       }
       
       // Extract friendly name from event data if available
-      const data = event.data as Record<string, unknown>;
+      const data = event.data as Record<string, unknown> | undefined;
       
       return (
         <div key={index} className="flex items-start gap-3 max-w-[90%] animate-in slide-in-from-bottom-2 duration-300">
@@ -166,7 +166,13 @@ export function MessageItem({
                 {data.friendlyAgentName}
               </div>
             )}
-            {/* Don't show detailed data for cleaner UI - just show the progress */}
+            {/* Show progress text */}
+            <div className="text-xs text-gray-500 italic">
+              {isThinking && "분석 중..."}
+              {isFunctionCall && "데이터 수집 중..."}
+              {isFunctionResponse && "처리 완료"}
+            </div>
+            {/* Show progress text */}
             <div className="text-xs text-gray-500 italic">
               {isThinking && "분석 중..."}
               {isFunctionCall && "데이터 수집 중..."}

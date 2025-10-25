@@ -1,10 +1,12 @@
 "use client";
 
-import { Bot } from "lucide-react";
+import { Bot, LogOut } from "lucide-react";
 import { UserIdInput } from "@/components/chat/UserIdInput";
 import { SessionSelector } from "@/components/chat/SessionSelector";
 import { ModelSelector } from "@/components/chat/ModelSelector";
 import { useChatContext } from "@/components/chat/ChatProvider";
+import { useSession, signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 
 /**
  * ChatHeader - User and session management interface
@@ -12,6 +14,7 @@ import { useChatContext } from "@/components/chat/ChatProvider";
  * Handles user ID input and session selection
  */
 export function ChatHeader(): React.JSX.Element {
+  const { data: session } = useSession();
   const {
     userId,
     sessionId,
@@ -20,6 +23,10 @@ export function ChatHeader(): React.JSX.Element {
     handleSessionSwitch,
     handleCreateNewSession,
   } = useChatContext();
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: "/login" });
+  };
 
   return (
     <div className="relative z-20 flex-shrink-0 border-b border-gray-200 bg-cream-25/80 backdrop-blur-sm shadow-[0_4px_8px_-2px_rgba(0,0,0,0.1)] px-4 py-3">
@@ -39,6 +46,13 @@ export function ChatHeader(): React.JSX.Element {
 
         {/* Right side - User controls */}
         <div className="flex items-center gap-4">
+          {/* User Info */}
+          {session?.user && (
+            <div className="text-sm text-gray-600 mr-2">
+              Welcome, {session.user.name || session.user.email}
+            </div>
+          )}
+
           {/* Model Selection */}
           <ModelSelector />
 
@@ -60,6 +74,17 @@ export function ChatHeader(): React.JSX.Element {
               className="text-xs"
             />
           )}
+
+          {/* Sign Out Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSignOut}
+            className="flex items-center gap-2 bg-white/80 border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900 shadow-sm"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </Button>
         </div>
       </div>
     </div>
