@@ -359,5 +359,108 @@
       "updated": "2025-10-25T14:54:10.654Z",
       "description": "Tasks for telemetry-fix context"
     }
+  },
+  "stock-symbol-removal": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Analyze stock_symbol usage across codebase",
+        "description": "Identify all code locations and dependencies involving stock_symbol to ensure comprehensive removal.",
+        "details": "Use static code analysis tools (e.g., grep, IDE search, or specialized tools like ESLint, TypeScript strict mode) to scan the entire codebase for references to stock_symbol. Document each occurrence, including imports, variable declarations, function parameters, and usage in logic. Create a detailed inventory of affected files and modules. Consider both direct references and indirect usage (e.g., dynamic property access, string concatenation).",
+        "testStrategy": "Manual review of the inventory to confirm no stock_symbol references are missed. Cross-check with a second developer for completeness.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Create backup of stock_symbol related code",
+        "description": "Safely archive all code and configuration files that reference stock_symbol before removal.",
+        "details": "Create a dedicated backup directory (e.g., /backups/stock_symbol_removal/). Copy all files and configurations identified in Task 1 into this directory, preserving original paths for traceability. Ensure the backup is version-controlled or otherwise protected from accidental deletion. Document the backup process and location for team reference.",
+        "testStrategy": "Verify that all files listed in the inventory from Task 1 exist in the backup directory. Check file integrity (e.g., diff against originals).",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Remove stock_symbol from request processing",
+        "description": "Eliminate stock_symbol from all request handling logic to prevent errors and clean up the API surface.",
+        "details": "Modify request validation, parsing, and processing logic to no longer expect, extract, or validate stock_symbol. Update API documentation and client-facing contracts if necessary. Ensure backward compatibility is not broken for other fields. Remove any stock_symbol-related error handling or logging.",
+        "testStrategy": "Write and run unit and integration tests that simulate requests with and without stock_symbol. Verify that requests succeed without stock_symbol and that no legacy error paths are triggered. Check logs for unexpected stock_symbol-related messages.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Remove stock_symbol from agent payload formatting",
+        "description": "Ensure agent result payloads no longer include or depend on stock_symbol.",
+        "details": "Inspect and modify all code responsible for formatting agent results. Remove stock_symbol from payload templates, serialization logic, and any conditional logic based on its presence. Ensure that payload structure remains valid and that no fields are left undefined or null due to removal.",
+        "testStrategy": "Validate payloads in test environments using mock agent results. Confirm that payloads are well-formed and that no stock_symbol field appears. Use automated assertions in test suites to enforce this.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Remove stock_symbol from session context",
+        "description": "Eliminate stock_symbol from session management and context propagation.",
+        "details": "Review session initialization, storage, and retrieval logic. Remove stock_symbol from session objects, context passing between components, and any session-related middleware. Ensure that session APIs and storage schemas are updated to reflect the removal.",
+        "testStrategy": "Test session lifecycle operations (create, read, update, destroy) to ensure no stock_symbol is stored or retrieved. Verify that existing sessions remain functional and that new sessions do not reference stock_symbol.",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          2
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Test agent result storage functionality",
+        "description": "Validate that agent result storage in memory continues to operate correctly after stock_symbol removal.",
+        "details": "Execute end-to-end test scenarios where agents generate results that are stored in memory. Verify that storage, retrieval, and expiration logic works as expected. Check for regressions in performance or correctness. Monitor memory usage and garbage collection to ensure no leaks are introduced.",
+        "testStrategy": "Automated integration tests covering storage and retrieval of agent results. Manual spot checks in staging environments. Compare memory metrics before and after changes.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          4,
+          5
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Verify production deployment without stock_symbol",
+        "description": "Confirm that the system operates correctly in production after stock_symbol removal.",
+        "details": "Deploy changes to a production-like environment (or production itself if safe). Monitor system behavior, error rates, and logs for issues related to stock_symbol removal. Ensure that all agent workflows, including result storage, continue to function. Prepare a rollback plan using the backup from Task 2 if critical issues arise.",
+        "testStrategy": "Canary deployment or phased rollout with close monitoring. Automated health checks and alerting for stock_symbol-related errors. Post-deployment validation of agent result storage and system stability.",
+        "priority": "high",
+        "dependencies": [
+          6
+        ],
+        "status": "in-progress",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-10-26T13:20:22.778Z",
+      "updated": "2025-10-26T13:38:00.075Z",
+      "description": "Tasks for stock-symbol-removal context"
+    }
   }
 }

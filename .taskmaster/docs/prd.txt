@@ -1,81 +1,20 @@
-<context>
-# Overview
-이 프로젝트는 AI 기반 주식 분석 서비스로, Next.js 프론트엔드와 Python 백엔드를 사용하는 웹 애플리케이션입니다. 현재 메모리 기반 사용자 저장소를 사용하고 있지만, 프로덕션 배포를 위해 실제 데이터베이스와 연동해야 합니다.
+# Stock Symbol Removal Task
 
-# Core Features
-- 이메일/비밀번호 기반 사용자 인증 (데이터베이스 연동)
-- 회원가입 기능 (관리자 전용: iam1492@gmail.com 계정만 접근 가능)
-- 사용자 관리 및 세션 관리
-- Vercel 배포 환경에 최적화된 데이터베이스 솔루션
+## Overview
+Remove stock_symbol related code from the production environment as it's causing errors and is no longer needed. The agent result storage in memory should continue to work properly.
 
-# User Experience
-- 사용자 페르소나: 주식 투자자, 금융 분석가
-- 주요 사용자 플로우:
-  1. 앱 접속 시 로그인 화면 표시
-  2. 이메일/비밀번호로 로그인
-  3. 로그인 성공 시 메인 채팅 인터페이스로 이동
-- 관리자 플로우:
-  1. iam1492@gmail.com으로 로그인
-  2. 회원가입 메뉴 접근 가능
-  3. 신규 사용자 계정 생성
-</context>
-<PRD>
-# Technical Architecture
-- 프론트엔드: Next.js 15, TypeScript, Tailwind CSS
-- 인증: NextAuth.js v5 (Auth.js)
-- 데이터베이스: Vercel Postgres (Vercel 환경에 최적화)
-- ORM: Prisma (타입 안전성과 개발 경험 향상)
-- 배포 환경: Vercel (서버리스 함수, 엣지 함수 지원)
+## Requirements
+1. Identify all code that uses stock_symbol
+2. Create backup folder and save stock_symbol related files
+3. Safely remove stock_symbol usage from production code
+4. Ensure agent result storage continues to work
+5. Test that the system works without stock_symbol
 
-# Development Roadmap
-## Phase 1: 데이터베이스 인프라 구축
-- Vercel Postgres 설정 및 연결
-- Prisma ORM 설치 및 구성
-- 사용자 테이블 스키마 설계
-- 데이터베이스 마이그레이션 설정
-
-## Phase 2: 인증 시스템 데이터베이스 연동
-- 기존 메모리 기반 인증을 데이터베이스 기반으로 전환
-- Prisma 클라이언트 설정
-- 사용자 모델 및 인증 로직 업데이트
-- 비밀번호 해싱 및 검증 로직 유지
-
-## Phase 3: 관리자 전용 회원가입 기능 구현
-- iam1492@gmail.com 계정 권한 확인 로직
-- 관리자 전용 회원가입 API 엔드포인트
-- 회원가입 폼 접근 권한 제어
-- 신규 사용자 생성 및 데이터베이스 저장
-
-## Phase 4: 보안 및 검증
-- 입력 데이터 검증 강화
-- SQL 인젝션 방지
-- 민감한 정보 암호화
-- 환경 변수 및 보안 설정 검토
-
-## Phase 5: 테스트 및 배포 준비
-- 데이터베이스 연결 테스트
-- 인증 플로우 종단 테스트
-- 프로덕션 환경 설정
-- Vercel 배포 구성 최적화
-
-# Logical Dependency Chain
-1. Vercel Postgres 데이터베이스 설정 (foundation)
-2. Prisma ORM 구성 및 스키마 정의
-3. 데이터베이스 마이그레이션 및 연결 테스트
-4. 기존 인증 로직을 데이터베이스 기반으로 전환
-5. 관리자 권한 확인 및 회원가입 API 구현
-6. 보안 검증 및 에러 처리 강화
-7. 통합 테스트 및 프로덕션 배포 준비
-
-# Risks and Mitigations
-- Vercel Postgres 연결 문제: 공식 문서와 예제 코드 참고, 로컬 개발 환경에서 충분히 테스트
-- Prisma 마이그레이션 복잡성: 단계적 접근으로 스키마 변경, 백업 전략 수립
-- 관리자 권한 관리: 이메일 기반 권한 확인 로직 구현, 환경 변수로 관리자 이메일 설정
-- 데이터 보안: bcrypt 해싱 유지, 민감한 데이터 암호화, HTTPS 강제 적용
-
-# Appendix
-- Vercel Postgres 공식 문서 참고
-- Prisma Next.js 가이드라인 준수
-- NextAuth.js 데이터베이스 어댑터 사용 고려
-- 프로덕션 배포 전 데이터베이스 백업 전략 수립
-</PRD>
+## Tasks
+1. Analyze current stock_symbol usage across the codebase
+2. Create backup folder for stock_symbol related code
+3. Remove stock_symbol from request processing
+4. Remove stock_symbol from agent payload formatting
+5. Remove stock_symbol from session context
+6. Test agent result storage functionality
+7. Verify production deployment works without stock_symbol

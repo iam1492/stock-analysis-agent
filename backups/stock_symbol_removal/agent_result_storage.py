@@ -49,19 +49,21 @@ class AgentResultStorage:
 
         return "unknown"
 
-    def _get_folder_path(self, user_id: str, session_id: str) -> Path:
+    def _get_folder_path(self, user_id: str, session_id: str, stock_symbol: str) -> Path:
         """Generate folder path for storing results"""
         # Sanitize inputs for filesystem safety
         safe_user_id = re.sub(r'[^\w\-_]', '_', user_id)
         safe_session_id = re.sub(r'[^\w\-_]', '_', session_id)
+        safe_stock_symbol = re.sub(r'[^\w\-_]', '_', stock_symbol)
 
-        folder_name = f"session_{safe_session_id}"
+        folder_name = f"session_{safe_session_id}_{safe_stock_symbol}"
         return self.base_dir / f"user_{safe_user_id}" / folder_name
 
     async def save_agent_result(
         self,
         user_id: str,
         session_id: str,
+        stock_symbol: str,
         agent_name: str,
         content: str,
         metadata: Optional[Dict[str, Any]] = None
@@ -72,6 +74,7 @@ class AgentResultStorage:
         Args:
             user_id: User identifier
             session_id: Session identifier
+            stock_symbol: Stock symbol (extracted from query)
             agent_name: Name of the agent
             content: Full text content from agent
             metadata: Additional metadata (timestamps, etc.)
@@ -80,7 +83,7 @@ class AgentResultStorage:
             bool: Success status
         """
         try:
-            folder_path = self._get_folder_path(user_id, session_id)
+            folder_path = self._get_folder_path(user_id, session_id, stock_symbol)
             folder_path.mkdir(parents=True, exist_ok=True)
 
             file_path = folder_path / f"{agent_name}.json"
@@ -91,6 +94,7 @@ class AgentResultStorage:
                 "timestamp": datetime.now().isoformat(),
                 "user_id": user_id,
                 "session_id": session_id,
+                "stock_symbol": stock_symbol,
                 "metadata": metadata or {}
             }
 
@@ -112,6 +116,7 @@ class AgentResultStorage:
         self,
         user_id: str,
         session_id: str,
+        stock_symbol: str,
         agent_name: str
     ) -> Optional[Dict[str, Any]]:
         """
@@ -121,7 +126,7 @@ class AgentResultStorage:
             Dict containing result data or None if not found
         """
         try:
-            folder_path = self._get_folder_path(user_id, session_id)
+            folder_path = self._get_folder_path(user_id, session_id, stock_symbol)
             file_path = folder_path / f"{agent_name}.json"
 
             if not file_path.exists():
@@ -141,7 +146,8 @@ class AgentResultStorage:
     async def get_available_agents(
         self,
         user_id: str,
-        session_id: str
+        session_id: str,
+        stock_symbol: str
     ) -> List[str]:
         """
         Get list of available agent results for a session
@@ -150,7 +156,7 @@ class AgentResultStorage:
             List of agent names that have saved results
         """
         try:
-            folder_path = self._get_folder_path(user_id, session_id)
+            folder_path = self._get_folder_path(user_id, session_id, stock_symbol)
 
             if not folder_path.exists():
                 return []

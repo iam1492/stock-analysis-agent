@@ -20,6 +20,7 @@ router = APIRouter(tags=["agent-results"])
 class SaveAgentResultRequest(BaseModel):
     user_id: str
     session_id: str
+    stock_symbol: str
     agent_name: str
     content: str
     message_id: Optional[str] = None
@@ -59,6 +60,7 @@ async def save_agent_result(
         success = await agent_storage.save_agent_result(
             user_id=request.user_id,
             session_id=request.session_id,
+            stock_symbol=request.stock_symbol,
             agent_name=request.agent_name,
             content=request.content,
             metadata={
@@ -71,7 +73,8 @@ async def save_agent_result(
             # Construct file path for response
             folder_path = agent_storage._get_folder_path(
                 request.user_id,
-                request.session_id
+                request.session_id,
+                request.stock_symbol
             )
             file_path = str(folder_path / f"{request.agent_name}.json")
 
@@ -102,9 +105,10 @@ async def load_agent_result(request: dict):
     try:
         user_id = request.get("user_id")
         session_id = request.get("session_id")
+        stock_symbol = request.get("stock_symbol")
         agent_name = request.get("agent_name")
 
-        if not all([user_id, session_id, agent_name]):
+        if not all([user_id, session_id, stock_symbol, agent_name]):
             raise HTTPException(status_code=400, detail="Missing required parameters")
 
         logger.info(f"Loading {agent_name} result for user {user_id}, session {session_id}")
@@ -112,6 +116,7 @@ async def load_agent_result(request: dict):
         result = await agent_storage.load_agent_result(
             user_id=user_id,
             session_id=session_id,
+            stock_symbol=stock_symbol,
             agent_name=agent_name
         )
 
@@ -136,15 +141,17 @@ async def list_agent_results(request: dict):
     try:
         user_id = request.get("user_id")
         session_id = request.get("session_id")
+        stock_symbol = request.get("stock_symbol")
 
-        if not all([user_id, session_id]):
+        if not all([user_id, session_id, stock_symbol]):
             raise HTTPException(status_code=400, detail="Missing required parameters")
 
         logger.info(f"Listing agent results for user {user_id}, session {session_id}")
 
         agents = await agent_storage.get_available_agents(
             user_id=user_id,
-            session_id=session_id
+            session_id=session_id,
+            stock_symbol=stock_symbol
         )
 
         if agents:
@@ -154,6 +161,7 @@ async def list_agent_results(request: dict):
                 result = await agent_storage.load_agent_result(
                     user_id=user_id,
                     session_id=session_id,
+                    stock_symbol=stock_symbol,
                     agent_name=agent_name
                 )
                 if result:

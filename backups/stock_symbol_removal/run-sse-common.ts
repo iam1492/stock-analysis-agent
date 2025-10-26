@@ -35,6 +35,7 @@ export interface AgentEnginePayload {
     session_id: string;
     message: string;
     model?: string;
+    stock_symbol?: string;
   };
 }
 
@@ -46,6 +47,7 @@ export interface LocalBackendPayload {
   userId: string;
   sessionId: string;
   model?: string;
+  stockSymbol?: string;
   newMessage: {
     parts: { text: string }[];
     role: "user";
@@ -140,6 +142,7 @@ export async function parseStreamRequest(request: NextRequest): Promise<{
     }
 
     const message = requestBody.message!;
+    const stockSymbol = extractStockSymbol(message);
 
     return {
       data: {
@@ -147,6 +150,7 @@ export async function parseStreamRequest(request: NextRequest): Promise<{
         userId: requestBody.userId!,
         sessionId: requestBody.sessionId!,
         model: requestBody.model,
+        stockSymbol,
       },
       validation: { isValid: true },
     };
@@ -214,6 +218,7 @@ export function formatAgentEnginePayload(
       session_id: requestData.sessionId,
       message: requestData.message,
       model: requestData.model,
+      stock_symbol: requestData.stockSymbol,
     },
   };
 }
@@ -232,6 +237,7 @@ export function formatLocalBackendPayload(
     userId: requestData.userId,
     sessionId: requestData.sessionId,
     model: requestData.model,
+    stockSymbol: requestData.stockSymbol,
     newMessage: {
       parts: [{ text: requestData.message }],
       role: "user",

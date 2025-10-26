@@ -31,19 +31,17 @@ def set_session(callback_context: CallbackContext):
     # Initialize agent result storage tracking
     callback_context.state["agent_results"] = {}
     callback_context.state["user_id"] = None
-    callback_context.state["stock_symbol"] = None
     callback_context.state["model"] = None
 
 
-def update_session_context(callback_context: CallbackContext, user_id: str, stock_symbol: str, model: str = None):
+def update_session_context(callback_context: CallbackContext, user_id: str, model: str = None):
     """
-    Update session context with user, stock, and model information.
+    Update session context with user and model information.
     This is called from the streaming handler when a new analysis starts.
     """
     callback_context.state["user_id"] = user_id
-    callback_context.state["stock_symbol"] = stock_symbol
     callback_context.state["model"] = model
-    print(f"📝 Updated session context: user_id={user_id}, stock_symbol={stock_symbol}, model={model}")
+    print(f"📝 Updated session context: user_id={user_id}, model={model}")
 
 
 # Note: Agent result saving is now handled through streaming detection
