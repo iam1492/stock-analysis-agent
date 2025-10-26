@@ -64,7 +64,7 @@ export async function handleLocalBackendStreamRequest(
 
     // Get authentication headers
     const authHeaders = await getAuthHeaders();
-
+    
     // Forward request to local backend
     const response = await fetch(localBackendUrl, {
       method: "POST",
