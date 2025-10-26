@@ -14,7 +14,17 @@ async function main() {
     console.error('- ADMIN_EMAIL: 관리자 이메일')
     console.error('- ADMIN_PASSWORD: 관리자 비밀번호')
     console.error('- ADMIN_NAME: 관리자 이름 (선택사항, 기본값: Admin)')
+    console.error('')
+    console.error('개발 환경에서는 .env.local 파일에 설정하세요.')
+    console.error('프로덕션 환경에서는 Vercel 환경 변수에 설정하세요.')
     process.exit(1)
+  }
+
+  // 프로덕션 환경에서만 관리자 계정 생성 (보안 강화)
+  if (process.env.NODE_ENV === 'production') {
+    console.log('프로덕션 환경에서 관리자 계정을 생성합니다...')
+  } else {
+    console.log('개발 환경에서 관리자 계정을 생성합니다...')
   }
 
   // 기존 관리자 계정이 있는지 확인
