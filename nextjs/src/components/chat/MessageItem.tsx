@@ -172,12 +172,6 @@ export function MessageItem({
               {isFunctionCall && "데이터 수집 중..."}
               {isFunctionResponse && "처리 완료"}
             </div>
-            {/* Show progress text */}
-            <div className="text-xs text-gray-500 italic">
-              {isThinking && "분석 중..."}
-              {isFunctionCall && "데이터 수집 중..."}
-              {isFunctionResponse && "처리 완료"}
-            </div>
           </div>
         </div>
       );

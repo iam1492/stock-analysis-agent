@@ -94,6 +94,13 @@ class TracingConfig:
             else:
                 os.environ[var] = "none"
 
+        # Additional aggressive disable for context issues
+        os.environ["OTEL_PYTHON_CONTEXT"] = "none"
+        os.environ["OTEL_PROPAGATORS"] = "none"
+        os.environ["OTEL_BSP_SCHEDULE_DELAY"] = "0"
+        os.environ["OTEL_BSP_MAX_EXPORT_BATCH_SIZE"] = "0"
+        os.environ["OTEL_BSP_MAX_QUEUE_SIZE"] = "0"
+
     def _apply_aggressive_disable(self) -> None:
         """Apply additional aggressive disabling for development environments."""
         # Force disable any remaining OTEL components
@@ -103,7 +110,49 @@ class TracingConfig:
             "OTEL_METRICS_EXPORTER",
             "OTEL_LOGS_EXPORTER",
             "OTEL_EXPORTER_CONSOLE_ENDPOINT",
-            "OTEL_EXPORTER_CONSOLE_PROTOCOL"
+            "OTEL_EXPORTER_CONSOLE_PROTOCOL",
+            "OTEL_EXPORTER_CONSOLE_TRACES_ENDPOINT",
+            "OTEL_EXPORTER_CONSOLE_METRICS_ENDPOINT",
+            "OTEL_EXPORTER_CONSOLE_LOGS_ENDPOINT",
+            "OTEL_EXPORTER_OTLP_COMPRESSION",
+            "OTEL_EXPORTER_OTLP_HEADERS",
+            "OTEL_EXPORTER_OTLP_TIMEOUT",
+            "OTEL_EXPORTER_OTLP_PROTOCOL",
+            "OTEL_EXPORTER_OTLP_INSECURE",
+            "OTEL_EXPORTER_OTLP_CERTIFICATE",
+            "OTEL_EXPORTER_OTLP_CLIENT_KEY",
+            "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE",
+            "OTEL_EXPORTER_OTLP_ENDPOINT",
+            "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT",
+            "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT",
+            "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT",
+            "OTEL_EXPORTER_JAEGER_ENDPOINT",
+            "OTEL_EXPORTER_JAEGER_USER",
+            "OTEL_EXPORTER_JAEGER_PASSWORD",
+            "OTEL_EXPORTER_ZIPKIN_ENDPOINT",
+            "OTEL_EXPORTER_PROMETHEUS_ENDPOINT",
+            "OTEL_EXPORTER_PROMETHEUS_HOST",
+            "OTEL_EXPORTER_PROMETHEUS_PORT",
+            "OTEL_RESOURCE_ATTRIBUTES",
+            "OTEL_SERVICE_NAME",
+            "OTEL_SERVICE_NAMESPACE",
+            "OTEL_SERVICE_INSTANCE_ID",
+            "OTEL_SERVICE_VERSION",
+            "OTEL_LIBRARY_INFO_ENABLED",
+            "OTEL_DISABLE_TELEMETRY",
+            "OTEL_TELEMETRY_SDK_DISABLED",
+            "OTEL_PYTHON_ID_GENERATOR",
+            "OTEL_PYTHON_FAILED_REQUEST_ATTRIBUTE_COUNT",
+            "OTEL_PYTHON_SUCCESSFUL_REQUEST_ATTRIBUTE_COUNT",
+            "OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED",
+            "OTEL_PYTHON_LOGGING_CORRELATION",
+            "OTEL_PYTHON_LOGGING_INCLUDE_TRACING_CONTEXT",
+            "OTEL_PYTHON_LOGGING_EXCLUDE_URLS",
+            "OTEL_PYTHON_LOGGING_LOG_LEVEL",
+            "OTEL_PYTHON_LOGGING_CAPTURE_HEADERS_SERVER_REQUEST",
+            "OTEL_PYTHON_LOGGING_CAPTURE_HEADERS_SERVER_RESPONSE",
+            "OTEL_PYTHON_LOGGING_CAPTURE_HEADERS_CLIENT_REQUEST",
+            "OTEL_PYTHON_LOGGING_CAPTURE_HEADERS_CLIENT_RESPONSE",
         ]
 
         for var in aggressive_vars:
@@ -111,6 +160,8 @@ class TracingConfig:
 
         # Ensure SDK is completely disabled
         os.environ["OTEL_SDK_DISABLED"] = "true"
+        os.environ["OTEL_DISABLE_TELEMETRY"] = "true"
+        os.environ["OTEL_TELEMETRY_SDK_DISABLED"] = "true"
 
     def _enable_selective_tracing(self) -> None:
         """Enable selective tracing for production use."""
@@ -124,6 +175,10 @@ class TracingConfig:
         os.environ["OTEL_TRACES_EXPORTER"] = "console"
         os.environ["OTEL_METRICS_EXPORTER"] = "none"
         os.environ["OTEL_LOGS_EXPORTER"] = "none"
+
+        # Add safe context management for production
+        os.environ["OTEL_PYTHON_CONTEXT"] = "contextvars_context"
+        os.environ["OTEL_PROPAGATORS"] = "tracecontext,baggage"
 
     def _configure_context_propagation(self) -> None:
         """Configure OpenTelemetry context propagation."""
@@ -156,6 +211,14 @@ def disable_tracing_aggressively() -> None:
     Convenience function to disable tracing aggressively.
     Use this in development or when experiencing OTEL context issues.
     """
+    # Force disable before any OTEL imports
+    os.environ["OTEL_SDK_DISABLED"] = "true"
+    os.environ["OTEL_DISABLE_TELEMETRY"] = "true"
+    os.environ["OTEL_TELEMETRY_SDK_DISABLED"] = "true"
+    os.environ["OTEL_PYTHON_DISABLED_INSTRUMENTATIONS"] = "opentelemetry.instrumentation.auto_instrumentation,opentelemetry.instrumentation.urllib3,opentelemetry.instrumentation.requests,opentelemetry.instrumentation.httpx,opentelemetry.instrumentation.asyncpg,opentelemetry.instrumentation.redis,opentelemetry.instrumentation.elasticsearch,opentelemetry.instrumentation.google_genai,opentelemetry.instrumentation.fastapi,opentelemetry.instrumentation.starlette"
+    os.environ["OTEL_PYTHON_CONTEXT"] = "none"
+    os.environ["OTEL_PROPAGATORS"] = "none"
+
     config = TracingConfig(disable_tracing=True, development_mode=True)
     config.apply_configuration()
     print("[DISABLED] OpenTelemetry tracing aggressively disabled")
@@ -177,7 +240,7 @@ def enable_tracing_for_production() -> None:
     """
     config = TracingConfig(disable_tracing=False, development_mode=False)
     config.apply_configuration()
-    print("[ENABLED] OpenTelemetry tracing enabled for production")
+    print("[ENABLED] OpenTelemetry tracing enabled for production with safe context management")
 
 
 # Auto-apply configuration based on environment
@@ -190,6 +253,11 @@ def auto_configure_tracing() -> None:
     3. Development mode (default) -> aggressive disable
     4. Production mode -> selective tracing
     """
+    # Always disable tracing aggressively due to persistent context issues
+    # This is a temporary measure until the root cause is fully resolved
+    disable_tracing_aggressively()
+    return
+
     # Check for explicit disable flags
     if os.environ.get("FORCE_DISABLE_OTEL", "").lower() == "true":
         disable_tracing_aggressively()
@@ -210,6 +278,7 @@ def auto_configure_tracing() -> None:
     if any(development_indicators):
         disable_tracing_aggressively()
     else:
+        # For production-like environments, use selective tracing with safe context management
         disable_tracing_selective()
 
 

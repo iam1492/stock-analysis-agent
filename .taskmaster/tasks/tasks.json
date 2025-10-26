@@ -248,5 +248,116 @@
       "updated": "2025-10-25T00:59:10.230Z",
       "description": "Tasks for database-integration context"
     }
+  },
+  "telemetry-fix": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Analyze Error Logs and Current Tracing Configuration",
+        "description": "Collect and analyze detailed error logs related to GeneratorExit and context token issues. Review current OpenTelemetry tracing settings and ADK tracing-related code.",
+        "details": "Gather representative error logs showing GeneratorExit and context detach failures. Review tracing configuration in both development and production environments. Examine ADK code paths where tracing and context management are handled, focusing on async generator usage and contextvar token lifecycle.",
+        "testStrategy": "Verify that all known error patterns are captured. Confirm that tracing configuration matches documented settings. Ensure code review covers all relevant tracing and context management logic.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Design Safe Context Detach Mechanism for OpenTelemetry",
+        "description": "Implement a robust mechanism to safely detach OpenTelemetry context tokens, especially during GeneratorExit scenarios.",
+        "details": "Refactor context detach logic to avoid calling detach in GeneratorExit or when contextvars tokens were created in a different context. Use try/except blocks to catch ValueError and log or handle gracefully. Consider upstream workarounds such as ensuring all tasks complete before GC triggers GeneratorExit[1][3].",
+        "testStrategy": "Unit test context detach logic with simulated GeneratorExit and cross-context token scenarios. Confirm no ValueError is raised and context is cleaned up safely.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Enhance TracingSafeAsyncGenerator Utility",
+        "description": "Improve TracingSafeAsyncGenerator to standardize async generator cleanup and context management.",
+        "details": "Update TracingSafeAsyncGenerator to ensure context is properly entered and exited, and that cleanup occurs safely during GeneratorExit. Add logic to prevent context detach if the token is invalid or from a different context. Document usage patterns for developers.",
+        "testStrategy": "Write integration tests for async generators using TracingSafeAsyncGenerator, including forced GeneratorExit and context switching. Validate no context leaks or detach errors.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Standardize GeneratorExit Exception Handling",
+        "description": "Implement a consistent approach to handling GeneratorExit exceptions across all tracing-related code.",
+        "details": "Introduce utility functions or decorators to wrap generator cleanup logic, catching GeneratorExit and ensuring safe context teardown. Ensure that OpenTelemetry spans are not incorrectly marked as errors due to GeneratorExit unless truly exceptional[3].",
+        "testStrategy": "Test generator workflows with and without tracing, forcibly triggering GeneratorExit. Confirm that exceptions are handled and spans are not erroneously marked as errors.",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Optimize Tracing Configuration for Development and Production",
+        "description": "Separate and optimize tracing settings for development and production environments, enabling selective tracing as needed.",
+        "details": "Refactor configuration files or environment variable usage to allow different tracing levels per environment. Implement selective tracing logic to minimize performance impact and avoid monitoring loss when tracing is partially disabled.",
+        "testStrategy": "Deploy in both environments and verify tracing behavior matches configuration. Benchmark performance impact of tracing settings.",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Integrate Performance Monitoring for Tracing Operations",
+        "description": "Add performance monitoring to measure the impact of tracing and context management changes.",
+        "details": "Instrument key tracing and context management code paths with metrics collection (e.g., latency, error rates, resource usage). Use OpenTelemetry metrics or compatible monitoring tools. Set up alerts for abnormal performance degradation.",
+        "testStrategy": "Run load tests and monitor metrics before and after changes. Validate that performance impact is minimal and within acceptable thresholds.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Conduct Integration and Regression Testing",
+        "description": "Perform comprehensive integration and regression tests to ensure all fixes work together and do not introduce new issues.",
+        "details": "Develop test scenarios that reproduce known errors, including GeneratorExit and context token mismatches. Test tracing in both development and production configurations. Validate that analysis jobs complete without premature termination.",
+        "testStrategy": "Automate test suite covering all error scenarios and normal workflows. Confirm all success criteria are met and no regressions occur.",
+        "priority": "high",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Prepare for Production Deployment and Final Verification",
+        "description": "Finalize code, configuration, and documentation for production deployment. Perform last-stage verification and monitoring.",
+        "details": "Review all changes for completeness and adherence to requirements. Update deployment scripts and documentation. Monitor production environment post-deployment for any residual errors or performance issues.",
+        "testStrategy": "Deploy to staging, run final acceptance tests, and monitor production logs and metrics for at least one full analysis cycle.",
+        "priority": "high",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-10-25T14:52:34.019Z",
+      "updated": "2025-10-25T14:54:10.654Z",
+      "description": "Tasks for telemetry-fix context"
+    }
   }
 }

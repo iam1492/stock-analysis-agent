@@ -35,8 +35,12 @@ class AgentEngineApp(AdkApp):
         super().set_up()
         logging_client = google_cloud_logging.Client()
         self.logger = logging_client.logger(__name__)
-        # Temporarily disable tracing to avoid context issues
+        # Completely disable tracing due to persistent context issues
         self.enable_tracing = False
+        # Additional safety measures
+        import os
+        os.environ["OTEL_SDK_DISABLED"] = "true"
+        os.environ["OTEL_DISABLE_TELEMETRY"] = "true"
 
     def register_feedback(self, feedback: dict[str, Any]) -> None:
         """Collect and log feedback from users."""
@@ -122,6 +126,7 @@ def deploy_agent_engine_app() -> agent_engines.AgentEngine:
         artifact_service_builder=lambda: GcsArtifactService(
             bucket_name=artifacts_bucket_name
         ),
+        enable_tracing=False,  # Explicitly disable tracing
     )
 
     # Add agent results API router at /agent-results path
