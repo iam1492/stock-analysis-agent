@@ -10,6 +10,14 @@ import { Copy, CopyCheck, Loader2, Bot, User, Brain, Info, Code, FileText } from
 import { Message } from "@/types";
 import { AgentResultButtons } from "./AgentResultButtons";
 
+// 타입 정의
+type MessageData = {
+  type: 'functionCall' | 'functionResponse' | 'thinking' | string;
+  name?: string;
+  friendlyAgentName?: string;
+  // ... 다른 필드들
+};
+
 interface MessageItemProps {
   message: Message;
   messageEvents?: Map<string, ProcessedEvent[]>;
@@ -143,7 +151,7 @@ export function MessageItem({
       }
       
       // Extract friendly name from event data if available
-      const data = event.data as Record<string, unknown> | undefined;
+      const data = event.data as MessageData | undefined;
       
       return (
         <div key={index} className="flex items-start gap-3 max-w-[90%] animate-in slide-in-from-bottom-2 duration-300">
@@ -151,7 +159,7 @@ export function MessageItem({
             {icon}
           </div>
           <div className={`flex-1 ${bubbleStyle} rounded-2xl rounded-tl-sm p-3 shadow-lg`}>
-            <div className="text-sm font-medium mb-1 text-gray-700">
+          <div className="text-sm font-medium mb-1 text-gray-700">
               {event.title}
             </div>
             {/* Show additional context for function calls/responses */}
