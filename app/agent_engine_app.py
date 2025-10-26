@@ -95,6 +95,17 @@ def deploy_agent_engine_app() -> agent_engines.AgentEngine:
 
     # Configure worker parallelism
     env_vars["NUM_WORKERS"] = "1"
+    
+    # Add FMP API key from environment
+    fmp_api_key = os.environ.get("FMP_API_KEY")
+    if fmp_api_key:
+        env_vars["FMP_API_KEY"] = fmp_api_key
+        
+    # Add OPENROUTER key from environment
+    openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
+    if openrouter_api_key:
+        env_vars["OPENROUTER_API_KEY"] = openrouter_api_key
+    
 
     # Step 3: Create required Google Cloud Storage buckets
     artifacts_bucket_name = (
