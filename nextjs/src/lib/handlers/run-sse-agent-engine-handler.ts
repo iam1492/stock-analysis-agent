@@ -171,7 +171,8 @@ class JSONFragmentProcessor {
    * Emit a complete part as SSE format to the frontend
    * Converts from Agent Engine JSON fragments to standard SSE format
    *
-   * IMPROVED: Now outputs proper SSE format for unified processing
+   * CRITICAL FIX: Ensure each SSE event contains a complete, parseable JSON object
+   * to prevent frontend parsing failures and maintain streaming continuity
    */
   private emitCompletePart(part: AgentEngineContentPart): void {
     console.log(
@@ -180,20 +181,38 @@ class JSONFragmentProcessor {
         (part.text && part.text.length > 200 ? "..." : "")
     );
 
+    // CRITICAL: Each event must be a complete, independent JSON object
+    // This prevents frontend buffer concatenation issues
     const sseData = {
       content: {
-        parts: [part],
+        parts: [part], // Single part per event for atomic processing
       },
       author: this.currentAgent || "goal_planning_agent",
+      id: this.generateEventId(), // Unique ID for debugging and tracking
+      timestamp: new Date().toISOString(), // Timestamp for debugging
     };
 
-    // Convert to proper SSE format: data: {...}\n\n
+    // Standard SSE format: data: {...}\n\n
     const sseEvent = `data: ${JSON.stringify(sseData)}\n\n`;
     this.controller.enqueue(Buffer.from(sseEvent));
 
     console.log(
-      `✅ [JSON PROCESSOR] Successfully emitted complete part as SSE format`
+      `✅ [JSON PROCESSOR] Successfully emitted complete part as SSE format`,
+      {
+        eventId: sseData.id,
+        author: sseData.author,
+        hasText: !!part.text,
+        isThought: !!part.thought,
+        textLength: part.text?.length || 0
+      }
     );
+  }
+
+  /**
+   * Generate a unique event ID for debugging and tracking
+   */
+  private generateEventId(): string {
+    return `sse_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
   /**
