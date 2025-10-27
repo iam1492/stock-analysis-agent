@@ -107,6 +107,13 @@ class JSONFragmentProcessor {
     const partsArrayStart = partsMatch.index! + partsMatch[0].length;
     const partsContent = this.buffer.substring(partsArrayStart);
 
+    // Also try to extract agent name from the buffer
+    let currentAgentFromBuffer = "goal_planning_agent";
+    const authorMatch = this.buffer.match(/"author"\s*:\s*"([^"]+)"/);
+    if (authorMatch) {
+      currentAgentFromBuffer = authorMatch[1];
+    }
+
     // Look for potential object starts and try to parse them
     let searchPos = 0;
 
@@ -125,17 +132,26 @@ class JSONFragmentProcessor {
         try {
           const part = JSON.parse(potentialJson);
 
-          // Check if this is a valid part object with text
-          if (part.text && typeof part.text === "string") {
+          // Check if this is a valid part object
+          if (this.isValidPart(part)) {
             const partHash = this.hashPart(part);
 
             if (!this.sentParts.has(partHash)) {
               console.log(
                 `✅ [JSON PROCESSOR] Found new part (thought: ${
                   part.thought
-                }): ${part.text.substring(0, 100)}...`
+                }): ${part.text?.substring(0, 100) || 'function call/response'}...`
               );
-              this.emitCompletePart(part);
+
+              // Emit the appropriate event based on part type
+              if (part.text && typeof part.text === "string") {
+                this.emitCompletePart(part, currentAgentFromBuffer);
+              } else if (part.function_call) {
+                this.emitFunctionCall(part.function_call, currentAgentFromBuffer);
+              } else if (part.function_response) {
+                this.emitFunctionResponse(part.function_response, currentAgentFromBuffer);
+              }
+
               this.sentParts.add(partHash);
             }
           }
@@ -157,14 +173,23 @@ class JSONFragmentProcessor {
   }
 
   /**
+   * Check if a parsed object is a valid Agent Engine content part
+   */
+  private isValidPart(obj: any): boolean {
+    return obj &&
+           (obj.text || obj.function_call || obj.function_response) &&
+           typeof obj === 'object';
+  }
+
+  /**
    * Create a simple hash of a part to detect duplicates
    */
   private hashPart(part: AgentEngineContentPart): string {
     // Use full text for better uniqueness and include position info
     const textHash = part.text?.substring(0, 100) || "";
-    return `${textHash}-${part.thought}-${!!part.function_call}-${
-      textHash.length
-    }`;
+    const functionCallHash = part.function_call ? JSON.stringify(part.function_call).substring(0, 100) : "";
+    const functionResponseHash = part.function_response ? JSON.stringify(part.function_response).substring(0, 100) : "";
+    return `${textHash}-${part.thought}-${!!part.function_call}-${!!part.function_response}-${functionCallHash}-${functionResponseHash}-${textHash.length}`;
   }
 
   /**
@@ -174,12 +199,15 @@ class JSONFragmentProcessor {
    * CRITICAL FIX: Ensure each SSE event contains a complete, parseable JSON object
    * to prevent frontend parsing failures and maintain streaming continuity
    */
-  private emitCompletePart(part: AgentEngineContentPart): void {
+  private emitCompletePart(part: AgentEngineContentPart, agentName?: string): void {
     console.log(
       `📤 [JSON PROCESSOR] Emitting complete part as SSE format (thought: ${part.thought}):`,
       part.text?.substring(0, 200) +
         (part.text && part.text.length > 200 ? "..." : "")
     );
+
+    // Use provided agent name or fallback to current agent or goal_planning_agent
+    const author = agentName || this.currentAgent || "goal_planning_agent";
 
     // CRITICAL: Each event must be a complete, independent JSON object
     // This prevents frontend buffer concatenation issues
@@ -187,7 +215,7 @@ class JSONFragmentProcessor {
       content: {
         parts: [part], // Single part per event for atomic processing
       },
-      author: this.currentAgent || "goal_planning_agent",
+      author: author,
       id: this.generateEventId(), // Unique ID for debugging and tracking
       timestamp: new Date().toISOString(), // Timestamp for debugging
     };
@@ -203,9 +231,61 @@ class JSONFragmentProcessor {
         author: sseData.author,
         hasText: !!part.text,
         isThought: !!part.thought,
+        hasFunctionCall: !!part.function_call,
+        hasFunctionResponse: !!part.function_response,
         textLength: part.text?.length || 0
       }
     );
+  }
+
+  /**
+   * Emit a function call event as SSE format
+   */
+  private emitFunctionCall(functionCall: { name: string; args: Record<string, unknown>; id: string }, agentName?: string): void {
+    console.log(`🔧 [JSON PROCESSOR] Emitting function call:`, functionCall.name);
+
+    const author = agentName || this.currentAgent || "goal_planning_agent";
+
+    const sseData = {
+      content: {
+        parts: [{
+          function_call: functionCall
+        }],
+      },
+      author: author,
+      id: this.generateEventId(),
+      timestamp: new Date().toISOString(),
+    };
+
+    const sseEvent = `data: ${JSON.stringify(sseData)}\n\n`;
+    this.controller.enqueue(Buffer.from(sseEvent));
+
+    console.log(`✅ [JSON PROCESSOR] Successfully emitted function call event`);
+  }
+
+  /**
+   * Emit a function response event as SSE format
+   */
+  private emitFunctionResponse(functionResponse: { name: string; response: Record<string, unknown>; id: string }, agentName?: string): void {
+    console.log(`🔧 [JSON PROCESSOR] Emitting function response:`, functionResponse.name);
+
+    const author = agentName || this.currentAgent || "goal_planning_agent";
+
+    const sseData = {
+      content: {
+        parts: [{
+          function_response: functionResponse
+        }],
+      },
+      author: author,
+      id: this.generateEventId(),
+      timestamp: new Date().toISOString(),
+    };
+
+    const sseEvent = `data: ${JSON.stringify(sseData)}\n\n`;
+    this.controller.enqueue(Buffer.from(sseEvent));
+
+    console.log(`✅ [JSON PROCESSOR] Successfully emitted function response event`);
   }
 
   /**
@@ -233,22 +313,29 @@ class JSONFragmentProcessor {
       );
 
       for (const [index, part] of fragment.content.parts.entries()) {
-        if (part.text && typeof part.text === "string") {
-          const partHash = this.hashPart(part);
+        const partHash = this.hashPart(part);
 
-          if (!this.sentParts.has(partHash)) {
-            console.log(
-              `✅ [JSON PROCESSOR] Processing complete fragment part ${
-                index + 1
-              } (thought: ${part.thought}): ${part.text.substring(0, 100)}...`
-            );
-            this.emitCompletePart(part);
-            this.sentParts.add(partHash);
-          } else {
-            console.log(
-              `⏭️ [JSON PROCESSOR] Skipping duplicate part ${index + 1}`
-            );
+        if (!this.sentParts.has(partHash)) {
+          console.log(
+            `✅ [JSON PROCESSOR] Processing complete fragment part ${
+              index + 1
+            } (thought: ${part.thought}): ${part.text?.substring(0, 100) || 'function call/response'}...`
+          );
+
+          // Emit the appropriate event based on part type
+          if (part.text && typeof part.text === "string") {
+            this.emitCompletePart(part, fragment.author);
+          } else if (part.function_call) {
+            this.emitFunctionCall(part.function_call, fragment.author);
+          } else if (part.function_response) {
+            this.emitFunctionResponse(part.function_response, fragment.author);
           }
+
+          this.sentParts.add(partHash);
+        } else {
+          console.log(
+            `⏭️ [JSON PROCESSOR] Skipping duplicate part ${index + 1}`
+          );
         }
       }
     } else {
