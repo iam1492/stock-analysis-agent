@@ -82,10 +82,6 @@ class JSONFragmentProcessor {
    */
   processChunk(chunk: string): void {
     console.log(`🔄 [JSON PROCESSOR] Processing chunk: ${chunk.length} bytes`);
-    console.log(
-      `📝 [JSON PROCESSOR] Full chunk content:`,
-      JSON.stringify(chunk)
-    );
 
     this.buffer += chunk;
 
@@ -98,24 +94,30 @@ class JSONFragmentProcessor {
    * Much simpler than manual brace counting - just try to parse incrementally!
    */
   private extractCompletePartsFromBuffer(): void {
+    console.log(`🔍 [JSON PROCESSOR] extractCompletePartsFromBuffer called, buffer length: ${this.buffer.length}`);
+
     // Find the start of the parts array if we haven't found it yet
     const partsMatch = this.buffer.match(/"parts"\s*:\s*\[/);
     if (!partsMatch) {
+      console.log(`⏭️ [JSON PROCESSOR] No parts array found in buffer yet`);
       return; // No parts array found yet
     }
 
     const partsArrayStart = partsMatch.index! + partsMatch[0].length;
     const partsContent = this.buffer.substring(partsArrayStart);
+    console.log(`📋 [JSON PROCESSOR] Found parts array, content length: ${partsContent.length}`);
 
     // Also try to extract agent name from the buffer
     let currentAgentFromBuffer = "goal_planning_agent";
     const authorMatch = this.buffer.match(/"author"\s*:\s*"([^"]+)"/);
     if (authorMatch) {
       currentAgentFromBuffer = authorMatch[1];
+      console.log(`👤 [JSON PROCESSOR] Extracted agent name: ${currentAgentFromBuffer}`);
     }
 
     // Look for potential object starts and try to parse them
     let searchPos = 0;
+    let partsFound = 0;
 
     while (searchPos < partsContent.length) {
       // Find the next potential object start
@@ -142,6 +144,7 @@ class JSONFragmentProcessor {
                   part.thought
                 }): ${part.text?.substring(0, 100) || 'function call/response'}...`
               );
+              partsFound++;
 
               // Emit the appropriate event based on part type
               if (part.text && typeof part.text === "string") {
@@ -170,6 +173,8 @@ class JSONFragmentProcessor {
         searchPos = objStart + 1;
       }
     }
+
+    console.log(`📊 [JSON PROCESSOR] extractCompletePartsFromBuffer completed, found ${partsFound} new parts`);
   }
 
   /**
