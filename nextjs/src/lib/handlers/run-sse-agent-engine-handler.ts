@@ -175,10 +175,10 @@ class JSONFragmentProcessor {
   /**
    * Check if a parsed object is a valid Agent Engine content part
    */
-  private isValidPart(obj: any): boolean {
-    return obj &&
-           (obj.text || obj.function_call || obj.function_response) &&
-           typeof obj === 'object';
+  private isValidPart(obj: unknown): boolean {
+    return obj !== null &&
+           typeof obj === 'object' &&
+           ('text' in obj || 'function_call' in obj || 'function_response' in obj);
   }
 
   /**
