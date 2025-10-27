@@ -181,8 +181,7 @@ export class StreamingConnectionManager {
     }
 
     const decoder = new TextDecoder();
-    let lineBuffer = "";
-    let eventDataBuffer = "";
+    let buffer = ""; // Changed from lineBuffer to buffer for event-based accumulation
     let eventCounter = 0;
 
     createDebugLog("SSE START", "Beginning to process streaming response");
@@ -193,48 +192,110 @@ export class StreamingConnectionManager {
 
       if (value) {
         const chunk = decoder.decode(value, { stream: true });
-        lineBuffer += chunk;
-        createDebugLog("SSE CHUNK", `Received ${chunk.length} bytes`);
+        buffer += chunk;
+        createDebugLog("SSE CHUNK", `Received ${chunk.length} bytes, total buffer: ${buffer.length}`);
       }
 
-      // Process all complete lines in the buffer
-      let eolIndex;
+      // Process all complete SSE events in the buffer (separated by \n\n)
+      let eventEndIndex;
       while (
-        (eolIndex = lineBuffer.indexOf("\n")) >= 0 ||
-        (done && lineBuffer.length > 0)
+        (eventEndIndex = buffer.indexOf("\n\n")) >= 0 ||
+        (done && buffer.length > 0)
       ) {
-        let line: string;
-        if (eolIndex >= 0) {
-          line = lineBuffer.substring(0, eolIndex);
-          lineBuffer = lineBuffer.substring(eolIndex + 1);
+        let eventData: string;
+        if (eventEndIndex >= 0) {
+          eventData = buffer.substring(0, eventEndIndex);
+          buffer = buffer.substring(eventEndIndex + 2); // Remove the event + \n\n
         } else {
-          // Only if done and lineBuffer has content without a trailing newline
-          line = lineBuffer;
-          lineBuffer = "";
+          // Only if done and buffer has content without trailing \n\n
+          eventData = buffer;
+          buffer = "";
         }
 
-        createDebugLog("SSE LINE", `Processing line: "${line}"`);
+        createDebugLog("SSE EVENT", `Processing event data (${eventData.length} chars): "${eventData.substring(0, 200)}${eventData.length > 200 ? '...' : ''}"`);
 
-        if (line.trim() === "") {
-          // Empty line: dispatch event
-          if (eventDataBuffer.length > 0) {
+        // Extract JSON data from the event (remove "data: " prefix if present)
+        let jsonDataToParse = eventData;
+        if (eventData.startsWith("data: ")) {
+          jsonDataToParse = eventData.substring(6); // Remove "data: " prefix
+        }
+
+        // Skip empty events or comments
+        if (jsonDataToParse.trim() === "" || jsonDataToParse.startsWith(":")) {
+          createDebugLog("SSE SKIP", `Skipping empty/comment event: "${eventData}"`);
+          continue;
+        }
+
+        eventCounter++;
+        createDebugLog(
+          "SSE DISPATCH EVENT",
+          `Event #${eventCounter} - JSON length: ${jsonDataToParse.length}`
+        );
+        createDebugLog(
+          "SSE DISPATCH EVENT",
+          `Event #${eventCounter} JSON preview: ${jsonDataToParse.substring(0, 200)}...`
+        );
+
+        // Process the event immediately for real-time updates
+        try {
+          createDebugLog("SSE DISPATCH EVENT", `Event #${eventCounter} - About to call processSseEventData`);
+          await processSseEventData(
+            jsonDataToParse,
+            aiMessageId,
+            callbacks,
+            accumulatedTextRef,
+            currentAgentRef,
+            setCurrentAgent,
+            onAnalysisComplete
+          );
+          createDebugLog("SSE DISPATCH EVENT", `Event #${eventCounter} - processSseEventData completed successfully`);
+
+          // 🔑 CRITICAL: Force immediate UI update by yielding to event loop
+          // This prevents React from batching updates and ensures real-time streaming
+          await new Promise((resolve) => setTimeout(resolve, 0));
+          createDebugLog("SSE DISPATCH EVENT", `Event #${eventCounter} - UI update yielded`);
+        } catch (error) {
+          console.error(
+            `❌ [SSE ERROR] Event #${eventCounter} - Failed to process SSE event:`,
+            error
+          );
+          console.error(
+            `❌ [SSE ERROR] Event #${eventCounter} - Problematic JSON:`,
+            jsonDataToParse.substring(0, 500)
+          );
+          console.error(
+            `❌ [SSE ERROR] Event #${eventCounter} - Full JSON:`,
+            jsonDataToParse
+          );
+        }
+        createDebugLog("SSE DISPATCH EVENT", `Event #${eventCounter} - Event processed, continuing...`);
+      }
+
+      if (done) {
+        // Handle any remaining data in buffer (final incomplete event)
+        if (buffer.length > 0) {
+          createDebugLog("SSE FINAL BUFFER", `Processing remaining buffer (${buffer.length} chars): "${buffer.substring(0, 200)}${buffer.length > 200 ? '...' : ''}"`);
+
+          // Extract JSON data from remaining buffer
+          let jsonDataToParse = buffer;
+          if (buffer.startsWith("data: ")) {
+            jsonDataToParse = buffer.substring(6); // Remove "data: " prefix
+          }
+
+          // Skip empty or comment data
+          if (jsonDataToParse.trim() !== "" && !jsonDataToParse.startsWith(":")) {
             eventCounter++;
-            const jsonDataToParse = eventDataBuffer.endsWith("\n")
-              ? eventDataBuffer.slice(0, -1)
-              : eventDataBuffer;
-
             createDebugLog(
-              "SSE DISPATCH EVENT",
-              `Event #${eventCounter} - Buffer length: ${eventDataBuffer.length}, JSON length: ${jsonDataToParse.length}`
+              "SSE DISPATCH FINAL EVENT",
+              `Final Event #${eventCounter} - JSON length: ${jsonDataToParse.length}`
             );
             createDebugLog(
-              "SSE DISPATCH EVENT",
-              `Event #${eventCounter} JSON preview: ${jsonDataToParse.substring(0, 200)}...`
+              "SSE DISPATCH FINAL EVENT",
+              `Final Event #${eventCounter} JSON preview: ${jsonDataToParse.substring(0, 200)}...`
             );
 
-            // Process the event immediately for real-time updates
             try {
-              createDebugLog("SSE DISPATCH EVENT", `Event #${eventCounter} - About to call processSseEventData`);
+              createDebugLog("SSE DISPATCH FINAL EVENT", `Final Event #${eventCounter} - About to call processSseEventData`);
               await processSseEventData(
                 jsonDataToParse,
                 aiMessageId,
@@ -244,97 +305,29 @@ export class StreamingConnectionManager {
                 setCurrentAgent,
                 onAnalysisComplete
               );
-              createDebugLog("SSE DISPATCH EVENT", `Event #${eventCounter} - processSseEventData completed successfully`);
+              createDebugLog("SSE DISPATCH FINAL EVENT", `Final Event #${eventCounter} - processSseEventData completed successfully`);
 
               // 🔑 CRITICAL: Force immediate UI update by yielding to event loop
               // This prevents React from batching updates and ensures real-time streaming
               await new Promise((resolve) => setTimeout(resolve, 0));
-              createDebugLog("SSE DISPATCH EVENT", `Event #${eventCounter} - UI update yielded`);
+              createDebugLog("SSE DISPATCH FINAL EVENT", `Final Event #${eventCounter} - UI update yielded`);
             } catch (error) {
               console.error(
-                `❌ [SSE ERROR] Event #${eventCounter} - Failed to process SSE event:`,
+                `❌ [SSE ERROR] Final Event #${eventCounter} - Failed to process final SSE event:`,
                 error
               );
               console.error(
-                `❌ [SSE ERROR] Event #${eventCounter} - Problematic JSON:`,
+                `❌ [SSE ERROR] Final Event #${eventCounter} - Problematic JSON:`,
                 jsonDataToParse.substring(0, 500)
               );
               console.error(
-                `❌ [SSE ERROR] Event #${eventCounter} - Full JSON:`,
+                `❌ [SSE ERROR] Final Event #${eventCounter} - Full JSON:`,
                 jsonDataToParse
               );
             }
-            eventDataBuffer = ""; // Reset for next event
-            createDebugLog("SSE DISPATCH EVENT", `Event #${eventCounter} - Buffer reset, ready for next event`);
           }
-        } else if (line.startsWith("data:")) {
-          // Accumulate data lines for this event
-          const dataContent = line.substring(5).trimStart();
-          eventDataBuffer += dataContent + "\n";
-          createDebugLog(
-            "SSE DATA",
-            `Event #${eventCounter + 1} - Added to buffer (${dataContent.length} chars): "${dataContent.substring(0, 100)}${dataContent.length > 100 ? '...' : ''}"`
-          );
-          createDebugLog(
-            "SSE DATA",
-            `Event #${eventCounter + 1} - Current buffer length: ${eventDataBuffer.length}`
-          );
-        } else if (line.startsWith(":")) {
-          createDebugLog("SSE COMMENT", `Ignoring comment: "${line}"`);
-          // Comment line, ignore
-        }
-      }
-
-      if (done) {
-        // Handle any remaining data in buffer
-        if (eventDataBuffer.length > 0) {
-          eventCounter++;
-          const jsonDataToParse = eventDataBuffer.endsWith("\n")
-            ? eventDataBuffer.slice(0, -1)
-            : eventDataBuffer;
-
-          createDebugLog(
-            "SSE DISPATCH FINAL EVENT",
-            `Final Event #${eventCounter} - Buffer length: ${eventDataBuffer.length}, JSON length: ${jsonDataToParse.length}`
-          );
-          createDebugLog(
-            "SSE DISPATCH FINAL EVENT",
-            `Final Event #${eventCounter} JSON preview: ${jsonDataToParse.substring(0, 200)}...`
-          );
-
-          try {
-            createDebugLog("SSE DISPATCH FINAL EVENT", `Final Event #${eventCounter} - About to call processSseEventData`);
-            await processSseEventData(
-              jsonDataToParse,
-              aiMessageId,
-              callbacks,
-              accumulatedTextRef,
-              currentAgentRef,
-              setCurrentAgent,
-              onAnalysisComplete
-            );
-            createDebugLog("SSE DISPATCH FINAL EVENT", `Final Event #${eventCounter} - processSseEventData completed successfully`);
-
-            // 🔑 CRITICAL: Force immediate UI update by yielding to event loop
-            // This prevents React from batching updates and ensures real-time streaming
-            await new Promise((resolve) => setTimeout(resolve, 0));
-            createDebugLog("SSE DISPATCH FINAL EVENT", `Final Event #${eventCounter} - UI update yielded`);
-          } catch (error) {
-            console.error(
-              `❌ [SSE ERROR] Final Event #${eventCounter} - Failed to process final SSE event:`,
-              error
-            );
-            console.error(
-              `❌ [SSE ERROR] Final Event #${eventCounter} - Problematic JSON:`,
-              jsonDataToParse.substring(0, 500)
-            );
-            console.error(
-              `❌ [SSE ERROR] Final Event #${eventCounter} - Full JSON:`,
-              jsonDataToParse
-            );
-          }
-          eventDataBuffer = "";
-          createDebugLog("SSE DISPATCH FINAL EVENT", `Final Event #${eventCounter} - Buffer reset`);
+          buffer = "";
+          createDebugLog("SSE DISPATCH FINAL EVENT", `Final Event #${eventCounter} - Buffer cleared`);
         }
         createDebugLog("SSE END", `Stream processing finished - Total events processed: ${eventCounter}`);
         return; // Exit recursion
