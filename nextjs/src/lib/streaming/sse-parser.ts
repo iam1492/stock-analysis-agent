@@ -19,6 +19,9 @@ import { ParsedSSEData, RawSSEData } from "./types";
  * @returns Structured data object with extracted information
  */
 export function extractDataFromSSE(data: string): ParsedSSEData {
+  console.log("🔍 [SSE PARSER] extractDataFromSSE called with data length:", data.length);
+  console.log("🔍 [SSE PARSER] Raw data preview:", data.substring(0, 200) + "...");
+
   try {
     const parsed: RawSSEData = JSON.parse(data);
 
@@ -122,6 +125,8 @@ export function extractDataFromSSE(data: string): ParsedSSEData {
       functionResponse,
     };
   } catch (error) {
+    console.error("❌ [SSE PARSER] JSON parsing failed:", error);
+    console.error("❌ [SSE PARSER] Problematic data:", data);
     return handleSSEParsingError(data, error);
   }
 }

@@ -229,6 +229,7 @@ export function ChatProvider({
         messageType: message.type,
         contentLength: message.content.length,
         hasContent: !!message.content,
+        contentPreview: message.content.substring(0, 100) + (message.content.length > 100 ? "..." : ""),
       });
 
       setMessages((prev) => {
@@ -281,6 +282,8 @@ export function ChatProvider({
             ? event.data.type
             : undefined,
         isThought: event.title.startsWith("🤔"),
+        hasData: !!event.data,
+        dataKeys: event.data && typeof event.data === "object" ? Object.keys(event.data) : [],
       });
 
       setMessageEvents((prev) => {
@@ -349,6 +352,7 @@ export function ChatProvider({
           messageId,
           totalEventsForMessage: newMap.get(messageId)?.length || 0,
           totalMessagesWithEvents: newMap.size,
+          eventTitles: newMap.get(messageId)?.map((e: ProcessedEvent) => e.title.substring(0, 50) + (e.title.length > 50 ? "..." : "")) || [],
         });
 
         // DEBUG: Log event details for production debugging

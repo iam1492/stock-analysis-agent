@@ -183,6 +183,7 @@ export class StreamingConnectionManager {
     const decoder = new TextDecoder();
     let lineBuffer = "";
     let eventDataBuffer = "";
+    let eventCounter = 0;
 
     createDebugLog("SSE START", "Beginning to process streaming response");
 
@@ -217,17 +218,23 @@ export class StreamingConnectionManager {
         if (line.trim() === "") {
           // Empty line: dispatch event
           if (eventDataBuffer.length > 0) {
+            eventCounter++;
             const jsonDataToParse = eventDataBuffer.endsWith("\n")
               ? eventDataBuffer.slice(0, -1)
               : eventDataBuffer;
 
             createDebugLog(
               "SSE DISPATCH EVENT",
-              jsonDataToParse.substring(0, 200) + "..."
+              `Event #${eventCounter} - Buffer length: ${eventDataBuffer.length}, JSON length: ${jsonDataToParse.length}`
+            );
+            createDebugLog(
+              "SSE DISPATCH EVENT",
+              `Event #${eventCounter} JSON preview: ${jsonDataToParse.substring(0, 200)}...`
             );
 
             // Process the event immediately for real-time updates
             try {
+              createDebugLog("SSE DISPATCH EVENT", `Event #${eventCounter} - About to call processSseEventData`);
               await processSseEventData(
                 jsonDataToParse,
                 aiMessageId,
@@ -237,28 +244,40 @@ export class StreamingConnectionManager {
                 setCurrentAgent,
                 onAnalysisComplete
               );
+              createDebugLog("SSE DISPATCH EVENT", `Event #${eventCounter} - processSseEventData completed successfully`);
 
               // 🔑 CRITICAL: Force immediate UI update by yielding to event loop
               // This prevents React from batching updates and ensures real-time streaming
               await new Promise((resolve) => setTimeout(resolve, 0));
+              createDebugLog("SSE DISPATCH EVENT", `Event #${eventCounter} - UI update yielded`);
             } catch (error) {
               console.error(
-                "❌ [SSE ERROR] Failed to process SSE event:",
+                `❌ [SSE ERROR] Event #${eventCounter} - Failed to process SSE event:`,
                 error
               );
               console.error(
-                "❌ [SSE ERROR] Problematic JSON:",
+                `❌ [SSE ERROR] Event #${eventCounter} - Problematic JSON:`,
                 jsonDataToParse.substring(0, 500)
+              );
+              console.error(
+                `❌ [SSE ERROR] Event #${eventCounter} - Full JSON:`,
+                jsonDataToParse
               );
             }
             eventDataBuffer = ""; // Reset for next event
+            createDebugLog("SSE DISPATCH EVENT", `Event #${eventCounter} - Buffer reset, ready for next event`);
           }
         } else if (line.startsWith("data:")) {
           // Accumulate data lines for this event
-          eventDataBuffer += line.substring(5).trimStart() + "\n";
+          const dataContent = line.substring(5).trimStart();
+          eventDataBuffer += dataContent + "\n";
           createDebugLog(
             "SSE DATA",
-            `Added to buffer: "${line.substring(5).trimStart()}"`
+            `Event #${eventCounter + 1} - Added to buffer (${dataContent.length} chars): "${dataContent.substring(0, 100)}${dataContent.length > 100 ? '...' : ''}"`
+          );
+          createDebugLog(
+            "SSE DATA",
+            `Event #${eventCounter + 1} - Current buffer length: ${eventDataBuffer.length}`
           );
         } else if (line.startsWith(":")) {
           createDebugLog("SSE COMMENT", `Ignoring comment: "${line}"`);
@@ -269,16 +288,22 @@ export class StreamingConnectionManager {
       if (done) {
         // Handle any remaining data in buffer
         if (eventDataBuffer.length > 0) {
+          eventCounter++;
           const jsonDataToParse = eventDataBuffer.endsWith("\n")
             ? eventDataBuffer.slice(0, -1)
             : eventDataBuffer;
 
           createDebugLog(
             "SSE DISPATCH FINAL EVENT",
-            jsonDataToParse.substring(0, 200) + "..."
+            `Final Event #${eventCounter} - Buffer length: ${eventDataBuffer.length}, JSON length: ${jsonDataToParse.length}`
+          );
+          createDebugLog(
+            "SSE DISPATCH FINAL EVENT",
+            `Final Event #${eventCounter} JSON preview: ${jsonDataToParse.substring(0, 200)}...`
           );
 
           try {
+            createDebugLog("SSE DISPATCH FINAL EVENT", `Final Event #${eventCounter} - About to call processSseEventData`);
             await processSseEventData(
               jsonDataToParse,
               aiMessageId,
@@ -288,23 +313,30 @@ export class StreamingConnectionManager {
               setCurrentAgent,
               onAnalysisComplete
             );
+            createDebugLog("SSE DISPATCH FINAL EVENT", `Final Event #${eventCounter} - processSseEventData completed successfully`);
 
             // 🔑 CRITICAL: Force immediate UI update by yielding to event loop
             // This prevents React from batching updates and ensures real-time streaming
             await new Promise((resolve) => setTimeout(resolve, 0));
+            createDebugLog("SSE DISPATCH FINAL EVENT", `Final Event #${eventCounter} - UI update yielded`);
           } catch (error) {
             console.error(
-              "❌ [SSE ERROR] Failed to process final SSE event:",
+              `❌ [SSE ERROR] Final Event #${eventCounter} - Failed to process final SSE event:`,
               error
             );
             console.error(
-              "❌ [SSE ERROR] Problematic JSON:",
+              `❌ [SSE ERROR] Final Event #${eventCounter} - Problematic JSON:`,
               jsonDataToParse.substring(0, 500)
+            );
+            console.error(
+              `❌ [SSE ERROR] Final Event #${eventCounter} - Full JSON:`,
+              jsonDataToParse
             );
           }
           eventDataBuffer = "";
+          createDebugLog("SSE DISPATCH FINAL EVENT", `Final Event #${eventCounter} - Buffer reset`);
         }
-        createDebugLog("SSE END", "Stream processing finished");
+        createDebugLog("SSE END", `Stream processing finished - Total events processed: ${eventCounter}`);
         return; // Exit recursion
       }
 

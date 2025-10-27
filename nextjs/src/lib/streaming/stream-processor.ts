@@ -58,8 +58,20 @@ export async function processSseEventData(
   setCurrentAgent: (agent: string) => void,
   onAnalysisComplete?: () => void
 ): Promise<void> {
+  console.log("🔄 [STREAM PROCESSOR] processSseEventData called with JSON length:", jsonData.length);
+  console.log("🔄 [STREAM PROCESSOR] JSON preview:", jsonData.substring(0, 200) + "...");
+
   const { textParts, thoughtParts, agent, functionCall, functionResponse } =
     extractDataFromSSE(jsonData);
+
+  console.log("🔄 [STREAM PROCESSOR] Parsed data:", {
+    textPartsCount: textParts.length,
+    thoughtPartsCount: thoughtParts.length,
+    agent,
+    hasFunctionCall: !!functionCall,
+    hasFunctionResponse: !!functionResponse,
+    aiMessageId
+  });
 
   // Show all agent activities in timeline, but only show hedge_fund_manager_agent text in UI
   const actualMessageId = aiMessageId;
@@ -72,16 +84,20 @@ export async function processSseEventData(
 
   // Process function calls (show all in timeline)
   if (functionCall) {
+    console.log("🔧 [STREAM PROCESSOR] Processing function call:", functionCall);
     processFunctionCall(functionCall, actualMessageId, callbacks.onEventUpdate);
+    console.log("✅ [STREAM PROCESSOR] Function call processed");
   }
 
   // Process function responses (show all in timeline)
   if (functionResponse) {
+    console.log("🔧 [STREAM PROCESSOR] Processing function response:", functionResponse);
     processFunctionResponse(
       functionResponse,
       actualMessageId,
       callbacks.onEventUpdate
     );
+    console.log("✅ [STREAM PROCESSOR] Function response processed");
   }
 
   // Process AI thoughts (show all in timeline)
@@ -105,13 +121,22 @@ export async function processSseEventData(
       callbacks.onEventUpdate,
       callbacks.onMessageUpdate // Create AI message so timeline has somewhere to attach
     );
+    console.log("✅ [STREAM PROCESSOR] Thoughts processed");
   } else {
     console.log("⚠️ [STREAM PROCESSOR] No thoughts to process");
   }
 
   // Process text content only for hedge_fund_manager_agent
   if (textParts.length > 0) {
+    console.log("📝 [STREAM PROCESSOR] Processing text content:", {
+      textPartsCount: textParts.length,
+      agent,
+      isHedgeFundManager: agent === "hedge_fund_manager_agent",
+      textPreview: textParts.join("").substring(0, 100) + "..."
+    });
+
     if (agent === "hedge_fund_manager_agent" || !agent) {
+      console.log("📝 [STREAM PROCESSOR] Processing text for hedge_fund_manager_agent");
       await processTextContent(
         textParts,
         agent,
@@ -120,8 +145,10 @@ export async function processSseEventData(
         callbacks.onMessageUpdate,
         onAnalysisComplete
       );
+      console.log("✅ [STREAM PROCESSOR] Text content processed for hedge_fund_manager_agent");
     } else {
       // Save results for other agents
+      console.log(`💾 [STREAM PROCESSOR] Saving result for agent: ${agent}`);
       await saveAgentResultFromStream(agent, textParts.join(""));
       console.log(`💾 [STREAM PROCESSOR] Saved result for agent: ${agent}`);
 
@@ -132,7 +159,11 @@ export async function processSseEventData(
         setTimeout(() => onAnalysisComplete(), 100);
       }
     }
+  } else {
+    console.log("⚠️ [STREAM PROCESSOR] No text content to process");
   }
+
+  console.log("🎉 [STREAM PROCESSOR] processSseEventData completed successfully");
 }
 
 /**
