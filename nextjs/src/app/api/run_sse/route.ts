@@ -9,7 +9,7 @@ import {
   createValidationError,
   createInternalServerError,
 } from "@/lib/handlers/error-utils";
-import { handleAgentEngineQueryRequest } from "@/lib/handlers/run-sse-agent-engine-handler";
+import { handleAgentEngineStreamRequest } from "@/lib/handlers/run-sse-agent-engine-handler";
 import { handleLocalBackendStreamRequest } from "@/lib/handlers/run-sse-local-backend-handler";
 
 // Configure maximum execution duration (5 minutes = 300 seconds)
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     // Delegate to appropriate deployment strategy handler
     if (deploymentType === "agent_engine") {
-      return await handleAgentEngineQueryRequest(requestData);
+      return await handleAgentEngineStreamRequest(requestData);
     } else {
       return await handleLocalBackendStreamRequest(requestData);
     }

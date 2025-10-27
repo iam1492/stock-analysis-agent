@@ -296,7 +296,7 @@ class JSONFragmentProcessor {
  * @param requestData - Processed request data
  * @returns Streaming SSE Response with processed JSON fragments
  */
-export async function handleAgentEngineQueryRequest(
+export async function handleAgentEngineStreamRequest(
   requestData: ProcessedStreamRequest
 ): Promise<Response> {
   console.log(
