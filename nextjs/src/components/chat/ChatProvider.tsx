@@ -284,7 +284,15 @@ export function ChatProvider({
       });
 
       setMessageEvents((prev) => {
-        const newMap = new Map(prev);
+        // CRITICAL FIX: Create completely new Map to ensure immutability
+        const newMap = new Map();
+
+        // Copy all existing entries with proper deep cloning
+        for (const [key, events] of prev) {
+          newMap.set(key, [...events]); // Deep clone the events array
+        }
+
+        // Get existing events for this messageId (now safely cloned)
         const existingEvents = newMap.get(messageId) || [];
         console.log("🔍 [CHAT_PROVIDER] Event state check:", {
           messageId,
@@ -295,7 +303,7 @@ export function ChatProvider({
         // Handle thinking activities with progressive content accumulation
         if (event.title.startsWith("🤔")) {
           const existingThinkingIndex = existingEvents.findIndex(
-            (existingEvent) => existingEvent.title === event.title
+            (existingEvent: ProcessedEvent) => existingEvent.title === event.title
           );
 
           if (existingThinkingIndex >= 0) {
@@ -335,6 +343,22 @@ export function ChatProvider({
         } else {
           // For non-thinking activities, add normally (no deduplication needed)
           newMap.set(messageId, [...existingEvents, event]);
+        }
+
+        console.log("✅ [CHAT_PROVIDER] Event update completed:", {
+          messageId,
+          totalEventsForMessage: newMap.get(messageId)?.length || 0,
+          totalMessagesWithEvents: newMap.size,
+        });
+
+        // DEBUG: Log event details for production debugging
+        if (process.env.NODE_ENV === 'production') {
+          console.log('🔧 [PRODUCTION DEBUG] Event added:', {
+            messageId,
+            eventTitle: event.title,
+            eventType: typeof event.data === 'object' && event.data && 'type' in event.data ? event.data.type : 'unknown',
+            totalEvents: newMap.get(messageId)?.length || 0
+          });
         }
 
         return newMap;
