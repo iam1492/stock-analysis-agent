@@ -137,7 +137,15 @@ export async function processSseEventData(
     });
 
     // Check if this is a chunked text (has chunkInfo)
-    const hasChunkInfo = (parsed as any).content?.parts?.some((part: any) => part.chunkInfo);
+    const content = (parsed as Record<string, unknown>).content;
+    const hasChunkInfo = content &&
+      typeof content === 'object' &&
+      content !== null &&
+      'parts' in content &&
+      Array.isArray((content as { parts?: unknown[] }).parts) &&
+      (content as { parts?: unknown[] }).parts?.some((part: unknown) =>
+        typeof part === 'object' && part !== null && 'chunkInfo' in part
+      );
     if (hasChunkInfo) {
       console.log("📦 [STREAM PROCESSOR] Detected chunked text content, processing chunks");
       await processChunkedTextContent(
@@ -462,7 +470,7 @@ async function processChunkedTextContent(
   if (!content?.parts) return;
 
   // Collect all text chunks and sort by chunk index
-  const textChunks: Array<{ text: string; chunkInfo: any }> = [];
+  const textChunks: Array<{ text: string; chunkInfo: Record<string, unknown> }> = [];
   let isComplete = false;
 
   for (const part of content.parts) {
@@ -476,7 +484,7 @@ async function processChunkedTextContent(
   }
 
   // Sort chunks by index to ensure correct order
-  textChunks.sort((a, b) => a.chunkInfo.index - b.chunkInfo.index);
+  textChunks.sort((a, b) => (a.chunkInfo.index as number) - (b.chunkInfo.index as number));
 
   // Combine all chunks into final text
   const finalText = textChunks.map(chunk => chunk.text).join('');
