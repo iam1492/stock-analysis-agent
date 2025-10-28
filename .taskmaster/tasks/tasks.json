@@ -462,5 +462,206 @@
       "updated": "2025-10-26T13:38:00.075Z",
       "description": "Tasks for stock-symbol-removal context"
     }
+  },
+  "docker-deployment": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Provision Vultr VPS with Ubuntu 22.04",
+        "description": "Set up a new Vultr VPS instance running Ubuntu 22.04 as the deployment target.",
+        "details": "Use the Vultr dashboard to deploy a new server. Select Ubuntu 22.04 as the OS. Choose at least 2GB RAM (upgrade to 4GB if needed). Configure SSH access for secure remote management.",
+        "testStrategy": "Verify SSH connectivity and OS version by logging in and running `lsb_release -a`.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Install Docker and Docker Compose on VPS",
+        "description": "Install Docker Engine and Docker Compose on the Ubuntu VPS.",
+        "details": "Follow the official Docker installation guide for Ubuntu 22.04. Install Docker Compose using the recommended method (e.g., via apt or downloading the binary). Add the current user to the docker group for non-root usage.",
+        "testStrategy": "Run `docker --version` and `docker-compose --version` to confirm installations.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Create Dockerfile for ADK Backend (Python/FastAPI)",
+        "description": "Develop a Dockerfile to containerize the ADK backend using Python 3.11 and uv package manager.",
+        "details": "Start from `python:3.11-slim`. Install uv, copy source code, install dependencies via uv, expose port 8000, and set CMD to run the FastAPI app with uvicorn. Use multi-stage build to minimize image size.",
+        "testStrategy": "Build the image locally and run the container. Test API endpoint with curl.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Create Dockerfile for Next.js Frontend",
+        "description": "Develop a Dockerfile to containerize the Next.js frontend using Node.js 20.",
+        "details": "Start from `node:20-alpine`. Copy source, install dependencies, build the app, and serve static files. Use multi-stage build to reduce final image size. Expose port 3000.",
+        "testStrategy": "Build and run the container locally. Access the frontend at localhost:3000.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Create Dockerfile for Nginx Reverse Proxy",
+        "description": "Develop a Dockerfile for Nginx with a custom configuration to route traffic to frontend and backend.",
+        "details": "Use the official nginx image. Copy a custom nginx.conf that proxies /api to backend:8000 and serves static files from frontend:3000. Prepare SSL config but comment out SSL directives.",
+        "testStrategy": "Run the container and test routing with curl and browser.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Configure PostgreSQL Docker Container",
+        "description": "Set up a PostgreSQL container with persistent storage and basic configuration.",
+        "details": "Use the official postgres image. Set environment variables for user, password, and database. Mount a Docker volume for data persistence. Expose port 5432 internally.",
+        "testStrategy": "Connect to the database from backend container and run basic CRUD operations.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Write docker-compose.yml for Multi-Container Orchestration",
+        "description": "Define all services, networks, and volumes in a single docker-compose.yml file.",
+        "details": "Specify services for backend, frontend, nginx, and postgres. Configure environment variables, build contexts, port mappings, and volumes. Set up a custom bridge network for secure inter-container communication.",
+        "testStrategy": "Run `docker-compose up` and verify all containers start and communicate as expected.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement Environment Variable and Secret Management",
+        "description": "Set up environment variable files and secret management for sensitive data.",
+        "details": "Use .env files for non-sensitive configuration. For secrets (e.g., DB passwords), use Docker secrets or environment variables with restricted permissions. Ensure .env files are excluded from version control.",
+        "testStrategy": "Check that containers receive correct environment variables and secrets are not exposed in logs or images.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Configure Container Networking and Port Mapping",
+        "description": "Set up Docker Compose networks and map ports according to the architecture.",
+        "details": "Define a user-defined bridge network in docker-compose.yml. Map Nginx to host port 80, frontend to 3000 (internal), backend to 8000 (internal), and postgres to 5432 (internal). Ensure only Nginx is exposed to the host.",
+        "testStrategy": "Verify network isolation using `docker network inspect` and test access from host and between containers.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Implement Health Checks and Auto-Restart Policies",
+        "description": "Add healthcheck directives and restart policies for all containers in docker-compose.yml.",
+        "details": "Define healthcheck commands for backend, frontend, and postgres. Set restart: always for all services to ensure reliability.",
+        "testStrategy": "Simulate failures and verify containers auto-restart and health status is reported.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Develop Automated Deployment Script",
+        "description": "Create a shell script to automate deployment, updates, and rollback on the VPS.",
+        "details": "Script should pull latest images, run docker-compose up with appropriate flags, and support rollback to previous version using tagged images or compose files.",
+        "testStrategy": "Run the script on the VPS and verify successful deployment and rollback.",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Set Up Logging and Monitoring for Containers",
+        "description": "Configure centralized logging and basic monitoring for all containers.",
+        "details": "Use Docker logging drivers (e.g., json-file or syslog). Optionally, deploy a lightweight monitoring tool (e.g., Portainer or cAdvisor) for container health and resource usage.",
+        "testStrategy": "Check logs for all services and verify monitoring dashboard displays correct metrics.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Optimize Docker Images and Build Process",
+        "description": "Apply multi-stage builds and remove unnecessary files to minimize image sizes.",
+        "details": "Refactor Dockerfiles to use multi-stage builds. Add .dockerignore files to exclude unnecessary files. Use smaller base images where possible.",
+        "testStrategy": "Compare image sizes before and after optimization. Ensure functionality is unchanged.",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          4,
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Implement Database Backup and Restore Procedures",
+        "description": "Set up automated backup and manual restore scripts for PostgreSQL data.",
+        "details": "Use pg_dump for scheduled backups to a mounted volume or remote storage. Provide a script for restoring from backup. Document backup frequency and retention.",
+        "testStrategy": "Perform a backup and restore cycle and verify data integrity.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Harden Security and Network Isolation",
+        "description": "Apply basic security best practices excluding HTTPS (per requirements).",
+        "details": "Restrict container privileges, use user-defined networks, limit exposed ports to only Nginx, and set file permissions. Document security settings. Prepare commented SSL config in nginx.conf for future use.",
+        "testStrategy": "Run security scans (e.g., Docker Bench for Security) and verify only required ports are accessible from the host.",
+        "priority": "medium",
+        "dependencies": [
+          7,
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-10-28T10:50:26.845Z",
+      "updated": "2025-10-28T10:55:53.774Z",
+      "description": "Tasks for docker-deployment context"
+    }
   }
 }

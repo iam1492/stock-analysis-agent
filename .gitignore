@@ -1,7 +1,8 @@
 .grok
 .kilocode
 NEXTJS_VERCEL_DEPLOYMENT_GUIDE.md
-
+README-DOCKER.md
+SERVER_INFO.md
 # Python
 __pycache__/
 *.py[cod]
@@ -81,6 +82,9 @@ nextjs/build/
 
 # Environment variables
 .env
+.env.production
+.env.local
+.env.*.local
 
 # Logs
 logs/
@@ -201,6 +205,11 @@ test-results.xml
 app/.env
 nextjs/.env*
 
+# Server configuration and deployment files
+SERVER_INFO.md
+setup-server.sh
+deploy.sh
+
 # Project specific directories
 ai_docs/
 
@@ -214,6 +223,13 @@ ai_docs/
 # Docker
 .dockerignore
 docker-compose.override.yml
+
+# Docker volumes (local development)
+postgres_data/
+
+# Backups (contains sensitive data)
+backups/
+backups/*
 
 # Terraform
 *.tfstate
