@@ -45,6 +45,12 @@ export interface RawSSEData {
         response: Record<string, unknown>;
         id: string;
       };
+      chunkInfo?: {
+        index: number;
+        total: number;
+        isLast: boolean;
+        originalLength: number;
+      };
     }>;
   };
   author?: string;

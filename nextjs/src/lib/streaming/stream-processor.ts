@@ -61,6 +61,7 @@ export async function processSseEventData(
   console.log("🔄 [STREAM PROCESSOR] processSseEventData called with JSON length:", jsonData.length);
   console.log("🔄 [STREAM PROCESSOR] JSON preview:", jsonData.substring(0, 200) + "...");
 
+  const parsed = JSON.parse(jsonData);
   const { textParts, thoughtParts, agent, functionCall, functionResponse } =
     extractDataFromSSE(jsonData);
 
@@ -135,7 +136,19 @@ export async function processSseEventData(
       textPreview: textParts.join("").substring(0, 100) + "..."
     });
 
-    if (agent === "hedge_fund_manager_agent" || !agent) {
+    // Check if this is a chunked text (has chunkInfo)
+    const hasChunkInfo = parsed.content?.parts?.some((part: any) => part.chunkInfo);
+    if (hasChunkInfo) {
+      console.log("📦 [STREAM PROCESSOR] Detected chunked text content, processing chunks");
+      await processChunkedTextContent(
+        parsed,
+        agent,
+        actualMessageId,
+        accumulatedTextRef,
+        callbacks.onMessageUpdate,
+        onAnalysisComplete
+      );
+    } else if (agent === "hedge_fund_manager_agent" || !agent) {
       console.log("📝 [STREAM PROCESSOR] Processing text for hedge_fund_manager_agent");
       await processTextContent(
         textParts,
@@ -425,6 +438,70 @@ function processThoughts(
       });
     });
   });
+}
+
+/**
+ * Processes chunked text content parts (split by backend due to size limits)
+ *
+ * @param parsed - Raw parsed SSE data
+ * @param agent - Current agent name
+ * @param aiMessageId - AI message ID
+ * @param accumulatedTextRef - Reference to accumulated text
+ * @param onMessageUpdate - Message update callback
+ * @param onAnalysisComplete - Analysis completion callback
+ */
+async function processChunkedTextContent(
+  parsed: any,
+  agent: string,
+  aiMessageId: string,
+  accumulatedTextRef: { current: string },
+  onMessageUpdate: (message: Message) => void,
+  onAnalysisComplete?: () => void
+): Promise<void> {
+  if (!parsed.content?.parts) return;
+
+  // Collect all text chunks and sort by chunk index
+  const textChunks: Array<{ text: string; chunkInfo: any }> = [];
+  let isComplete = false;
+
+  for (const part of parsed.content.parts) {
+    if (part.text && part.chunkInfo) {
+      textChunks.push({ text: part.text, chunkInfo: part.chunkInfo });
+      if (part.chunkInfo.isLast) {
+        isComplete = true;
+      }
+    }
+  }
+
+  // Sort chunks by index to ensure correct order
+  textChunks.sort((a, b) => a.chunkInfo.index - b.chunkInfo.index);
+
+  // Combine all chunks into final text
+  const finalText = textChunks.map(chunk => chunk.text).join('');
+
+  console.log(`📦 [STREAM PROCESSOR] Processed ${textChunks.length} chunks, total length: ${finalText.length}, isComplete: ${isComplete}`);
+
+  // Update accumulated text
+  accumulatedTextRef.current = finalText;
+
+  const updatedMessage: Message = {
+    type: "ai",
+    content: finalText.trim(),
+    id: aiMessageId,
+    timestamp: new Date(),
+  };
+
+  // Force immediate update
+  flushSync(() => {
+    onMessageUpdate(updatedMessage);
+  });
+
+  // Check if this is hedge_fund_manager_agent completing
+  if (isComplete && agent === "hedge_fund_manager_agent" && onAnalysisComplete) {
+    console.log("🎯 [STREAM PROCESSOR] Chunked hedge fund manager analysis completed - triggering completion callback");
+    // Use setTimeout to ensure UI updates are processed first
+    setTimeout(() => onAnalysisComplete(), 100);
+  }
 }
 
 /**
