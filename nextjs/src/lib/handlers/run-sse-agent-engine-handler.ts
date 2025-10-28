@@ -36,6 +36,12 @@ interface AgentEngineContentPart {
     response: Record<string, unknown>;
     id: string;
   };
+  chunkInfo?: {
+    index: number;
+    total: number;
+    isLast: boolean;
+    originalLength: number;
+  };
 }
 
 interface AgentEngineFragment {
@@ -71,6 +77,7 @@ class JSONFragmentProcessor {
   private buffer: string = "";
   private currentAgent: string = "";
   private sentParts: Set<string> = new Set(); // Track sent parts by their content hash
+  private readonly MAX_CHUNK_SIZE = 1024; // Maximum chunk size in bytes
 
   constructor(
     private controller: ReadableStreamDefaultController<Uint8Array>
@@ -203,6 +210,9 @@ class JSONFragmentProcessor {
    *
    * CRITICAL FIX: Ensure each SSE event contains a complete, parseable JSON object
    * to prevent frontend parsing failures and maintain streaming continuity
+   *
+   * CHUNK SIZE LIMITING: Split large text content into smaller chunks to prevent
+   * frontend processing failures with large JSON payloads
    */
   private emitCompletePart(part: AgentEngineContentPart, agentName?: string): void {
     console.log(
@@ -213,6 +223,15 @@ class JSONFragmentProcessor {
 
     // Use provided agent name or fallback to current agent or goal_planning_agent
     const author = agentName || this.currentAgent || "goal_planning_agent";
+
+    // Check if text content is too large and needs to be split
+    if (part.text && part.text.length > this.MAX_CHUNK_SIZE) {
+      console.log(
+        `📦 [JSON PROCESSOR] Text content too large (${part.text.length} chars), splitting into chunks`
+      );
+      this.emitTextInChunks(part, author);
+      return;
+    }
 
     // CRITICAL: Each event must be a complete, independent JSON object
     // This prevents frontend buffer concatenation issues
@@ -241,6 +260,60 @@ class JSONFragmentProcessor {
         textLength: part.text?.length || 0
       }
     );
+  }
+
+  /**
+   * Split large text content into smaller chunks and emit each as separate SSE events
+   */
+  private emitTextInChunks(part: AgentEngineContentPart, author: string): void {
+    if (!part.text) return;
+
+    const text = part.text;
+    const totalLength = text.length;
+    let startIndex = 0;
+    let chunkIndex = 0;
+
+    console.log(
+      `📦 [JSON PROCESSOR] Splitting ${totalLength} chars into chunks of max ${this.MAX_CHUNK_SIZE} bytes`
+    );
+
+    while (startIndex < totalLength) {
+      const endIndex = Math.min(startIndex + this.MAX_CHUNK_SIZE, totalLength);
+      const chunkText = text.substring(startIndex, endIndex);
+      const isLastChunk = endIndex >= totalLength;
+
+      // Create chunk part with continuation metadata
+      const chunkPart: AgentEngineContentPart = {
+        ...part,
+        text: chunkText,
+        // Add chunk metadata for frontend processing
+        chunkInfo: {
+          index: chunkIndex,
+          total: Math.ceil(totalLength / this.MAX_CHUNK_SIZE),
+          isLast: isLastChunk,
+          originalLength: totalLength
+        }
+      };
+
+      const sseData = {
+        content: {
+          parts: [chunkPart],
+        },
+        author: author,
+        id: this.generateEventId(),
+        timestamp: new Date().toISOString(),
+      };
+
+      const sseEvent = `data: ${JSON.stringify(sseData)}\n\n`;
+      this.controller.enqueue(Buffer.from(sseEvent));
+
+      console.log(
+        `✅ [JSON PROCESSOR] Emitted chunk ${chunkIndex + 1}/${Math.ceil(totalLength / this.MAX_CHUNK_SIZE)} (${chunkText.length} chars)`
+      );
+
+      startIndex = endIndex;
+      chunkIndex++;
+    }
   }
 
   /**
