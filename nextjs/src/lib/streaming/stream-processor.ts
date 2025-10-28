@@ -137,7 +137,7 @@ export async function processSseEventData(
     });
 
     // Check if this is a chunked text (has chunkInfo)
-    const hasChunkInfo = parsed.content?.parts?.some((part: any) => part.chunkInfo);
+    const hasChunkInfo = (parsed as any).content?.parts?.some((part: any) => part.chunkInfo);
     if (hasChunkInfo) {
       console.log("📦 [STREAM PROCESSOR] Detected chunked text content, processing chunks");
       await processChunkedTextContent(
@@ -451,23 +451,25 @@ function processThoughts(
  * @param onAnalysisComplete - Analysis completion callback
  */
 async function processChunkedTextContent(
-  parsed: any,
+  parsed: Record<string, unknown>,
   agent: string,
   aiMessageId: string,
   accumulatedTextRef: { current: string },
   onMessageUpdate: (message: Message) => void,
   onAnalysisComplete?: () => void
 ): Promise<void> {
-  if (!parsed.content?.parts) return;
+  const content = parsed.content as { parts?: unknown[] };
+  if (!content?.parts) return;
 
   // Collect all text chunks and sort by chunk index
   const textChunks: Array<{ text: string; chunkInfo: any }> = [];
   let isComplete = false;
 
-  for (const part of parsed.content.parts) {
-    if (part.text && part.chunkInfo) {
-      textChunks.push({ text: part.text, chunkInfo: part.chunkInfo });
-      if (part.chunkInfo.isLast) {
+  for (const part of content.parts) {
+    const partObj = part as { text?: string; chunkInfo?: any };
+    if (partObj.text && partObj.chunkInfo) {
+      textChunks.push({ text: partObj.text, chunkInfo: partObj.chunkInfo });
+      if (partObj.chunkInfo.isLast) {
         isComplete = true;
       }
     }
