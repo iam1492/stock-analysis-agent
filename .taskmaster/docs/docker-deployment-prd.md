@@ -36,8 +36,8 @@ ADK(Agent Development Kit) Stock Analysis 애플리케이션을 Docker를 사용
 ### 컨테이너 구성
 ```
 docker-compose.yml
-├── adk-backend (Python/FastAPI)
-├── adk-frontend (Next.js)
+├── stock-analysis-backend (Python/FastAPI)
+├── stock-analysis-frontend (Next.js)
 ├── nginx (리버스 프록시)
 └── postgres (데이터베이스)
 ```
