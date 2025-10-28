@@ -474,7 +474,7 @@ async function processChunkedTextContent(
   let isComplete = false;
 
   for (const part of content.parts) {
-    const partObj = part as { text?: string; chunkInfo?: any };
+    const partObj = part as { text?: string; chunkInfo?: Record<string, unknown> };
     if (partObj.text && partObj.chunkInfo) {
       textChunks.push({ text: partObj.text, chunkInfo: partObj.chunkInfo });
       if (partObj.chunkInfo.isLast) {
