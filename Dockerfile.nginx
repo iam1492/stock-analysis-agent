@@ -3,8 +3,8 @@ FROM nginx:alpine
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copy static files for fallback
-COPY --from=stock-analysis-frontend /app/public /var/www/html
+# Create directory for static files (will be served by frontend service)
+RUN mkdir -p /var/www/html
 
 # Expose port
 EXPOSE 80

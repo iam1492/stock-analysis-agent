@@ -8,11 +8,14 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies (including dev dependencies for build)
+RUN npm ci
 
 # Copy source code
 COPY . .
+
+# Set dummy DATABASE_URL for Prisma build (will be overridden at runtime)
+ENV DATABASE_URL="postgresql://dummy:dummy@dummy:5432/dummy"
 
 # Build application
 RUN npm run build
