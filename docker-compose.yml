@@ -52,6 +52,10 @@ services:
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-your-secret-key}
       - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost}
       - DATABASE_URL=postgresql://stock_user:${POSTGRES_PASSWORD:-stock_password_2024}@postgres:5432/stock_analysis
+      - AUTH_TRUST_HOST=true
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ADMIN_NAME=${ADMIN_NAME}
     depends_on:
       stock-analysis-backend:
         condition: service_healthy
