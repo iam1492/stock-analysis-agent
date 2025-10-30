@@ -25,6 +25,8 @@ services:
       context: .
       dockerfile: Dockerfile.backend
     container_name: stock-analysis-backend
+    env_file:
+      - app/.env
     environment:
       - DATABASE_URL=postgresql://stock_user:${POSTGRES_PASSWORD:-stock_password_2024}@postgres:5432/stock_analysis
       - BACKEND_URL=http://localhost:8000
