@@ -5,11 +5,16 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Set npm registry to Korean mirror for faster and more reliable downloads
+RUN npm config set registry https://registry.npmjs.org/
+
+# Copy package files - explicitly include both package.json and package-lock.json
+COPY package.json ./
+COPY package-lock.json ./
 
 # Install all dependencies (including dev dependencies for build)
-RUN npm ci
+# Set timeout to prevent network issues
+RUN npm ci --timeout=300000
 
 # Copy source code
 COPY . .

@@ -1,0 +1,340 @@
+# Docker Hub 기반 배포 가이드
+
+## 개요
+이 문서는 Stock Analysis Agent를 로컬에서 Docker 빌드 → Docker Hub 업로드 → 원격 서버 배포 방식으로 전환하는 전체 가이드입니다.
+
+## 📁 생성된 파일 목록
+
+### Docker Hub 설정
+- `DOCKER_HUB_SETUP.md`: Docker Hub 레포지토리 설정 가이드
+
+### 스크립트 파일 (`scripts/` 디렉토리)
+- `build-images.sh`: 로컬 Docker 이미지 빌드 스크립트
+- `push-images.sh`: Docker Hub 이미지 업로드 스크립트
+- `deploy-remote.sh`: 원격 서버 배포 스크립트
+- `generate-version.sh`: 자동 버전 생성 스크립트
+- `run-workflow.sh`: 전체 워크플로우 통합 실행 스크립트
+
+### 프로덕션 설정
+- `docker-compose-prod.yml`: Docker Hub 이미지 기반 프로덕션용 설정
+- `VERSION_MANAGEMENT.md`: 이미지 버전 관리 전략 가이드
+
+## 🚀 빠른 시작 (5단계)
+
+### 1단계: Docker Hub 레포지토리 준비
+```bash
+# Docker Hub에서 다음 레포지토리 생성 (Private 권장):
+# - stock-analysis-backend
+# - stock-analysis-frontend  
+# - stock-analysis-nginx
+
+# Docker Hub 로그인
+docker login
+```
+
+### 2단계: 자동 버전 생성 (선택사항)
+```bash
+# 개발 버전 자동 생성
+scripts/generate-version.sh
+
+# 안정 버전 생성
+scripts/generate-version.sh --stable --patch    # v1.0.1
+scripts/generate-version.sh --stable --minor    # v1.1.0
+scripts/generate-version.sh --stable v1.2.3     # 직접 지정
+```
+
+### 3단계: Docker 이미지 빌드 및 업로드
+```bash
+# 전체 워크플로우 (추천)
+DOCKER_USERNAME=yourusername scripts/run-workflow.sh
+
+# 또는 단계별 실행
+DOCKER_USERNAME=yourusername VERSION=latest scripts/build-images.sh
+DOCKER_USERNAME=yourusername VERSION=latest scripts/push-images.sh
+```
+
+### 4단계: 원격 서버 배포
+```bash
+# 원격 서버에 접속
+ssh root@158.247.216.21
+
+# 원격 서버에서 배포
+DOCKER_USERNAME=yourusername IMAGE_VERSION=latest bash deploy-remote.sh
+```
+
+### 5단계: 서비스 확인
+```bash
+# 원격 서버에서 서비스 상태 확인
+docker compose -f docker-compose-prod.yml ps
+
+# 웹사이트 접근 확인
+curl http://158.247.216.21
+```
+
+## 📋 상세 워크플로우
+
+### 로컬 개발 환경
+
+#### Docker 이미지 빌드
+```bash
+# 모든 이미지 빌드
+scripts/build-images.sh
+
+# 단일 서비스 빌드
+scripts/build-images.sh --backend
+scripts/build-images.sh --frontend
+scripts/build-images.sh --nginx
+```
+
+#### Docker Hub 업로드
+```bash
+# 모든 이미지 업로드
+scripts/push-images.sh
+
+# 상태 확인
+scripts/push-images.sh --check
+
+# 단일 서비스 업로드
+scripts/push-images.sh --backend
+```
+
+### 원격 서버 환경
+
+#### 서비스 배포
+```bash
+# 전체 배포
+DOCKER_USERNAME=yourusername IMAGE_VERSION=latest scripts/deploy-remote.sh
+
+# 특정 단계만 실행
+scripts/deploy-remote.sh --pull          # 이미지 다운로드만
+scripts/deploy-remote.sh --start         # 컨테이너 시작만
+scripts/deploy-remote.sh --stop          # 컨테이너 중지만
+scripts/deploy-remote.sh --restart       # 컨테이너 재시작
+scripts/deploy-remote.sh --logs          # 로그 확인
+scripts/deploy-remote.sh --backup        # 백업만 수행
+```
+
+#### 서비스 모니터링
+```bash
+# 서비스 상태 확인
+scripts/deploy-remote.sh --check
+
+# 컨테이너 로그 추적
+docker compose -f docker-compose-prod.yml logs -f
+
+# 특정 서비스 로그
+docker compose -f docker-compose-prod.yml logs -f stock-analysis-backend
+```
+
+## 🔄 이전 방식 vs 새로운 방식 비교
+
+### 이전 방식 (파일 복사)
+```
+1. 로컬에서 파일 수정
+2. 원격 서버에 파일 복사 (rsync, scp 등)
+3. 원격 서버에서 Docker 빌드
+4. 원격 서버에서 컨테이너 실행
+```
+
+**문제점:**
+- 원격 서버에서 빌드시간 증가
+- 네트워크 대역폭 소모
+- 원격 서버 리소스 사용
+- 여러 서버 시 복잡성 증가
+
+### 새로운 방식 (Docker Hub)
+```
+1. 로컬에서 Docker 빌드
+2. Docker Hub에 업로드
+3. 원격 서버에서 Docker Hub에서 다운로드
+4. 원격 서버에서 컨테이너 실행
+```
+
+**장점:**
+- 원격 서버 빌드시간 없음
+- 로컬 네트워크 대역폭만 사용
+- 일관된 이미지 보장
+- 쉬운 롤백 가능
+- 멀티 서버 배포 용이
+
+## 📊 버전 관리 전략
+
+### 개발 버전 (main 브랜치)
+```bash
+# 자동 생성: dev-YYYYMMDD-HASH
+scripts/generate-version.sh
+# 결과: dev-20251030-a1b2c3d
+```
+
+### 안정 버전 (Git 태그)
+```bash
+# Patch 업데이트
+scripts/generate-version.sh --stable --patch
+# 결과: v1.0.1
+
+# Minor 업데이트  
+scripts/generate-version.sh --stable --minor
+# 결과: v1.1.0
+
+# Major 업데이트
+scripts/generate-version.sh --stable --major
+# 결과: v2.0.0
+```
+
+### 버전 배포 워크플로우
+```bash
+# 1. 버전 생성
+scripts/generate-version.sh --stable --patch
+
+# 2. 빌드 및 업로드
+DOCKER_USERNAME=yourusername VERSION=v1.0.1 scripts/run-workflow.sh
+
+# 3. 원격 서버 배포
+DOCKER_USERNAME=yourusername IMAGE_VERSION=v1.0.1 scripts/deploy-remote.sh
+
+# 4. 롤백 (필요시)
+DOCKER_USERNAME=yourusername IMAGE_VERSION=v1.0.0 scripts/deploy-remote.sh
+```
+
+## 🔧 환경 변수 및 설정
+
+### Docker Hub 설정
+```bash
+export DOCKER_USERNAME="your-dockerhub-username"
+```
+
+### 버전 설정
+```bash
+export VERSION="latest"           # 개발용
+export VERSION="v1.0.0"           # 안정 버전
+export VERSION="dev-20251030-abc1234"  # 개발 버전
+```
+
+### 이미지 크기 최적화
+- **백엔드**: Python slim 이미지 + uv 사용
+- **프론트엔드**: Multi-stage build로 최적화
+- **Nginx**: Alpine 기반 경량 이미지
+
+## 🚨 문제 해결
+
+### 일반적인 문제
+
+#### 1. Docker Hub 업로드 실패
+```bash
+# 로그인 상태 확인
+docker login
+
+# 레포지토리 접근 권한 확인
+docker info | grep "Username"
+```
+
+#### 2. 원격 서버 배포 실패
+```bash
+# 기존 컨테이너 확인
+docker compose -f docker-compose-prod.yml ps
+
+# 수동으로 컨테이너 중지
+docker compose -f docker-compose-prod.yml down
+
+# 디스크 공간 확인
+df -h
+docker system df
+```
+
+#### 3. 서비스 접속 불가
+```bash
+# 컨테이너 상태 확인
+docker compose -f docker-compose-prod.yml ps
+
+# 로그 확인
+docker compose -f docker-compose-prod.yml logs
+
+# 네트워크 확인
+docker network ls
+docker network inspect stock-analysis_stock-analysis-network
+```
+
+#### 4. 데이터베이스 연결 문제
+```bash
+# 데이터베이스 상태 확인
+docker exec stock-analysis-postgres pg_isready
+
+# 연결 테스트
+docker exec stock-analysis-backend python -c "
+import os
+from sqlalchemy import create_engine
+engine = create_engine(os.getenv('DATABASE_URL'))
+engine.connect()
+print('DB 연결 성공')
+"
+```
+
+## 🔒 보안 고려사항
+
+### Docker Hub 레포지토리
+- **Private 레포지토리 사용 권장**
+- **기억할 수 없는 비밀번호로 설정**
+- **정기적으로 비밀번호 변경**
+
+### 환경 변수 보안
+```bash
+# 민감한 정보는 환경 파일에 저장
+POSTGRES_PASSWORD=your-secure-password
+NEXTAUTH_SECRET=your-secret-key
+ADMIN_PASSWORD=your-admin-password
+```
+
+### 네트워크 보안
+- **Nginx 프록시 사용으로 포트 8000, 3000 비공개**
+- **HTTPS 적용 권장**
+- **방화벽 설정으로 필요 포트만 개방**
+
+## 📈 모니터링 및 백업
+
+### 백업 자동화
+```bash
+# 주기적 데이터베이스 백업
+0 2 * * * DOCKER_USERNAME=yourusername /path/to/scripts/deploy-remote.sh --backup
+
+# 로그 로테이션
+docker compose -f docker-compose-prod.yml logs --max-size 100m --max-file 3
+```
+
+### 성능 모니터링
+```bash
+# 컨테이너 리소스 사용량
+docker stats
+
+# 디스크 사용량
+docker system df
+
+# 서비스별 상세 정보
+docker inspect stock-analysis-backend
+```
+
+## 🎯 다음 단계
+
+### 고급 기능
+1. **CI/CD 파이프라인 자동화** (GitHub Actions, GitLab CI 등)
+2. **Kubernetes 배포**로 확장
+3. **Prometheus + Grafana** 모니터링
+4. **ELK Stack** 로깅
+5. **Blue-Green 배포** 전략
+
+### 최적화
+1. **Docker 이미지 캐싱** 최적화
+2. **멀티 아키텍처** 지원 (ARM64, AMD64)
+3. **이미지 스캐닝** (Vulnerability scanning)
+4. **레지스트리 미러링** (Private registry)
+
+## 📞 지원 및 연락처
+
+### 문제 발생 시
+1. **로그 확인**: 각 스크립트의 로그 섹션 참조
+2. **문서 확인**: 관련 가이드 문서 확인
+3. **커뮤니티**: Docker, GitHub 이슈 활용
+
+### 업데이트 알림
+- **Docker Hub 레포지토리** 모니터링
+- **GitHub** 릴리스 노트 확인
+- **보안 업데이트** 정기 적용
