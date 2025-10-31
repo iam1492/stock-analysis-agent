@@ -1,7 +1,7 @@
 version: '3.8'
 
 # Docker Hub 이미지 기반 프로덕션용 docker-compose 파일
-# Stock Analysis Agent - 원격 서버 배포용
+# Stock Analysis Agent - 원격 서버 배포용 (Cloudflare SSL)
 
 services:
   postgres:
@@ -30,7 +30,7 @@ services:
       - app/.env
     environment:
       - DATABASE_URL=postgresql://stock_user:${POSTGRES_PASSWORD:-stock_password_2024}@postgres:5432/stock_analysis
-      - BACKEND_URL=http://localhost:8000
+      - BACKEND_URL=https://ramus-stock.life
       - PYTHONPATH=/app
     depends_on:
       postgres:
@@ -51,7 +51,7 @@ services:
     environment:
       - BACKEND_URL=http://stock-analysis-backend:8000
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-your-secret-key}
-      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost}
+      - NEXTAUTH_URL=https://ramus-stock.life
       - DATABASE_URL=postgresql://stock_user:${POSTGRES_PASSWORD:-stock_password_2024}@postgres:5432/stock_analysis
       - AUTH_TRUST_HOST=true
       - ADMIN_EMAIL=${ADMIN_EMAIL}
