@@ -262,7 +262,7 @@ deploy_all() {
     fi
     
     # 배포 프로세스
-    create_backup
+    # create_backup
     stop_containers
     pull_images
     start_containers
