@@ -146,7 +146,7 @@ export function logGoalPlanningRequest(
   sessionId: string,
   userId: string,
   goal: GoalInput,
-  deploymentType: "agent_engine" | "local_backend"
+  deploymentType: "local_backend"
 ): void {
   console.log(
     `📡 Goal Planning API [${deploymentType}] - Session: ${sessionId}, User: ${userId}`

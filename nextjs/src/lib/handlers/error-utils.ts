@@ -67,14 +67,12 @@ export function createAuthenticationError(
  * Create backend connection error response (502)
  */
 export function createBackendConnectionError(
-  deploymentType: "agent_engine" | "local_backend",
+  deploymentType: "local_backend",
   statusCode: number,
   statusText: string,
   details?: string
 ): NextResponse<ApiResponse<never>> {
-  const message = `${
-    deploymentType === "agent_engine" ? "Agent Engine" : "Local backend"
-  } connection error: ${statusCode} ${statusText}`;
+  const message = `Local backend connection error: ${statusCode} ${statusText}`;
 
   // Map backend error codes to appropriate client error codes
   let clientStatusCode: number;
@@ -95,13 +93,11 @@ export function createBackendConnectionError(
  * Create streaming error response (500)
  */
 export function createStreamingError(
-  deploymentType: "agent_engine" | "local_backend",
+  deploymentType: "local_backend",
   error: Error | unknown,
   details?: string
 ): NextResponse<ApiResponse<never>> {
-  const message = `${
-    deploymentType === "agent_engine" ? "Agent Engine" : "Local backend"
-  } streaming error`;
+  const message = `Local backend streaming error`;
   const errorDetails =
     details ||
     (error instanceof Error ? error.message : "Unknown streaming error");
@@ -115,12 +111,10 @@ export function createStreamingError(
  * Create session creation error response (500)
  */
 export function createSessionCreationError(
-  deploymentType: "agent_engine" | "local_backend",
+  deploymentType: "local_backend",
   details?: string
 ): NextResponse<ApiResponse<never>> {
-  const message = `Failed to create session for ${
-    deploymentType === "agent_engine" ? "Agent Engine" : "local backend"
-  }`;
+  const message = `Failed to create session for local backend`;
 
   return createErrorResponse(message, 500, details);
 }
@@ -146,7 +140,7 @@ export function createInternalServerError(
  */
 export function logError(
   errorType: GoalPlanningErrorType,
-  deploymentType: "agent_engine" | "local_backend" | "general",
+  deploymentType: "local_backend" | "general",
   error: Error | unknown,
   context?: Record<string, unknown>
 ): void {
@@ -180,7 +174,7 @@ export async function extractErrorFromResponse(
  */
 export async function handleFetchError(
   error: unknown,
-  deploymentType: "agent_engine" | "local_backend",
+  deploymentType: "local_backend",
   operation: string
 ): Promise<NextResponse<ApiResponse<never>>> {
   if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -213,7 +207,7 @@ export async function handleFetchError(
  */
 export async function validateStreamingResponseOrCreateError(
   response: Response,
-  deploymentType: "agent_engine" | "local_backend"
+  deploymentType: "local_backend"
 ): Promise<NextResponse<ApiResponse<never>> | null> {
   if (!response.ok) {
     const errorDetails = await extractErrorFromResponse(response);

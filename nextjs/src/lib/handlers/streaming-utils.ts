@@ -1,6 +1,6 @@
 /**
  * Streaming utilities for SSE (Server-Sent Events) handling
- * Provides reusable streaming logic for both Agent Engine and local backend deployments
+ * Provides reusable streaming logic for local backend deployments
  */
 
 import { SSE_HEADERS } from "./run-sse-common";
@@ -15,12 +15,12 @@ export function createStreamingResponse(stream: ReadableStream): Response {
 }
 
 /**
- * Create a simple pass-through stream (for Agent Engine)
+ * Create a simple pass-through stream
  * This forwards SSE chunks directly from the source without processing
  */
 export function createPassThroughStream(
   sourceResponse: Response,
-  deploymentType: "agent_engine" | "local_backend"
+  deploymentType: "local_backend"
 ): ReadableStream {
   return new ReadableStream({
     start(controller) {
@@ -59,7 +59,7 @@ export function createPassThroughStream(
               chunk.substring(0, 200) + (chunk.length > 200 ? "..." : "")
             );
 
-            // Forward the SSE chunk as-is
+            // Forward: SSE chunk as-is
             controller.enqueue(new TextEncoder().encode(chunk));
             console.log(
               `✅ Goal planning chunk ${chunkCount} forwarded to client`
@@ -88,7 +88,7 @@ export function createPassThroughStream(
  */
 export function validateStreamingResponse(
   response: Response,
-  deploymentType: "agent_engine" | "local_backend"
+  deploymentType: "local_backend"
 ): boolean {
   if (!response.ok) {
     console.error(

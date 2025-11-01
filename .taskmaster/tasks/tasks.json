@@ -663,5 +663,25 @@
       "updated": "2025-10-28T10:55:53.774Z",
       "description": "Tasks for docker-deployment context"
     }
+  },
+  "agent-engine-removal": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Inventory Agent Engine Integration in nextjs/ Folder",
+        "description": "Analyze the frontend codebase to identify all files within the nextjs/ folder that reference or use agent engine functionality, producing a comprehensive inventory for removal or refactoring.",
+        "details": "1. Review the entire nextjs/ directory, including all subfolders and files, focusing on code that imports, references, or interacts with agent engine modules, APIs, or related utilities.\n2. Use code search tools (e.g., grep, ripgrep, or IDE search) to locate keywords such as 'agent', 'AgentEngine', 'agent_engine', and any known integration points (e.g., API routes, service calls, or context providers).\n3. Document each file and code location where agent engine functionality is present, including:\n   - File path and line numbers\n   - Type of usage (import, function call, component usage, etc.)\n   - Brief description of the integration's purpose in that context\n4. Cross-reference findings with architectural documentation and recent commits to ensure completeness.\n5. Organize the inventory in a structured format (e.g., markdown table or spreadsheet) for easy review by engineering and product stakeholders.\n6. Highlight any code that is tightly coupled to agent engine logic and may require significant refactoring.\n7. Exclude files outside the nextjs/ folder from this analysis.",
+        "testStrategy": "1. Validate that all files in nextjs/ referencing agent engine functionality are included in the inventory by running comprehensive codebase searches for relevant keywords and imports.\n2. Peer review the inventory with at least one other engineer to confirm completeness and accuracy.\n3. Spot-check a sample of files from the inventory to ensure the documented usage matches the actual code.\n4. Confirm that no agent engine references remain undiscovered by running static analysis or linting tools configured to flag such dependencies.",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "medium",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-11-01T03:55:15.383Z",
+      "updated": "2025-11-01T03:58:34.189Z",
+      "description": "Remove agent engine dependency and refactor to use local backend only"
+    }
   }
 }

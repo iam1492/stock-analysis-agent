@@ -26,19 +26,6 @@ export interface ProcessedStreamRequest {
 }
 
 /**
- * Agent Engine specific payload format
- */
-export interface AgentEnginePayload {
-  class_method: "stream_query";
-  input: {
-    user_id: string;
-    session_id: string;
-    message: string;
-    model?: string;
-  };
-}
-
-/**
  * Local backend payload format
  */
 export interface LocalBackendPayload {
@@ -54,9 +41,9 @@ export interface LocalBackendPayload {
 }
 
 /**
- * Union type for backend payloads
+ * Backend payload type (now only local backend)
  */
-export type BackendPayload = AgentEnginePayload | LocalBackendPayload;
+export type BackendPayload = LocalBackendPayload;
 
 /**
  * Validation result for request parsing
@@ -199,26 +186,6 @@ export function validateStreamRequest(requestBody: {
 }
 
 /**
- * Format Agent Engine payload
- *
- * @param requestData - Processed request data
- * @returns Agent Engine formatted payload
- */
-export function formatAgentEnginePayload(
-  requestData: ProcessedStreamRequest
-): AgentEnginePayload {
-  return {
-    class_method: "stream_query",
-    input: {
-      user_id: requestData.userId,
-      session_id: requestData.sessionId,
-      message: requestData.message,
-      model: requestData.model,
-    },
-  };
-}
-
-/**
  * Format local backend payload
  *
  * @param requestData - Processed request data
@@ -252,7 +219,7 @@ export function logStreamRequest(
   sessionId: string,
   userId: string,
   message: string,
-  deploymentType: "agent_engine" | "local_backend"
+  deploymentType: "local_backend"
 ): void {
   const truncatedMessage =
     message.length > 50 ? message.substring(0, 50) + "..." : message;
@@ -271,7 +238,7 @@ export function logStreamRequest(
 export function logStreamStart(
   url: string,
   payload: BackendPayload,
-  deploymentType: "agent_engine" | "local_backend"
+  deploymentType: "local_backend"
 ): void {
   console.log(`🔗 Forwarding to ${deploymentType}: ${url}`);
   console.log(`📤 Payload:`, payload);
@@ -289,7 +256,7 @@ export function logStreamResponse(
   status: number,
   statusText: string,
   headers: Headers,
-  deploymentType: "agent_engine" | "local_backend"
+  deploymentType: "local_backend"
 ): void {
   console.log(
     `✅ ${deploymentType} response received, status: ${status} ${statusText}`

@@ -345,12 +345,6 @@ export class StreamingConnectionManager {
     }
   }
 
-  // Removed Agent Engine JSON processing methods:
-  // - handleAgentEngineJsonStream()
-  // - processCompleteJsonLines()
-  // - processAgentEngineJsonPart()
-  // - hashPart()
-  //
-  // These are no longer needed since Agent Engine now sends standard SSE format
-  // and uses the same processing pipeline as local backend.
+  // Note: Agent Engine processing methods have been removed
+  // The system now uses unified SSE processing for all backends
 }
