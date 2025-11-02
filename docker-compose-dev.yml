@@ -1,0 +1,100 @@
+version: '3.8'
+
+# Docker Hub 이미지 기반 로컬 개발용 docker-compose 파일
+# Stock Analysis Agent - 로컬 개발 환경용
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: stock-analysis-postgres
+    environment:
+      POSTGRES_DB: stock_analysis
+      POSTGRES_USER: stock_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stock_password_2024}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups/postgres:/backups
+    networks:
+      - stock-analysis-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stock_user -d stock_analysis"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  stock-analysis-backend:
+    image: ${DOCKER_USERNAME}/stock-analysis-backend:${IMAGE_VERSION:-latest}
+    container_name: stock-analysis-backend
+    env_file:
+      - app/.env
+    environment:
+      - DATABASE_URL=postgresql://stock_user:${POSTGRES_PASSWORD:-stock_password_2024}@postgres:5432/stock_analysis
+      - BACKEND_URL=http://localhost:8000
+      - PYTHONPATH=/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - stock-analysis-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.settimeout(3); s.connect(('localhost', 8000)); s.close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  stock-analysis-frontend:
+    image: ${DOCKER_USERNAME}/stock-analysis-frontend:${IMAGE_VERSION:-latest}
+    container_name: stock-analysis-frontend
+    environment:
+      - BACKEND_URL=http://stock-analysis-backend:8000
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-your-secret-key}
+      - NEXTAUTH_URL=http://localhost:3000
+      - DATABASE_URL=postgresql://stock_user:${POSTGRES_PASSWORD:-stock_password_2024}@postgres:5432/stock_analysis
+      - AUTH_TRUST_HOST=true
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ADMIN_NAME=${ADMIN_NAME}
+    depends_on:
+      stock-analysis-backend:
+        condition: service_healthy
+    networks:
+      - stock-analysis-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.settimeout(3); s.connect(('localhost', 3000)); s.close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx-dev
+    container_name: stock-analysis-nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - stock-analysis-frontend
+    networks:
+      - stock-analysis-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  stock-analysis-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

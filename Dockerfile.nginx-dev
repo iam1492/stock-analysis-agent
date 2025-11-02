@@ -1,0 +1,17 @@
+FROM nginx:alpine
+
+# Copy nginx configuration for development
+COPY nginx-dev.conf /etc/nginx/nginx.conf
+
+# Create directory for static files (will be served by frontend service)
+RUN mkdir -p /var/www/html
+
+# Expose port 80 only (HTTP for development)
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/health || exit 1
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
