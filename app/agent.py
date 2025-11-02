@@ -59,16 +59,12 @@ def create_fundamental_analysis_agents(model_name=None):
         ]
     )
 
-fundamental_analysis_agents = create_fundamental_analysis_agents()
-
 def create_financial_team(model_name=None):
     return SequentialAgent(
         name = "financial_team_agents",
         description = "재무 팀의 여러 에이전트를 순차적으로 실행하여 정보를 취합하는 에이전트 입니다.",
         sub_agents = [create_fundamental_analysis_agents(model_name), create_senior_financial_advisor_agent(model_name)]
     )
-
-financial_team = create_financial_team()
 
 def create_quantitative_analysis_agents(model_name=None):
     return ParallelAgent(
@@ -83,9 +79,6 @@ def create_quantitative_analysis_team(model_name=None):
         description = "Quantitative Analysis 팀의 여러 에이전트를 순차적으로 실행하여 정보를 취합하는 에이전트 입니다.",
         sub_agents = [create_quantitative_analysis_agents(model_name), create_senior_quantitative_advisor_agent(model_name)]
     )
-
-quantitative_analysis_agents = create_quantitative_analysis_agents()
-quantitative_analysis_team = create_quantitative_analysis_team()
 
 def create_stock_analysis_department(model_name=None):
     return ParallelAgent(
@@ -108,11 +101,8 @@ def create_stock_analysis_company(model_name=None):
         before_agent_callback=set_session
     )
 
-stock_analysis_department = create_stock_analysis_department()
-stock_analysis_company = create_stock_analysis_company()
-
 def create_root_agent(model_name=None):
-    return create_stock_analysis_company(model_name)
+    return create_stock_analysis_company()
 
 # Default root agent (can be overridden dynamically)
 root_agent = create_root_agent()

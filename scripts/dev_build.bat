@@ -89,15 +89,52 @@ echo All images build completed
 
 echo.
 echo ========================================
+echo Creating version tags for images
+echo ========================================
+
+echo Tagging backend image...
+docker tag stock-analysis-backend %DOCKER_USERNAME%/stock-analysis-backend:%VERSION%
+if errorlevel 1 (
+    echo Backend image tagging failed
+    exit /b 1
+)
+echo Backend image tagged: %DOCKER_USERNAME%/stock-analysis-backend:%VERSION%
+
+echo Tagging frontend image...
+docker tag stock-analysis-frontend %DOCKER_USERNAME%/stock-analysis-frontend:%VERSION%
+if errorlevel 1 (
+    echo Frontend image tagging failed
+    exit /b 1
+)
+echo Frontend image tagged: %DOCKER_USERNAME%/stock-analysis-frontend:%VERSION%
+
+echo Tagging nginx image...
+docker tag stock-analysis-nginx %DOCKER_USERNAME%/stock-analysis-nginx:%VERSION%
+if errorlevel 1 (
+    echo Nginx image tagging failed
+    exit /b 1
+)
+echo Nginx image tagged: %DOCKER_USERNAME%/stock-analysis-nginx:%VERSION%
+
+echo.
+echo ========================================
 echo Operation Complete!
 echo ========================================
-echo Development images built successfully.
+echo Development images built and tagged successfully.
 echo.
-echo Built images:
+echo Built and tagged images:
+echo   %DOCKER_USERNAME%/stock-analysis-backend:%VERSION%
+echo   %DOCKER_USERNAME%/stock-analysis-frontend:%VERSION%
+echo   %DOCKER_USERNAME%/stock-analysis-nginx:%VERSION%
+echo.
+echo Local images (without registry):
 echo   stock-analysis-backend
 echo   stock-analysis-frontend
 echo   stock-analysis-nginx (development version)
 echo.
 echo To run locally: docker-compose -f docker-compose-dev.yml up -d
+echo.
+echo Show built images:
+docker images | findstr "stock-analysis"
 echo.
 echo Batch file execution completed.
