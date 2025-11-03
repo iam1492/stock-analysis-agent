@@ -62,18 +62,24 @@ export function ChatHeader(): React.JSX.Element {
           />
 
           {/* Admin Actions */}
-          {session?.user?.email === 'iam1492@gmail.com' && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.location.href = '/signup'}
-              className="flex items-center gap-2 bg-emerald-50 border-emerald-300 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 shadow-sm"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Create Account
-            </Button>
+          {session?.user?.role === 'admin' && (
+            <>
+              {/* Debug info */}
+              <div className="text-xs text-gray-500 mr-2">
+                Role: {session.user.role}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.location.href = '/signup'}
+                className="flex items-center gap-2 bg-emerald-50 border-emerald-300 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 shadow-sm"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Create Account
+              </Button>
+            </>
           )}
 
           {/* Sign Out Button */}

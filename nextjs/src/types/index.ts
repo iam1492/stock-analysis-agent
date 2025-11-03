@@ -114,6 +114,28 @@ export type ApiResponse<T> =
   | { success: true; data: T }
   | { success: false; error: string };
 
+// NextAuth types
+declare module "next-auth" {
+  interface User {
+    role?: string;
+  }
+
+  interface Session {
+    user: {
+      id: string;
+      email: string;
+      name?: string;
+      role?: string;
+    };
+  }
+}
+
+declare module "@auth/core/jwt" {
+  interface JWT {
+    role?: string;
+  }
+}
+
 // Form types
 export interface GoalInput {
   title: string;
