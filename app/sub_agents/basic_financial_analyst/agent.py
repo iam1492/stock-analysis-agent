@@ -5,10 +5,10 @@ from ..utils.llm_model import lite_llm_model
 from google.genai import types
 from google.adk.planners import BuiltInPlanner
 
-def create_basic_financial_analyst_agent(model_name=None):
+def create_basic_financial_analyst_agent():
     return LlmAgent(
         name = "basic_financial_analyst_agent",
-        model = lite_llm_model(model_name),
+        model = lite_llm_model(),
         description = "당신은 핵심 지표와 비율을 사용하여 회사 가치 평가, 효율성 및 전반적인 재무 건전성을 평가하는 재무 지표 및 비율 전문가입니다.",
         instruction = """
         [설명]

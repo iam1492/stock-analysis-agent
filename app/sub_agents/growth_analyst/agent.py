@@ -7,10 +7,10 @@ from google.genai import types
 from google.adk.planners import BuiltInPlanner
 
 
-def create_growth_analyst_agent(model_name=None):
+def create_growth_analyst_agent():
     return LlmAgent(
         name = "growth_analyst_agent",
-        model = lite_llm_model(model_name),
+        model = lite_llm_model(),
         description = """
         당신은 성장 투자 전략에 특화된 정량 분석(Quantitative Analysis) 전문가입니다.
         의사 결정에 도움이 되는 주식 순위를 매기는 성장 투자 순위 알고리즘을 설계할 수 있습니다.

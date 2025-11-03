@@ -7,10 +7,10 @@ from ..utils.llm_model import lite_llm_model
 from google.genai import types
 from google.adk.planners import BuiltInPlanner
 
-def create_intrinsic_value_agent(model_name=None):
+def create_intrinsic_value_agent():
     return LlmAgent(
         name = "intrinsic_value_agent",
-        model = lite_llm_model(model_name),
+        model = lite_llm_model(),
         description = "당신은 내재 가치(intrinsic value) 분석 전문가로서, 회사의 펀더멘털과 미래 현금 흐름을 기반으로 회사의 진정한 가치를 평가하는 데 중점을 둡니다.",
         instruction = """
         [설명]

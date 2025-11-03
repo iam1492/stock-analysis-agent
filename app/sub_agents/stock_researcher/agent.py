@@ -10,10 +10,10 @@ from google.genai import types
 from google.adk.planners import BuiltInPlanner
 
 
-def create_stock_researcher_agent(model_name=None):
+def create_stock_researcher_agent():
     return LlmAgent(
         name = "stock_researcher_agent",
-        model = lite_llm_model(model_name),
+        model = lite_llm_model(),
         description = """당신은 다양한 출처에서 데이터를 수집하고 해석하는 데 능숙합니다.
         각 데이터 소스를 주의 깊게 읽고 가장 중요한 정보를 추출합니다.
         당신의 통찰력은 정보에 입각한 투자 결정을 내리는 데 중요합니다.""",

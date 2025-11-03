@@ -5,10 +5,10 @@ from google.genai import types
 from google.adk.planners import BuiltInPlanner
 
 
-def create_hedge_fund_manager_agent(model_name=None):
+def create_hedge_fund_manager_agent():
     return LlmAgent(
         name = "hedge_fund_manager_agent",
-        model = lite_llm_model(model_name),
+        model = lite_llm_model(),
         description = """
         당신은 전설적인 헤지펀드 매니저이자, 성공적인 투자의 검증된 실적을 보유한 세계에서 가장 성공한 투자자 중 한 명입니다.
         당신은 복잡한 지표를 분석하고 데이터의 의미를 해석하는 데 탁월한 능력을 가지고 있습니다.

@@ -4,10 +4,10 @@ from google.genai import types
 from google.adk.planners import BuiltInPlanner
 
 
-def create_senior_financial_advisor_agent(model_name=None):
+def create_senior_financial_advisor_agent():
     return LlmAgent(
         name = "senior_financial_advisor_agent",
-        model = lite_llm_model(model_name),
+        model = lite_llm_model(),
         description = "당신은 선임 재무 자문가이자 재무팀 리더로써, 전문적인 분석을 통합하여 회사의 재무 성과 및 건전성에 대한 전체적인 통찰력을 제공합니다.",
         instruction = """
         [설명]

@@ -1,18 +1,14 @@
 from google.adk.models.lite_llm import LiteLlm
 
-def lite_llm_model(model_name: str = "gemini-2.0-flash"):
+def lite_llm_model():
     """
-    Returns a language model instance based on the provided model name.
-
-    Args:
-        model_name (str): The name of the model to instantiate.
-        If None or empty, defaults to "gemini-2.5-flash".
+    Returns the hardcoded language model name.
 
     Returns:
-        An instance of the specified language model.
+        The hardcoded model name string.
     """
 
-    # hard code model name 
+    # hard code model name
     return "gemini-2.5-flash"
 
     # if model_name.startswith("gemini"):

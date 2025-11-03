@@ -4,10 +4,10 @@ from google.genai import types
 from google.adk.planners import BuiltInPlanner
 
 
-def create_senior_quantitative_advisor_agent(model_name=None):
+def create_senior_quantitative_advisor_agent():
     return LlmAgent(
         name = "senior_quantitative_advisor_agent",
-        model = lite_llm_model(model_name),
+        model = lite_llm_model(),
         description = "당신은 정량적 재무 분석(quantitative financial analysis)의 선도적인 전문가입니다.",
         instruction = """
         [설명]

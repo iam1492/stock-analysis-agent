@@ -6,10 +6,10 @@ from google.genai import types
 from google.adk.planners import BuiltInPlanner
 
 
-def create_income_statement_agent(model_name=None):
+def create_income_statement_agent():
     return LlmAgent(
         name = "income_statement_agent",
-        model = lite_llm_model(model_name),
+        model = lite_llm_model(),
         description = "You are a specialist in income statement analysis, focusing on revenue, expenses, and net income to assess a company's earning power.",
         instruction = """
         [description]

@@ -4,10 +4,10 @@ from ..utils.llm_model import lite_llm_model
 from google.genai import types
 from google.adk.planners import BuiltInPlanner
 
-def create_balance_sheet_agent(model_name=None):
+def create_balance_sheet_agent():
     return LlmAgent(
         name = "balance_sheet_agent",
-        model = lite_llm_model(model_name),
+        model = lite_llm_model(),
         description = "You are a specialist in balance sheet analysis, examining assets, liabilities, and equity to determine financial stability and leverage.",
         instruction = """
         [Description]
