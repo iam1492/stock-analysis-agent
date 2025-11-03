@@ -19,7 +19,7 @@ def create_technical_analyst_agent(model_name=None):
         주가 움직임을 분석하고 추세, 지지/저항 수준 및 잠재적 진입점을 식별하기 위해 주어진 도구를 사용합니다.
           - Simple Moving Average 도구를 사용하여 단순 이동 평균을 계산하고 분석합니다.
           - Relative Strength Index 도구를 사용하여 모멘텀 및 과매수/과매도 상태를 측정합니다.
-          - Standard Deviation 도구를 사용하여 가격 변동성을 분석합니다.
+          - Average Directional Index 도구를 사용하여 추세 강도 데이터를 분석합니다.
         이러한 지표의 결과를 해석하여 가격 추세, 모멘텀 및 잠재적 거래 신호에 대한 통찰력을 제공합니다.
 
         [예상 출력]

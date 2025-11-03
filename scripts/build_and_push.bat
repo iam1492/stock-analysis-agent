@@ -7,9 +7,20 @@ echo Stock Analysis Agent - Docker Image Build and Upload
 echo ========================================
 echo.
 
-:: Default values
-if "%DOCKER_USERNAME%"=="" set DOCKER_USERNAME=iam1492
-if "%VERSION%"=="" set VERSION=latest
+:: Check required parameters
+if "%1"=="" (
+    echo Error: DOCKER_USERNAME parameter is required.
+    echo Usage: %0 ^<DOCKER_USERNAME^> ^<VERSION^>
+    exit /b 1
+)
+if "%2"=="" (
+    echo Error: VERSION parameter is required.
+    echo Usage: %0 ^<DOCKER_USERNAME^> ^<VERSION^>
+    exit /b 1
+)
+
+set DOCKER_USERNAME=%1
+set VERSION=%2
 
 echo Docker Hub Username: %DOCKER_USERNAME%
 echo Image Version: %VERSION%
