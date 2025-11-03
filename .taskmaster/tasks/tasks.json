@@ -683,5 +683,115 @@
       "updated": "2025-11-01T03:58:34.189Z",
       "description": "Remove agent engine dependency and refactor to use local backend only"
     }
+  },
+  "model-selector-removal": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Audit and Identify ModelSelector Usage in Frontend",
+        "description": "Locate all instances of the ModelSelector component, model selection state, and related props/handlers in the nextjs frontend codebase.",
+        "details": "Search the nextjs/ directory for all imports, references, and usages of ModelSelector. Identify all state management, props, and handlers related to model selection. Document all affected files and code sections for removal in subsequent tasks.",
+        "testStrategy": "Verify that all ModelSelector references are identified by running a global search for 'ModelSelector', 'model', and related keywords. Confirm with code owners if any ambiguous usages are found.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Remove ModelSelector Component and Related UI Elements",
+        "description": "Delete the ModelSelector component and all UI elements, state, and handlers related to model selection from the frontend.",
+        "details": "Remove the ModelSelector component file(s), delete all imports and usages in chat interfaces, and eliminate model selection state and handlers. Clean up any conditional rendering or UI logic tied to model selection.",
+        "testStrategy": "Run the application and confirm that no model selection UI is present. Check for missing import errors and ensure the chat interface renders correctly.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Clean Up Model-Related Props and Dependencies in Frontend",
+        "description": "Remove all model-related props, context, and dependencies from frontend components and state management.",
+        "details": "Update all components that previously received model-related props or context to remove these parameters. Refactor state management to eliminate model selection logic. Remove any model-related code from Redux, Zustand, or other state libraries if used.",
+        "testStrategy": "Run type checks and linter to ensure no missing props or unused variables remain. Confirm that all frontend components function as expected.",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Remove Model Parameter from Frontend-Backend Communication",
+        "description": "Eliminate the model parameter from all API requests, SSE, and WebSocket messages sent from the frontend.",
+        "details": "Update API call functions to exclude the model parameter. Refactor SSE/WebSocket message payloads to remove model fields. Ensure all request/response interfaces are updated accordingly.",
+        "testStrategy": "Monitor network requests in browser dev tools to confirm no model parameter is sent. Validate that all communication with the backend still succeeds.",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Audit and Identify Model Handling in Backend",
+        "description": "Locate all backend code in the app/ directory that handles model parameters, validation, or processing.",
+        "details": "Search for model-related parameters in API endpoint definitions, request parsing, and business logic. Document all affected files and code sections for removal or refactoring.",
+        "testStrategy": "Verify all model-related backend code is identified by searching for 'model', 'modelName', and similar terms. Cross-check with frontend changes to ensure alignment.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Remove Model Parameter Handling and Validation in Backend",
+        "description": "Delete all backend logic related to model parameter handling, validation, and processing.",
+        "details": "Remove model parameter parsing from API endpoints, eliminate validation logic, and refactor business logic to use the hardcoded 'gemini-2.5-flash' model. Update any affected tests or documentation.",
+        "testStrategy": "Run backend unit and integration tests to ensure endpoints function correctly without model parameters. Confirm that the hardcoded model is always used.",
+        "priority": "high",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Remove Model Parameter from Backend Communication Interfaces",
+        "description": "Update backend SSE/WebSocket and API response interfaces to remove model-related fields.",
+        "details": "Refactor response payloads to exclude model fields. Update any interface/type definitions and ensure backward compatibility for all other fields.",
+        "testStrategy": "Test all backend endpoints and real-time interfaces to confirm no model fields are present in responses. Validate with frontend integration.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Final Codebase Cleanup and Regression Testing",
+        "description": "Remove any dead code, unused imports, and ensure no references to model selection remain. Perform full regression testing.",
+        "details": "Run static analysis tools to detect unused code. Manually review recent commits for any lingering model-related logic. Execute full application regression tests to ensure all features work as expected and no console errors or warnings are present.",
+        "testStrategy": "Run automated and manual regression tests. Check application logs and browser console for errors or warnings. Confirm all success criteria from the PRD are met.",
+        "priority": "high",
+        "dependencies": [
+          4,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-11-03T21:39:06.120Z",
+      "updated": "2025-11-03T21:39:45.699Z",
+      "description": "Tasks for model-selector-removal context"
+    }
   }
 }

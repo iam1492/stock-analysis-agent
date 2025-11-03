@@ -2,7 +2,6 @@
 
 import { Bot, LogOut } from "lucide-react";
 import { SessionSelector } from "@/components/chat/SessionSelector";
-import { ModelSelector } from "@/components/chat/ModelSelector";
 import { useChatContext } from "@/components/chat/ChatProvider";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -48,9 +47,6 @@ export function ChatHeader(): React.JSX.Element {
               Welcome, {session.user.name || session.user.email}
             </div>
           )}
-
-          {/* Model Selection */}
-          <ModelSelector />
 
           {/* Session Management */}
           <SessionSelector

@@ -21,7 +21,6 @@ export interface ProcessedStreamRequest {
   message: string;
   userId: string;
   sessionId: string;
-  model?: string; // Selected LLM model
   stockSymbol?: string; // Extracted stock symbol from message
 }
 
@@ -32,7 +31,6 @@ export interface LocalBackendPayload {
   appName: string;
   userId: string;
   sessionId: string;
-  model?: string;
   newMessage: {
     parts: { text: string }[];
     role: "user";
@@ -117,7 +115,6 @@ export async function parseStreamRequest(request: NextRequest): Promise<{
       message?: string;
       userId?: string;
       sessionId?: string;
-      model?: string;
     };
 
     // Validate the request structure
@@ -133,7 +130,6 @@ export async function parseStreamRequest(request: NextRequest): Promise<{
         message,
         userId: requestBody.userId!,
         sessionId: requestBody.sessionId!,
-        model: requestBody.model,
       },
       validation: { isValid: true },
     };
@@ -159,7 +155,6 @@ export function validateStreamRequest(requestBody: {
   message?: string;
   userId?: string;
   sessionId?: string;
-  model?: string;
 }): StreamValidationResult {
   if (!requestBody.message?.trim()) {
     return {
@@ -198,7 +193,6 @@ export function formatLocalBackendPayload(
     appName: getAdkAppName(),
     userId: requestData.userId,
     sessionId: requestData.sessionId,
-    model: requestData.model,
     newMessage: {
       parts: [{ text: requestData.message }],
       role: "user",
