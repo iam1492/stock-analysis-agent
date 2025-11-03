@@ -214,12 +214,17 @@ function processFunctionCall(
     'fmp_price_target_summary': '목표 주가 분석',
     'fmp_price_target_news': '목표 주가 뉴스 분석',
     'fmp_historical_stock_grade': '주식 등급 분석',
-    'fmp_simple_moving_average': '이동평균선 분석',
+    'fmp_simple_moving_average_long_term_trend': '장기 이동평균선 분석',
+    'fmp_simple_moving_average_mid_term_trend': '중기 이동평균선 분석',
     'fmp_relative_strength_index': 'RSI 분석',
     'fmp_standard_deviation': '변동성 분석',
     'fmp_balance_sheet_statement_growth': '대차대조표 성장 분석',
     'fmp_cash_flow_statement_growth': '현금흐름 성장 분석',
-    'fmp_income_statement_growth': '손익계산서 성장 분석'
+    'fmp_income_statement_growth': '손익계산서 성장 분석',
+    'fmp_key_metrics_ttm':'12개월 핵심 지표 분석',
+    'fmp_analyst_estimates':'애널리스트 미래 실적 추정치 분석',
+    'fmp_average_directional_index':'추세 강도 데이터 분석',
+
   };
 
   const friendlyName = friendlyFunctionNames[functionCall.name] || functionCall.name;
@@ -274,12 +279,16 @@ function processFunctionResponse(
     'fmp_price_target_summary': '목표 주가 분석',
     'fmp_price_target_news': '목표 주가 뉴스 분석',
     'fmp_historical_stock_grade': '주식 등급 분석',
-    'fmp_simple_moving_average': '이동평균선 분석',
+    'fmp_simple_moving_average_long_term_trend': '장기 이동평균선 분석',
+    'fmp_simple_moving_average_mid_term_trend': '중기 이동평균선 분석',
     'fmp_relative_strength_index': 'RSI 분석',
     'fmp_standard_deviation': '변동성 분석',
     'fmp_balance_sheet_statement_growth': '대차대조표 성장 분석',
     'fmp_cash_flow_statement_growth': '현금흐름 성장 분석',
-    'fmp_income_statement_growth': '손익계산서 성장 분석'
+    'fmp_income_statement_growth': '손익계산서 성장 분석',
+    'fmp_key_metrics_ttm':'12개월 핵심 지표 분석',
+    'fmp_analyst_estimates':'애널리스트 미래 실적 추정치 분석',
+    'fmp_average_directional_index':'추세 강도 데이터 분석',
   };
 
   const friendlyName = friendlyFunctionNames[functionResponse.name] || functionResponse.name;

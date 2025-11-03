@@ -3,6 +3,7 @@ from .tools.fmp_stock_news import fmt_stock_news
 from .tools.fmp_price_target_summary import fmp_price_target_summary
 from .tools.fmp_price_target_news import fmp_price_target_news
 from .tools.fmp_historical_stock_grade import fmp_historical_stock_grade
+from .tools.fmp_analyst_estimates import fmp_analyst_estimates
 from google.adk.tools import google_search
 from ..utils.llm_model import lite_llm_model
 from google.genai import types
@@ -24,11 +25,12 @@ def create_stock_researcher_agent(model_name=None):
         fmp_price_target_summary 도구를 사용하여 주식에 대한 여러 분석가의 목표 주가 요약을 얻습니다.
         fmp_price_target_news 도구를 사용하여 주식에 대한 애널리스트들의 목표 주가 실시간 업데이트의 최신 정보를 얻습니다.
         fmp_historical_stock_grade 도구를 사용하여 주식에 대한 애널리스트들의 특정 주식 종목에 대한 애널리스트들의 평가 변화를 이해합니다.
+        fmp_analyst_estimates 도구를 사용하여 주식에 대한 애널리스트들의 과거와 미래의 실적 추정치를 가져와 미래 기대치를 평가합니다.
 
         [예상 출력]
         최종 답변은 주식을 둘러싼 뉴스 및 시장 심리, 분석가들의 목표주가에 대한 상세한 요약이어야 합니다.
         """,
-        tools = [fmt_stock_news, fmp_price_target_summary, fmp_price_target_news, fmp_historical_stock_grade],
+        tools = [fmt_stock_news, fmp_price_target_summary, fmp_price_target_news, fmp_historical_stock_grade, fmp_analyst_estimates],
         output_key = "stock_researcher_result",
         planner=BuiltInPlanner(
             thinking_config=types.ThinkingConfig(

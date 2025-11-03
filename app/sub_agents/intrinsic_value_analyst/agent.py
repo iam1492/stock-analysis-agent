@@ -2,6 +2,7 @@ from google.adk.agents import LlmAgent
 from .tools.fmp_dcf_valuation import fmp_dcf_valuation
 from .tools.fmp_owner_earnings import fmp_owner_earnings
 from .tools.fmp_enterprise_value import fmp_enterprise_value
+from .tools.fmp_key_metrics_ttm import fmp_key_metrics_ttm
 from ..utils.llm_model import lite_llm_model
 from google.genai import types
 from google.adk.planners import BuiltInPlanner
@@ -18,6 +19,7 @@ def create_intrinsic_value_agent(model_name=None):
           - DCF Valuation 도구를 사용하여 할인된 현금 흐름(DCF) 가치를 계산합니다.
           - Owner Earnings 도구를 사용하여 소유자 이익 및 지속 가능한 가치를 평가합니다.
           - Enterprise Value 도구를 사용하여 기업 가치 지표를 결정합니다.
+          - TTM Key Metrics 도구를 사용하여 기업의 최근 12개월 주요 성과지표를 종합적으로 검색합니다.
         이러한 도구의 결과를 분석하여 주식의 내재 가치를 결정합니다.
         내재 가치를 현재 시장 가격과 비교하여 주식이 저평가되었는지 또는 고평가되었는지 평가합니다.
 
@@ -31,7 +33,7 @@ def create_intrinsic_value_agent(model_name=None):
         - 데이터 출처 및 신뢰성에 대한 설명.
         - [매우 중요] 분석을 기반으로 주식이 저평가, 적정 가치 또는 고평가되었는지에 대한 평가.
         """,
-        tools = [fmp_dcf_valuation, fmp_owner_earnings, fmp_enterprise_value],
+        tools = [fmp_dcf_valuation, fmp_owner_earnings, fmp_enterprise_value, fmp_key_metrics_ttm],
         output_key = "intrinsic_value_result",
         planner=BuiltInPlanner(
             thinking_config=types.ThinkingConfig(

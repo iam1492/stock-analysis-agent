@@ -1,7 +1,8 @@
 from google.adk.agents import LlmAgent
-from .tools.fmp_simple_moving_average import fmp_simple_moving_average
+from .tools.fmp_simple_moving_average_mid import fmp_simple_moving_average_mid_term_trend
+from .tools.fmp_simple_moving_average_long import fmp_simple_moving_average_long_term_trend
 from .tools.fmp_relative_strength_index import fmp_relative_strength_index
-from .tools.fmp_standard_deviation import fmp_standard_deviation
+from .tools.fmp_average_directional_index import fmp_average_directional_index
 from ..utils.llm_model import lite_llm_model
 from google.genai import types
 from google.adk.planners import BuiltInPlanner
@@ -30,7 +31,7 @@ def create_technical_analyst_agent(model_name=None):
         - [중요] 잠재적 진입점, 목표 가격 및 위험 평가.
 
         """,
-        tools = [fmp_simple_moving_average, fmp_relative_strength_index, fmp_standard_deviation],
+        tools = [fmp_simple_moving_average_mid_term_trend, fmp_simple_moving_average_long_term_trend, fmp_relative_strength_index, fmp_average_directional_index],
         output_key = "technical_analyst_result",
         planner=BuiltInPlanner(
             thinking_config=types.ThinkingConfig(
