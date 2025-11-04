@@ -33,10 +33,3 @@ lint:
 	uv run ruff check . --diff
 	uv run ruff format . --check --diff
 	uv run mypy .
-
-# Deploy the agent remotely
-deploy-adk:
-	(uv export --no-hashes --no-header --no-dev --no-emit-project --no-annotate > .requirements.txt || \
-	uv export --no-hashes --no-header --no-dev --no-emit-project > .requirements.txt) && \
-	uv run app/agent_engine_app.py
-

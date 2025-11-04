@@ -1,48 +1,33 @@
 """
-Logging Configuration for ADK Agent Engine
+Logging Configuration for Stock Analysis Agent
 
-This module provides centralized logging configuration with appropriate
-levels for OpenTelemetry and other components to reduce noise.
+This module provides centralized logging configuration for the application.
 """
 
 import logging
 import os
 import sys
-from typing import Dict, Optional
+from typing import Optional
 
 
 class LoggingConfig:
     """
-    Centralized logging configuration for the ADK application.
-
-    This class manages logging levels for different components,
-    especially OpenTelemetry components that can be verbose.
+    Centralized logging configuration for the application.
+    
+    This class manages logging levels for different components.
     """
 
     # Default logging levels for different components
     DEFAULT_LEVELS = {
-        # OpenTelemetry components - reduce noise
-        "opentelemetry": logging.WARNING,
-        "opentelemetry.context": logging.ERROR,
-        "opentelemetry.trace": logging.WARNING,
-        "opentelemetry.sdk": logging.WARNING,
-        "opentelemetry.exporter": logging.WARNING,
-        "opentelemetry.instrumentation": logging.WARNING,
-
-        # Google Cloud components
-        "google.cloud": logging.WARNING,
-        "google.auth": logging.WARNING,
-        "vertexai": logging.WARNING,
-
         # ADK components
         "google.adk": logging.INFO,
         "app": logging.INFO,
-
+        
         # FastAPI and Starlette
         "fastapi": logging.WARNING,
         "starlette": logging.WARNING,
         "uvicorn": logging.WARNING,
-
+        
         # Root logger
         "": logging.INFO,
     }
@@ -50,7 +35,6 @@ class LoggingConfig:
     # Environment variable mappings
     ENV_LEVELS = {
         "LOG_LEVEL": "",  # Root logger
-        "OTEL_LOG_LEVEL": "opentelemetry",
         "ADK_LOG_LEVEL": "google.adk",
         "FASTAPI_LOG_LEVEL": "fastapi",
         "UVICORN_LOG_LEVEL": "uvicorn",
@@ -136,7 +120,6 @@ class LoggingConfig:
             os.environ.get("PYTHON_ENV") == "development",
             os.environ.get("ENV") == "dev",
             "dev" in os.getcwd().lower(),
-            not os.environ.get("GOOGLE_CLOUD_PROJECT"),
         ]
         return any(indicators)
 
@@ -151,7 +134,7 @@ class LoggingConfig:
     def _log_configuration_summary(self) -> None:
         """Log a summary of the current logging configuration."""
         print("[LOGGING] Configuration Summary:")
-        print(f"  Root Level: {logging.getLogger().level}")
+        print(f"  Root Level: {logging.getLevelName(logging.getLogger().level)}")
         print("  Component Levels:")
 
         for logger_name in sorted(self.DEFAULT_LEVELS.keys()):
@@ -160,31 +143,6 @@ class LoggingConfig:
                 level_name = logging.getLevelName(level)
                 print(f"    {logger_name}: {level_name}")
 
-    def silence_ot_warnings(self) -> None:
-        """Specifically silence OpenTelemetry warnings and errors."""
-        ot_loggers = [
-            "opentelemetry",
-            "opentelemetry.context",
-            "opentelemetry.trace",
-            "opentelemetry.sdk.trace",
-            "opentelemetry.sdk.trace.export",
-        ]
-
-        for logger_name in ot_loggers:
-            logging.getLogger(logger_name).setLevel(logging.ERROR)
-
-    def enable_ot_debug(self) -> None:
-        """Enable debug logging for OpenTelemetry (for troubleshooting)."""
-        ot_loggers = [
-            "opentelemetry",
-            "opentelemetry.context",
-            "opentelemetry.trace",
-            "opentelemetry.sdk",
-        ]
-
-        for logger_name in ot_loggers:
-            logging.getLogger(logger_name).setLevel(logging.DEBUG)
-
 
 # Global instance
 logging_config = LoggingConfig()
@@ -192,7 +150,7 @@ logging_config = LoggingConfig()
 
 def setup_logging(log_level: Optional[int] = None) -> None:
     """
-    Set up logging for the ADK application.
+    Set up logging for the application.
 
     This function should be called early in the application lifecycle.
     """
