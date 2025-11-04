@@ -55,6 +55,7 @@ google-adk = "1.17.0"
 python-dotenv = "*"
 litellm = "*"
 cachetools = "*"
+firebase-admin = ">=6.0.0"
 
 [project.optional-dependencies.lint]
 ruff = ">=0.4.6"
@@ -179,7 +180,8 @@ npm --prefix nextjs run db:seed
     - `tools/`: Agent-specific tools (if any)
 - **`app/sub_agents/utils/`**: Shared utilities
   - `fmp_api_client.py`: Common FMP API client
-  - `llm_model.py`: LLM model configuration (hardcoded gemini-2.5-flash)
+  - `llm_model.py`: Dynamic LLM model configuration (Firestore integration)
+  - `firestore_config.py`: Firestore client and configuration service
 
 ### Frontend Organization
 - **`src/app/`**: Next.js App Router pages and API routes
@@ -247,9 +249,16 @@ npm --prefix nextjs run db:seed
 
 ### Google Gemini AI
 - **Purpose**: LLM inference via google.adk
-- **Model**: gemini-2.5-flash (hardcoded in code)
+- **Models**: Configurable per agent via Firestore (default: gemini-2.5-flash)
 - **Authentication**: Handled internally by ADK
-- **No additional configuration required**
+- **Configuration**: Managed via Firebase Console
+
+### Google Firestore
+- **Purpose**: Dynamic model configuration storage
+- **Authentication**: Firebase Admin SDK with service account
+- **Schema**: `stock_agents` collection with agent-specific model mappings
+- **Caching**: In-memory cache loaded at startup (O(1) lookups)
+- **Fallback**: Graceful degradation to default models if unavailable
 
 ## Development Workflow
 

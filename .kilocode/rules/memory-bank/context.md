@@ -6,7 +6,16 @@ The Stock Analysis Agent is a **production-ready** web application that provides
 
 ## Recent Work
 
-### Infrastructure Simplification (Latest)
+### Firestore Dynamic Model Configuration (Latest)
+- ✅ **Complete Firestore Integration**: Implemented dynamic AI model configuration for all 11 agents
+- ✅ **Agent-Specific Models**: Each agent can now use different LLM models (e.g., hedge_fund_manager uses gemini-2.5-pro)
+- ✅ **Real-Time Configuration**: Models can be changed via Firebase Console without code deployment
+- ✅ **Zero Runtime Overhead**: Configurations loaded once at startup, cached in memory for O(1) lookups
+- ✅ **Graceful Fallback**: System continues operating with default models if Firestore unavailable
+- ✅ **Comprehensive Documentation**: Added setup guides, configuration management, and troubleshooting
+- ✅ **Testing Infrastructure**: Created utility scripts for Firestore population and connection testing
+
+### Infrastructure Simplification (Previous)
 - Removed all Google Cloud and Vertex AI dependencies
 - Eliminated OpenTelemetry tracing infrastructure
 - Removed Agent Engine deployment support
@@ -44,9 +53,9 @@ The Stock Analysis Agent is a **production-ready** web application that provides
 
 ### Known Limitations
 - Financial API (FMP) requires API key configuration
-- No model selection UI (uses gemini-2.5-flash hardcoded)
 - Agent results not yet integrated with chat UI buttons
 - No result persistence in database (only filesystem)
+- Model configuration requires backend restart (not real-time)
 
 ## Removed Components
 
@@ -68,10 +77,12 @@ The Stock Analysis Agent is a **production-ready** web application that provides
 Potential areas for enhancement:
 1. Integrate agent result viewing in the UI
 2. Add result persistence to PostgreSQL database
-3. Implement model selection interface
-4. Add user session history with result loading
-5. Enhance error handling for streaming failures
-6. Add analytics/monitoring for agent performance
+3. Add user session history with result loading
+4. Enhance error handling for streaming failures
+5. Add analytics/monitoring for agent performance
+6. Implement real-time model configuration reloading (hot-swap)
+7. Add model performance tracking and A/B testing
+8. Create admin UI for model configuration management
 
 ## Important Notes
 
