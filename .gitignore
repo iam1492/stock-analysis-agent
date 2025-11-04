@@ -221,6 +221,11 @@ ai_docs/
 *.p12
 *.pfx
 
+# Firebase credentials
+*service-account*.json
+credentials/
+firebase-credentials*.json
+
 # Docker
 .dockerignore
 docker-compose.override.yml
@@ -274,5 +279,5 @@ dev-debug.log
 # OS specific
 
 # Task files
-# tasks.json
-# tasks/ 
+tasks.json
+tasks/ 

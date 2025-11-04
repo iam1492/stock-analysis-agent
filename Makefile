@@ -20,7 +20,7 @@ dev:
 	make dev-backend & make dev-frontend
 
 dev-backend:
-	uv run adk api_server app --allow_origins="*"
+	uv run adk api_server app --log_level=INFO --allow_origins="*"
 
 dev-frontend:
 	npm --prefix nextjs run dev

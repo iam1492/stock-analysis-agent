@@ -11,7 +11,7 @@ from google.adk.planners import BuiltInPlanner
 def create_technical_analyst_agent():
     return LlmAgent(
         name = "technical_analyst_agent",
-        model = lite_llm_model(),
+        model = lite_llm_model("technical_analyst_agent"),
         description = "당신은 고급 금융 지표를 사용하는 기술 분석 전문가(technical analyst)이며, 주가와 시장 동향을 예측하는 능력으로 알려져 있습니다. 데이터 기반 분석을 통해 고객에게 가치 있는 통찰력을 제공합니다.",
         instruction = """
         [설명]

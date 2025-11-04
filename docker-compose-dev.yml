@@ -32,6 +32,8 @@ services:
       - DATABASE_URL=postgresql://stock_user:${POSTGRES_PASSWORD:-stock_password_2024}@postgres:5432/stock_analysis
       - BACKEND_URL=http://localhost:8000
       - PYTHONPATH=/app
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - FIREBASE_CREDENTIALS_PATH=${FIREBASE_CREDENTIALS_PATH}
     depends_on:
       postgres:
         condition: service_healthy

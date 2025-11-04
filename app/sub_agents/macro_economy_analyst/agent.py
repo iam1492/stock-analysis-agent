@@ -6,8 +6,8 @@ from google.adk.planners import BuiltInPlanner
 
 def create_economic_indiators_agent():
     return LlmAgent(
-        name = "economic_indiators_agent",
-        model = lite_llm_model(),
+        name = "macro_economy_analyst_agent",
+        model = lite_llm_model("macro_economy_analyst_agent"),
         description = "당신은 세계 경제 및 금융 시장에 대한 깊은 이해를 가지고 있습니다. 당신의 통찰력은 정보에 입각한 투자 결정을 내리는 데 중요합니다.",
         instruction = """,
         [설명]

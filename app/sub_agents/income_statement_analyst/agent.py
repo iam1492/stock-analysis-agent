@@ -9,7 +9,7 @@ from google.adk.planners import BuiltInPlanner
 def create_income_statement_agent():
     return LlmAgent(
         name = "income_statement_agent",
-        model = lite_llm_model(),
+        model = lite_llm_model("income_statement_agent"),
         description = "You are a specialist in income statement analysis, focusing on revenue, expenses, and net income to assess a company's earning power.",
         instruction = """
         [description]

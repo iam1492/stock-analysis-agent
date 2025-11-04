@@ -8,7 +8,7 @@ from google.adk.planners import BuiltInPlanner
 def create_cash_flow_statement_agent():
     return LlmAgent(
         name = "cash_flow_statement_agent",
-        model = lite_llm_model(),
+        model = lite_llm_model("cash_flow_statement_agent"),
         description = "당신은 현금 흐름 분석 전문가로서, 현금 유입 및 유출을 추적하여 운영 효율성과 재무 건전성을 평가합니다.",
         instruction = """
         [설명]

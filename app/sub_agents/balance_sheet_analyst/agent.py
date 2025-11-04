@@ -7,7 +7,7 @@ from google.adk.planners import BuiltInPlanner
 def create_balance_sheet_agent():
     return LlmAgent(
         name = "balance_sheet_agent",
-        model = lite_llm_model(),
+        model = lite_llm_model("balance_sheet_agent"),
         description = "You are a specialist in balance sheet analysis, examining assets, liabilities, and equity to determine financial stability and leverage.",
         instruction = """
         [Description]
