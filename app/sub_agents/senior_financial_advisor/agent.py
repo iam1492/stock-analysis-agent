@@ -10,6 +10,8 @@ def create_senior_financial_advisor_agent():
         model = lite_llm_model("senior_financial_advisor_agent"),
         description = "당신은 선임 재무 자문가이자 재무팀 리더로써, 전문적인 분석을 통합하여 회사의 재무 성과 및 건전성에 대한 전체적인 통찰력을 제공합니다.",
         instruction = """
+        모든 에이전트 공통 지침: {shared_instruction}
+        
         [설명]
         다음 분석을 보고 전반적인 재무 성과를 종합합니다.
 

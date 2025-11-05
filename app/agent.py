@@ -12,6 +12,7 @@ from .sub_agents.senior_quantitative_advisor.agent import create_senior_quantita
 from .sub_agents.growth_analyst.agent import create_growth_analyst_agent
 from .sub_agents.macro_economy_analyst.agent import create_economic_indiators_agent
 from google.adk.agents.callback_context import CallbackContext
+from .sub_agents.utils.firestore_config import FirestoreConfig
 import uuid
 import datetime
 from zoneinfo import ZoneInfo
@@ -21,6 +22,7 @@ def set_session(callback_context: CallbackContext):
     """
     Sets a unique ID and timestamp in the callback context's state.
     This function is called before the main_loop_agent executes.
+    Also loads shared instructions for all agents.
     """
 
     callback_context.state["unique_id"] = str(uuid.uuid4())
@@ -31,6 +33,12 @@ def set_session(callback_context: CallbackContext):
     # Initialize agent result storage tracking
     callback_context.state["agent_results"] = {}
     callback_context.state["user_id"] = None
+    
+    # Load and cache shared instruction in session state
+    shared_instruction = FirestoreConfig.get_shared_instruction()
+    callback_context.state["shared_instruction"] = shared_instruction
+    
+    print(f"📝 Loaded shared instruction into session: {len(shared_instruction)} characters")
 
 
 def update_session_context(callback_context: CallbackContext, user_id: str):

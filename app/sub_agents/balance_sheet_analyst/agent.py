@@ -10,6 +10,8 @@ def create_balance_sheet_agent():
         model = lite_llm_model("balance_sheet_agent"),
         description = "You are a specialist in balance sheet analysis, examining assets, liabilities, and equity to determine financial stability and leverage.",
         instruction = """
+        모든 에이전트 공통 지침: {shared_instruction}
+        
         [Description]
         Balance Sheet 도구를 사용하여 회사의 대차대조표를 분석하세요.
         가장 최근 데이터를 얻기 위해 period='quarter' 및 period='annual' 매개변수를 사용하세요.

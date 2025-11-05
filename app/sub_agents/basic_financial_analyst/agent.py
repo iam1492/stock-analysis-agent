@@ -11,6 +11,8 @@ def create_basic_financial_analyst_agent():
         model = lite_llm_model("basic_financial_analyst_agent"),
         description = "당신은 핵심 지표와 비율을 사용하여 회사 가치 평가, 효율성 및 전반적인 재무 건전성을 평가하는 재무 지표 및 비율 전문가입니다.",
         instruction = """
+        모든 에이전트 공통 지침: {shared_instruction}
+        
         [설명]
         fmp_key_metrics 및 fmp_financial_ratios 도구를 사용하여 회사의 주요 지표와 재무 비율을 분석합니다.
         핵심 재무 지표와 재무 비율을 확보합니다.

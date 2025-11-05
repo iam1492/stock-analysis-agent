@@ -10,6 +10,8 @@ def create_senior_quantitative_advisor_agent():
         model = lite_llm_model("senior_quantitative_advisor_agent"),
         description = "당신은 정량적 재무 분석(quantitative financial analysis)의 선도적인 전문가입니다.",
         instruction = """
+        모든 에이전트 공통 지침: {shared_instruction}
+        
         [설명]
         다음 분석된 내용을 보고 정량적 재무 분석을 종합합니다.
 

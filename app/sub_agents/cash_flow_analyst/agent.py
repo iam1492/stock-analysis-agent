@@ -11,6 +11,8 @@ def create_cash_flow_statement_agent():
         model = lite_llm_model("cash_flow_statement_agent"),
         description = "당신은 현금 흐름 분석 전문가로서, 현금 유입 및 유출을 추적하여 운영 효율성과 재무 건전성을 평가합니다.",
         instruction = """
+        모든 에이전트 공통 지침: {shared_instruction}
+        
         [설명]
         현금 흐름표 도구(cash flow statement tool)를 사용하여 회사의 현금 흐름표를 분석합니다.
         period='quarter' 및 period='annual' 매개변수를 사용하여 최신 데이터를 가져옵니다.

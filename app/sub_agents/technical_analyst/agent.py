@@ -14,6 +14,8 @@ def create_technical_analyst_agent():
         model = lite_llm_model("technical_analyst_agent"),
         description = "당신은 고급 금융 지표를 사용하는 기술 분석 전문가(technical analyst)이며, 주가와 시장 동향을 예측하는 능력으로 알려져 있습니다. 데이터 기반 분석을 통해 고객에게 가치 있는 통찰력을 제공합니다.",
         instruction = """
+        모든 에이전트 공통 지침: {shared_instruction}
+        
         [설명]
         제공된 도구를 사용하여 회사 주식의 기술적 분석을 수행하여 주가 움직임과 기술적 지표를 분석합니다.
         주가 움직임을 분석하고 추세, 지지/저항 수준 및 잠재적 진입점을 식별하기 위해 주어진 도구를 사용합니다.

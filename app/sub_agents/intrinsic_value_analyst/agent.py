@@ -13,6 +13,8 @@ def create_intrinsic_value_agent():
         model = lite_llm_model("intrinsic_value_analyst_agent"),
         description = "당신은 내재 가치(intrinsic value) 분석 전문가로서, 회사의 펀더멘털과 미래 현금 흐름을 기반으로 회사의 진정한 가치를 평가하는 데 중점을 둡니다.",
         instruction = """
+        모든 에이전트 공통 지침: {shared_instruction}
+        
         [설명]
         가치 평가 도구를 사용하여 회사 주식의 내재 가치 분석을 수행합니다.
         회사의 내재 가치를 평가하기 위해 다음 도구를 반드시 사용해야 합니다.

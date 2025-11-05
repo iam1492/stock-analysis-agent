@@ -1,8 +1,9 @@
 """
-Firestore Configuration Service for Dynamic Model Management
+Firestore Configuration Service for Dynamic Model and Instruction Management
 
 This module provides centralized Firestore client initialization and
 agent model configuration management with caching and fallback support.
+Extended to support shared instructions for all agents.
 """
 
 import logging
@@ -89,11 +90,11 @@ class FirestoreClient:
 
 class FirestoreConfig:
     """
-    Centralized model configuration service.
+    Centralized model and instruction configuration service.
     
-    Loads agent-to-model mappings from Firestore at startup and caches them
-    in memory for fast O(1) lookups. Provides graceful fallback to default
-    model if Firestore is unavailable or agent config is missing.
+    Loads agent-to-model mappings and shared instructions from Firestore at startup
+    and caches them in memory for fast O(1) lookups. Provides graceful fallback
+    to default model/instruction if Firestore is unavailable or config is missing.
     """
     
     # Configuration cache: {agent_name: model_name}
@@ -105,22 +106,29 @@ class FirestoreConfig:
     # Default model for fallback
     DEFAULT_MODEL: str = "gemini-2.5-flash"
     
-    # Firestore collection name
-    COLLECTION_NAME: str = "stock_agents"
+    # Default shared instruction for fallback
+    DEFAULT_SHARED_INSTRUCTION: str = "우리는 세계 최고의 금융회사다."
+    
+    # Firestore collection names
+    AGENTS_COLLECTION_NAME: str = "stock_agents"
+    COMPANY_COLLECTION_NAME: str = "stock_agent_company"
+    
+    # Document IDs
+    SHARED_INSTRUCTION_DOC_ID: str = "shared_instruction"
     
     # Loading timeout (seconds)
     TIMEOUT: int = 5
-    
+
     @classmethod
     def load_configs(cls) -> None:
         """
-        Load all agent model configurations from Firestore.
+        Load all agent model configurations and shared instructions from Firestore.
         
         This should be called once at application startup, before any agents
         are created. Configurations are cached in memory for O(1) access.
         
         If Firestore is unavailable or loading fails, logs a warning and
-        continues with empty cache (fallback to default models).
+        continues with empty cache (fallback to defaults).
         """
         if cls._loaded:
             logger.debug("Firestore configs already loaded, skipping")
@@ -133,19 +141,19 @@ class FirestoreConfig:
             if client is None:
                 logger.warning(
                     "⚠️  Firestore client not available. "
-                    f"Using default model '{cls.DEFAULT_MODEL}' for all agents."
+                    f"Using default model '{cls.DEFAULT_MODEL}' and shared instruction for all agents."
                 )
                 cls._loaded = True
                 return
             
-            # Load configurations from Firestore
+            # Load agent model configurations
             logger.info(
                 f"📥 Loading agent configurations from Firestore "
-                f"collection '{cls.COLLECTION_NAME}'..."
+                f"collection '{cls.AGENTS_COLLECTION_NAME}'..."
             )
             
             # Query all documents in stock_agents collection
-            docs = client.collection(cls.COLLECTION_NAME).stream(timeout=cls.TIMEOUT)
+            docs = client.collection(cls.AGENTS_COLLECTION_NAME).stream(timeout=cls.TIMEOUT)
             
             loaded_count = 0
             for doc in docs:
@@ -163,6 +171,34 @@ class FirestoreConfig:
                     logger.warning(
                         f"  ⚠️  {agent_name}: missing 'llm_model' field"
                     )
+            
+            # Load shared instruction
+            logger.info(
+                f"📥 Loading shared instruction from Firestore "
+                f"collection '{cls.COMPANY_COLLECTION_NAME}' → '{cls.SHARED_INSTRUCTION_DOC_ID}'..."
+            )
+            
+            try:
+                shared_doc = client.collection(cls.COMPANY_COLLECTION_NAME).document(cls.SHARED_INSTRUCTION_DOC_ID).get(timeout=cls.TIMEOUT)
+                if shared_doc.exists:
+                    shared_data = shared_doc.to_dict()
+                    if shared_data and 'description' in shared_data:
+                        cls._cache[cls.SHARED_INSTRUCTION_DOC_ID] = shared_data['description']
+                        logger.info("✅ Successfully loaded shared instruction from Firestore")
+                    else:
+                        cls._cache[cls.SHARED_INSTRUCTION_DOC_ID] = cls.DEFAULT_SHARED_INSTRUCTION
+                        logger.warning(
+                            f"⚠️  Shared instruction document missing 'shared_instruction' field. "
+                            f"Using default instruction."
+                        )
+                else:
+                    logger.warning(
+                        f"⚠️  Shared instruction document not found. "
+                        f"Using default instruction."
+                    )
+            except Exception as e:
+                logger.error(f"❌ Failed to load shared instruction: {e}")
+                logger.warning("⚠️  Using default shared instruction.")
             
             cls._loaded = True
             
@@ -183,10 +219,31 @@ class FirestoreConfig:
             )
             logger.warning(
                 f"⚠️  Falling back to default model '{cls.DEFAULT_MODEL}' "
-                "for all agents."
+                "and shared instruction for all agents."
             )
             cls._loaded = True  # Prevent retry loop
-    
+            
+    @classmethod
+    def get_shared_instruction(cls) -> str:
+        """get the shared instructions from firestore or cache.
+
+        Returns:
+            str: shared instruction
+        """
+        if not cls._loaded:
+            # Load 
+            cls.load_configs()
+        
+        if cls.SHARED_INSTRUCTION_DOC_ID in cls._cache:
+            shared_instruction = cls._cache[cls.SHARED_INSTRUCTION_DOC_ID]
+            logger.debug(
+                    f"🎯 Shared Instruction: {shared_instruction}"
+                )
+            return shared_instruction
+        
+        logger.debug(f"🎯 Shared Instruction not loaded")
+        return cls.DEFAULT_SHARED_INSTRUCTION
+            
     @classmethod
     def get_model(cls, agent_name: str) -> str:
         """
@@ -203,6 +260,7 @@ class FirestoreConfig:
         """
         # Ensure configs are loaded (idempotent)
         if not cls._loaded:
+            # Load 
             cls.load_configs()
         
         # Lookup in cache
