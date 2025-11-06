@@ -1,7 +1,56 @@
 from google.adk.agents import LlmAgent
+from google.adk.agents.callback_context import ReadonlyContext
 from ..utils.llm_model import lite_llm_model
 from google.genai import types
 from google.adk.planners import BuiltInPlanner
+
+
+def get_senior_quantitative_advisor_instruction(context: ReadonlyContext) -> str:
+    """동적으로 instruction을 생성하는 InstructionProvider"""
+    
+    # PM의 맞춤형 지시사항 가져오기
+    pm_instructions = context.state.get("pm_instructions", {})
+    custom_instruction = pm_instructions.get("quantitative_team_instruction", "")
+    
+    # 기본 instruction
+    shared_instruction = context.state.get('shared_instruction', '')
+    growth_analyst_result = context.state.get('growth_analyst_result', '')
+    intrinsic_value_result = context.state.get('intrinsic_value_result', '')
+    
+    base_instruction = f"""
+모든 에이전트 공통 지침: {shared_instruction}
+
+[설명]
+다음 분석된 내용을 보고 정량적 재무 분석을 종합합니다.
+
+**성장 분석**
+{growth_analyst_result}
+
+**내재 가치 분석**
+{intrinsic_value_result}
+
+내재 가치를 현재 시장 가격과 비교하여 주식이 저평가되었는지 또는 고평가되었는지 평가합니다.
+성장 순위 점수(Grow Rank Score)를 포함한 성장 잠재력에 대한 포괄적인 평가를 제공합니다.
+
+[예상 출력]
+최종 보고서는 회사의 가치 평가 및 성장 잠재력에 대한 포괄적인 분석이어야 합니다.
+내재 가치 분석 및 성장 분석에 대한 상세 보고서를 포함합니다.
+헤지 펀드 매니저가 귀하의 보고서를 사용하여 투자 결정을 내릴 것입니다.
+보고서를 사실(FACT) 및 의견(OPINION) 섹션으로 구분합니다.
+최적의 가독성을 위해 마크다운 형식을 사용합니다.
+"""
+    
+    # PM 지시사항이 있으면 추가
+    if custom_instruction:
+        return f"""{base_instruction}
+
+[프로젝트 매니저의 특별 지시사항]
+{custom_instruction}
+
+위 지시사항을 우선적으로 고려하여 분석을 수행하세요.
+"""
+    
+    return base_instruction
 
 
 def create_senior_quantitative_advisor_agent():
@@ -9,28 +58,7 @@ def create_senior_quantitative_advisor_agent():
         name = "senior_quantitative_advisor_agent",
         model = lite_llm_model("senior_quantitative_advisor_agent"),
         description = "당신은 정량적 재무 분석(quantitative financial analysis)의 선도적인 전문가입니다.",
-        instruction = """
-        모든 에이전트 공통 지침: {shared_instruction}
-        
-        [설명]
-        다음 분석된 내용을 보고 정량적 재무 분석을 종합합니다.
-
-        **성장 분석**
-        {growth_analyst_result}
-
-        **내재 가치 분석**
-        {intrinsic_value_result}
-
-        내재 가치를 현재 시장 가격과 비교하여 주식이 저평가되었는지 또는 고평가되었는지 평가합니다.
-        성장 순위 점수(Grow Rank Score)를 포함한 성장 잠재력에 대한 포괄적인 평가를 제공합니다.
-
-        [예상 출력]
-        최종 보고서는 회사의 가치 평가 및 성장 잠재력에 대한 포괄적인 분석이어야 합니다.
-        내재 가치 분석 및 성장 분석에 대한 상세 보고서를 포함합니다.
-        헤지 펀드 매니저가 귀하의 보고서를 사용하여 투자 결정을 내릴 것입니다.
-        보고서를 사실(FACT) 및 의견(OPINION) 섹션으로 구분합니다.
-        최적의 가독성을 위해 마크다운 형식을 사용합니다.
-        """,
+        instruction = get_senior_quantitative_advisor_instruction,
 
         output_key = "senior_quantitative_advisor_result",
         planner=BuiltInPlanner(

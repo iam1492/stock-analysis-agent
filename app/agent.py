@@ -11,6 +11,7 @@ from .sub_agents.intrinsic_value_analyst.agent import create_intrinsic_value_age
 from .sub_agents.senior_quantitative_advisor.agent import create_senior_quantitative_advisor_agent
 from .sub_agents.growth_analyst.agent import create_growth_analyst_agent
 from .sub_agents.macro_economy_analyst.agent import create_economic_indiators_agent
+from .sub_agents.project_manager.agent import create_project_manager_agent
 from google.adk.agents.callback_context import CallbackContext
 from .sub_agents.utils.firestore_config import FirestoreConfig
 import uuid
@@ -102,8 +103,12 @@ def create_stock_analysis_department():
 def create_stock_analysis_company():
     return SequentialAgent(
         name = "root_agent",
-        description = "여러 서브 에이전트의 결과를 종합하여 최종 투자 권고안을 작성하는 에이전트 입니다.",
-        sub_agents = [create_stock_analysis_department(), create_hedge_fund_manager_agent()],
+        description = "프로젝트 매니저가 업무를 분배하고, 여러 전문 에이전트가 분석을 수행한 후, 헤지펀드 매니저가 최종 투자 권고안을 작성하는 에이전트입니다.",
+        sub_agents = [
+            create_project_manager_agent(),
+            create_stock_analysis_department(),
+            create_hedge_fund_manager_agent()
+        ],
         before_agent_callback=set_session
     )
 
