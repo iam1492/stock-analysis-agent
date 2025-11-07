@@ -36,6 +36,7 @@ app/
 ├── agent_results_api.py          # REST API for result operations
 ├── logging_config.py             # Simplified logging setup
 └── sub_agents/                   # Specialized agent implementations
+    ├── project_manager/          
     ├── balance_sheet_analyst/
     ├── income_statement_analyst/
     ├── cash_flow_analyst/
@@ -50,7 +51,8 @@ app/
     ├── hedge_fund_manager/
     └── utils/
         ├── fmp_api_client.py     # FMP API utility
-        └── llm_model.py          # LLM configuration
+        ├── llm_model.py          # LLM configuration
+        └── firestore_config.py   # Firestore configuration for dynamic models
 ```
 
 ### Frontend (`/nextjs`)
@@ -105,17 +107,22 @@ nextjs/
 
 ### Hierarchical Multi-Agent Pattern
 
-The system uses a **three-level hierarchy**:
+The system uses a **four-level hierarchy**:
 
-1. **Root Agent** ([`create_stock_analysis_company`](app/agent.py:94))
+1. **Root Agent** ([`create_stock_analysis_company`](app/agent.py:136))
    - Coordinates the entire workflow
-   - Sequential execution: Department → Hedge Fund Manager
+   - Sequential execution: Project Manager → Department → Hedge Fund Manager
 
-2. **Department Level** ([`create_stock_analysis_department`](app/agent.py:81))
+2. **Project Manager Level** ([`create_project_manager_agent`](app/sub_agents/project_manager/agent.py))
+   - Analyzes user queries and creates customized instructions
+   - Generates JSON instructions for each analysis team
+   - Acts as Investment Director coordinating the analysis workflow
+
+3. **Department Level** ([`create_stock_analysis_department`](app/agent.py:123))
    - Parallel execution of specialized teams
    - Teams: Stock Research, Financial, Technical, Quantitative, Macro
 
-3. **Team Level** (Financial Team, Quantitative Team)
+4. **Team Level** (Financial Team, Quantitative Team)
    - Sequential execution within teams
    - Pattern: Parallel Analysts → Senior Advisor (synthesis)
 
@@ -123,35 +130,38 @@ The system uses a **three-level hierarchy**:
 
 ```mermaid
 graph TD
-    A[User Query] --> B[Stock Analysis Department]
-    B --> C1[Stock Researcher]
-    B --> C2[Financial Team]
-    B --> C3[Technical Analyst]
-    B --> C4[Quantitative Team]
-    B --> C5[Macro Analyst]
-    
-    C2 --> D1[Balance Sheet Analyst]
-    C2 --> D2[Income Statement Analyst]
-    C2 --> D3[Cash Flow Analyst]
-    C2 --> D4[Basic Financial Analyst]
-    D1 & D2 & D3 & D4 --> E1[Senior Financial Advisor]
-    
-    C4 --> F1[Intrinsic Value Analyst]
-    C4 --> F2[Growth Analyst]
-    F1 & F2 --> E2[Senior Quantitative Advisor]
-    
-    C1 & E1 & C3 & E2 & C5 --> G[Hedge Fund Manager]
-    G --> H[Final Investment Report]
+    A[User Query] --> B[Project Manager]
+    B --> C[Stock Analysis Department]
+
+    C --> D1[Stock Researcher]
+    C --> D2[Financial Team]
+    C --> D3[Technical Analyst]
+    C --> D4[Quantitative Team]
+    C --> D5[Macro Analyst]
+
+    D2 --> E1[Balance Sheet Analyst]
+    D2 --> E2[Income Statement Analyst]
+    D2 --> E3[Cash Flow Analyst]
+    D2 --> E4[Basic Financial Analyst]
+    E1 & E2 & E3 & E4 --> F1[Senior Financial Advisor]
+
+    D4 --> G1[Intrinsic Value Analyst]
+    D4 --> G2[Growth Analyst]
+    G1 & G2 --> F2[Senior Quantitative Advisor]
+
+    D1 & F1 & D3 & F2 & D5 --> H[Hedge Fund Manager]
+    H --> I[Final Investment Report]
 ```
 
 ### Key Implementation Details
 
-**Agent Definition Pattern** ([`app/agent.py`](app/agent.py:94)):
+**Agent Definition Pattern** ([`app/agent.py`](app/agent.py:136)):
 ```python
 def create_stock_analysis_company():
     return SequentialAgent(
         name="root_agent",
         sub_agents=[
+            create_project_manager_agent(),      # NEW: Instruction generation
             create_stock_analysis_department(),  # Parallel execution
             create_hedge_fund_manager_agent()    # Final synthesis
         ],

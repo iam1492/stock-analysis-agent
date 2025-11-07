@@ -6,8 +6,16 @@ The Stock Analysis Agent is a **production-ready** web application that provides
 
 ## Recent Work
 
-### Firestore Dynamic Model Configuration (Latest)
-- ✅ **Complete Firestore Integration**: Implemented dynamic AI model configuration for all 11 agents
+### Project Manager Agent Integration (Latest)
+- ✅ **Project Manager Agent**: Added Project Manager as the first agent in the workflow
+- ✅ **Customized Instructions**: Project Manager analyzes user queries and generates tailored instructions for each of the 5 analysis teams
+- ✅ **Session State Communication**: Instructions passed through session state to specialized agents using InstructionProvider pattern
+- ✅ **User Query Access**: Senior advisors now have access to original user queries for better context
+- ✅ **Token Optimization**: Maintained `include_contents='none'` for senior advisors to reduce token usage while preserving user context
+- ✅ **Logging Standardization**: Updated logging to use centralized logging configuration
+
+### Firestore Dynamic Model Configuration (Previous)
+- ✅ **Complete Firestore Integration**: Implemented dynamic AI model configuration for all 12 agents
 - ✅ **Agent-Specific Models**: Each agent can now use different LLM models (e.g., hedge_fund_manager uses gemini-2.5-pro)
 - ✅ **Real-Time Configuration**: Models can be changed via Firebase Console without code deployment
 - ✅ **Zero Runtime Overhead**: Configurations loaded once at startup, cached in memory for O(1) lookups
@@ -45,7 +53,7 @@ The Stock Analysis Agent is a **production-ready** web application that provides
 ## Current Technical Focus
 
 ### Active Components
-1. **Multi-Agent Analysis System**: 11 specialized agents coordinating stock analysis
+1. **Multi-Agent Analysis System**: 12 specialized agents coordinating stock analysis (including Project Manager)
 2. **Real-Time Streaming**: SSE-based streaming with activity timeline
 3. **Financial Data Integration**: FMP API for comprehensive financial data
 4. **Result Storage**: Filesystem-based agent result archival
