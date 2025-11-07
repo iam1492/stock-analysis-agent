@@ -81,7 +81,8 @@ def create_hedge_fund_manager_agent():
                 include_thoughts=True,
                 thinking_budget=1024,
             )
-        )
+        ),
+        include_contents='none'
     )
 
 hadge_fund_manager_agent = create_hedge_fund_manager_agent()

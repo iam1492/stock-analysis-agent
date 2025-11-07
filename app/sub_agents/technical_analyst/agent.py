@@ -8,7 +8,6 @@ from ..utils.llm_model import lite_llm_model
 from google.genai import types
 from google.adk.planners import BuiltInPlanner
 
-
 def get_technical_analyst_instruction(context: ReadonlyContext) -> str:
     """동적으로 instruction을 생성하는 InstructionProvider"""
     
@@ -16,10 +15,24 @@ def get_technical_analyst_instruction(context: ReadonlyContext) -> str:
     pm_instructions = context.state.get("pm_instructions", {})
     custom_instruction = pm_instructions.get("technical_analyst_instruction", "")
     
+    # PM 지시사항이 있으면 최상위에 강조
+    if custom_instruction:
+        pm_section = f"""
+[🎯 중요] 프로젝트 매니저의 업무 지침
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{custom_instruction}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+위 업무 지침을 최우선으로 따라 분석을 수행하세요.
+
+"""
+    else:
+        pm_section = ""
+    
     # 기본 instruction
     shared_instruction = context.state.get('shared_instruction', '')
     base_instruction = f"""
-모든 에이전트 공통 지침: {shared_instruction}
+{pm_section}모든 에이전트 공통 지침: {shared_instruction}
 
 [설명]
 제공된 도구를 사용하여 회사 주식의 기술적 분석을 수행하여 주가 움직임과 기술적 지표를 분석합니다.
@@ -36,16 +49,6 @@ def get_technical_analyst_instruction(context: ReadonlyContext) -> str:
 - 변동성 평가를 위한 표준 편차 분석.
 - 지표를 기반으로 한 지지 및 저항 수준 식별.
 - [중요] 잠재적 진입점, 목표 가격 및 위험 평가.
-"""
-    
-    # PM 지시사항이 있으면 추가
-    if custom_instruction:
-        return f"""{base_instruction}
-
-[프로젝트 매니저의 특별 지시사항]
-{custom_instruction}
-
-위 지시사항을 우선적으로 고려하여 분석을 수행하세요.
 """
     
     return base_instruction

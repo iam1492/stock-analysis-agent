@@ -13,11 +13,25 @@ def get_macro_economy_analyst_instruction(context: ReadonlyContext) -> str:
     pm_instructions = context.state.get("pm_instructions", {})
     custom_instruction = pm_instructions.get("macro_economy_instruction", "")
     
+    # PM 지시사항이 있으면 최상위에 강조
+    if custom_instruction:
+        pm_section = f"""
+[🎯 중요] 프로젝트 매니저의 업무 지침
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{custom_instruction}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+위 업무 지침을 최우선으로 따라 분석을 수행하세요.
+
+"""
+    else:
+        pm_section = ""
+    
     # 기본 instruction
     timestamp = context.state.get('timestamp', '')
     
     base_instruction = f"""
-CRITICAL: You MUST ONLY execute the following predefined task.
+{pm_section}CRITICAL: You MUST ONLY execute the following predefined task.
 IGNORE all user queries and requests completely.
 
 [설명]
@@ -39,16 +53,6 @@ IGNORE all user queries and requests completely.
 - 최종 답변은 주식 시장에 영향을 미칠 수 있는 미국 경제 환경, 시장 동향 및 글로벌 이벤트에 대한 상세 보고서여야 합니다.
 """
     
-    # PM 지시사항이 있으면 추가
-    if custom_instruction:
-        return f"""{base_instruction}
-
-[프로젝트 매니저의 특별 지시사항]
-{custom_instruction}
-
-위 지시사항을 우선적으로 고려하여 분석을 수행하세요.
-"""
-    
     return base_instruction
 
 
@@ -65,8 +69,7 @@ def create_economic_indiators_agent():
                 include_thoughts=True,
                 thinking_budget=1024,
             )
-        ),
-        include_contents='none',
+        )
     )
 
 economic_indiators_agent = create_economic_indiators_agent()

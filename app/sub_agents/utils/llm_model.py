@@ -8,6 +8,7 @@ default models.
 
 import logging
 from typing import Optional
+from google.adk.models.lite_llm import LiteLlm
 
 from .firestore_config import FirestoreConfig
 
@@ -58,4 +59,7 @@ def lite_llm_model(agent_name: Optional[str] = None) -> str:
     # Get model from Firestore config service
     model = FirestoreConfig.get_model(agent_name)
     
-    return model
+    if model.startswith("gemini"):
+        return model
+    
+    return LiteLlm(model=model)

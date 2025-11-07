@@ -18,10 +18,24 @@ def get_stock_researcher_instruction(context: ReadonlyContext) -> str:
     pm_instructions = context.state.get("pm_instructions", {})
     custom_instruction = pm_instructions.get("stock_researcher_instruction", "")
     
+    # PM 지시사항이 있으면 최상위에 강조
+    if custom_instruction:
+        pm_section = f"""
+[🎯 중요] 프로젝트 매니저의 업무 지침
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{custom_instruction}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+위 업무 지침을 최우선으로 따라 분석을 수행하세요.
+
+"""
+    else:
+        pm_section = ""
+    
     # 기본 instruction
     shared_instruction = context.state.get('shared_instruction', '')
     base_instruction = f"""
-모든 에이전트 공통 지침: {shared_instruction}
+{pm_section}모든 에이전트 공통 지침: {shared_instruction}
 
 [설명]
 회사 주식을 둘러싼 최신 뉴스 및 시장 심리를 수집하고 분석합니다.
@@ -34,16 +48,6 @@ fmp_analyst_estimates 도구를 사용하여 주식에 대한 애널리스트들
 
 [예상 출력]
 최종 답변은 주식을 둘러싼 뉴스 및 시장 심리, 분석가들의 목표주가에 대한 상세한 요약이어야 합니다.
-"""
-    
-    # PM 지시사항이 있으면 추가
-    if custom_instruction:
-        return f"""{base_instruction}
-
-[프로젝트 매니저의 특별 지시사항]
-{custom_instruction}
-
-위 지시사항을 우선적으로 고려하여 분석을 수행하세요.
 """
     
     return base_instruction
