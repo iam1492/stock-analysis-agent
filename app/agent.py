@@ -14,9 +14,12 @@ from .sub_agents.macro_economy_analyst.agent import create_economic_indiators_ag
 from .sub_agents.project_manager.agent import create_project_manager_agent
 from google.adk.agents.callback_context import CallbackContext
 from .sub_agents.utils.firestore_config import FirestoreConfig
+from .logging_config import get_logger
 import uuid
 import datetime
 from zoneinfo import ZoneInfo
+
+logger = get_logger(__name__)
 
 
 def set_session(callback_context: CallbackContext):
@@ -34,13 +37,44 @@ def set_session(callback_context: CallbackContext):
     # Initialize agent result storage tracking
     callback_context.state["agent_results"] = {}
     callback_context.state["user_id"] = None
-    
+    logger.info(f"🔍 state: {callback_context.state}")
+    # Store user query for agents that need it (like hedge_fund_manager)
+    # Debug: Log the user_content structure
+    logger.info(f"🔍 user_content type: {type(callback_context.user_content)}")
+    logger.info(f"🔍 user_content: {callback_context.user_content}")
+    if callback_context.user_content:
+        logger.info(f"🔍 user_content dir: {dir(callback_context.user_content)}")
+
+    # Extract text from Content object
+    user_query = get_user_query(callback_context)
+
+    callback_context.state["user_query"] = user_query
+
     # Load and cache shared instruction in session state
     shared_instruction = FirestoreConfig.get_shared_instruction()
     callback_context.state["shared_instruction"] = shared_instruction
-    
-    print(f"📝 Loaded shared instruction into session: {len(shared_instruction)} characters")
 
+    logger.info(f"📝 Loaded shared instruction into session: {len(shared_instruction)} characters")
+    logger.info(f"📝 Stored user query: {user_query[:100]}...")
+
+def get_user_query(callback_context):
+    user_query = ""
+    if callback_context.user_content:
+        try:
+            # Try different ways to extract text
+            if hasattr(callback_context.user_content, 'parts'):
+                # Content has parts
+                for part in callback_context.user_content.parts:
+                    if hasattr(part, 'text'):
+                        user_query += part.text
+            elif hasattr(callback_context.user_content, 'text'):
+                user_query = callback_context.user_content.text
+            else:
+                user_query = str(callback_context.user_content)
+        except Exception as e:
+            logger.error(f"❌ Error extracting user query: {e}")
+            user_query = ""
+    return user_query
 
 def update_session_context(callback_context: CallbackContext, user_id: str):
     """
@@ -48,8 +82,7 @@ def update_session_context(callback_context: CallbackContext, user_id: str):
     This is called from the streaming handler when a new analysis starts.
     """
     callback_context.state["user_id"] = user_id
-    print(f"📝 Updated session context: user_id={user_id}")
-
+    logger.info(f"📝 Updated session context: user_id={user_id}")
 
 # Note: Agent result saving is now handled through streaming detection
 # rather than direct agent callbacks to avoid Pydantic validation issues

@@ -15,7 +15,10 @@ def create_hedge_fund_manager_agent():
         당신은 항상 고객들에게 깊은 인상을 심어줍니다.""",
         instruction = """
         모든 에이전트 공통 지침: {shared_instruction}
-        
+
+        [참고: 사용자 최초 쿼리]
+        {user_query}
+
         [Description]
         다음의 분석 결과를 종합하여, 해당 기업 주식에 대한 아주 상세한 투자 권고안을 제시하십시오.
         당신의 최종 리포트는 사용자에게 전달될것이고 사용자는 이 리포트를 기반으로 투자 결정을 내리게 됩니다.

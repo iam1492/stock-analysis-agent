@@ -11,7 +11,10 @@ def create_senior_financial_advisor_agent():
         description = "당신은 선임 재무 자문가이자 재무팀 리더로써, 전문적인 분석을 통합하여 회사의 재무 성과 및 건전성에 대한 전체적인 통찰력을 제공합니다.",
         instruction = """
         모든 에이전트 공통 지침: {shared_instruction}
-        
+
+        [참고: 사용자 최초 쿼리]
+        {user_query}
+
         [설명]
         재무팀 멤버들의 분석을 면밀히 검토해 재무 성과를 종합합니다.
 
