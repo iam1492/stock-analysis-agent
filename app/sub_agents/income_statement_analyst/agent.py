@@ -31,17 +31,19 @@ def get_income_statement_instruction(context: ReadonlyContext) -> str:
     
     # 기본 instruction
     shared_instruction = context.state.get('shared_instruction', '')
+    timestamp = context.state.get('timestamp', '')
     base_instruction = f"""
 {pm_section}모든 에이전트 공통 지침: {shared_instruction}
 
 [description]
 손익계산서 도구를 사용하여 회사의 손익계산서를 분석하세요.
-가장 최근 데이터를 얻기 위해 period='quarter' 및 period='annual' 매개변수를 사용하세요.
+반드시 최신 데이터를 사용하기 위해 period='quarter' 및 period='annual' 매개변수를 모두 사용하여 가장 최근의 데이터를 확보하세요.
 수익, 비용, 순이익 및 수익성 추세에 초점을 맞추세요.
 
 [Expected Output]
+- 리포트 작성 날짜: {timestamp} (읽기 쉬운 한국 현지 시간대로 표기)
 손익계산서에 대한 상세한 분석을 제공하세요.
-분기 및 연간 데이터를 포함하세요.
+분기 및 연간 데이터를 모두 포함하세요.
 FACT 및 OPINION 섹션으로 분리하세요.
 Markdown 형식을 사용하세요.
 """

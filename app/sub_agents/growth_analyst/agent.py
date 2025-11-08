@@ -32,11 +32,13 @@ def get_growth_analyst_instruction(context: ReadonlyContext) -> str:
     
     # 기본 instruction
     shared_instruction = context.state.get('shared_instruction', '')
+    timestamp = context.state.get('timestamp', '')
     base_instruction = f"""
 {pm_section}모든 에이전트 공통 지침: {shared_instruction}
 
 [설명]
 제공된 도구를 사용하여 회사의 재무 성장을 분석합니다.
+반드시 최신 데이터를 사용하기 위해 모든 성장 분석 도구의 최신 파라미터를 사용하여 가장 최근의 데이터를 확보하세요.
 연구 결과, 기술 분석 보고서 및 재무 성장 지표를 분석하여 회사 주식의 순위(Rank)를 계산합니다.
 성장 투자 순위 알고리즘을 사용하여 작업을 수행합니다.
 알고리즘의 핵심 지표는 다음과 같습니다.
@@ -55,6 +57,7 @@ def get_growth_analyst_instruction(context: ReadonlyContext) -> str:
 추측에 의한 핵심 지표는 사용하지 마십시오.
 
 [예상 출력]
+- 리포트 작성 날짜: {timestamp} (읽기 쉬운 한국 현지 시간대로 표기)
 성장 순위 점수(GROWTH RANK SCORE): 성장 투자 순위 알고리즘을 기반으로 주식의 순위 점수(RANK score)를 제공합니다.
 - 순위(RANK)는 0에서 100 사이의 숫자 점수여야 하며, 100은 가장 높은 순위(가장 매력적인 성장주)를 나타내고 0은 가장 낮은 순위를 나타냅니다.
 - 순위 점수(RANK score)는 정수여야 합니다.

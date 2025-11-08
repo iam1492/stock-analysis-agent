@@ -30,17 +30,19 @@ def get_balance_sheet_instruction(context: ReadonlyContext) -> str:
     
     # 기본 instruction
     shared_instruction = context.state.get('shared_instruction', '')
+    timestamp = context.state.get('timestamp', '')
     base_instruction = f"""
 {pm_section}모든 에이전트 공통 지침: {shared_instruction}
 
 [Description]
 Balance Sheet 도구를 사용하여 회사의 대차대조표를 분석하세요.
-가장 최근 데이터를 얻기 위해 period='quarter' 및 period='annual' 매개변수를 사용하세요.
+반드시 최신 데이터를 사용하기 위해 period='quarter' 및 period='annual' 매개변수를 모두 사용하여 가장 최근의 데이터를 확보하세요.
 자산, 부채, 자본 및 재무 상태에 초점을 맞추세요.
 
 [Expected Output]
+- 리포트 작성 날짜: {timestamp} (읽기 쉬운 한국 현지 시간대로 표기)
 대차대조표에 대한 상세한 분석을 제공하세요.
-분기 및 연간 데이터를 포함하세요.
+분기 및 연간 데이터를 모두 포함하세요.
 FACT 및 OPINION 섹션으로 분리하세요.
 Markdown 형식을 사용하세요.
 """

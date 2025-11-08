@@ -30,17 +30,19 @@ def get_cash_flow_instruction(context: ReadonlyContext) -> str:
     
     # 기본 instruction
     shared_instruction = context.state.get('shared_instruction', '')
+    timestamp = context.state.get('timestamp', '')
     base_instruction = f"""
 {pm_section}모든 에이전트 공통 지침: {shared_instruction}
 
 [설명]
 현금 흐름표 도구(cash flow statement tool)를 사용하여 회사의 현금 흐름표를 분석합니다.
-period='quarter' 및 period='annual' 매개변수를 사용하여 최신 데이터를 가져옵니다.
+반드시 최신 데이터를 사용하기 위해 period='quarter' 및 period='annual' 매개변수를 모두 사용하여 가장 최근의 데이터를 확보하세요.
 현금 유입, 유출 및 유동성에 중점을 둡니다.
 
 [예상 출력]
+- 리포트 작성 날짜: {timestamp} (읽기 쉬운 한국 현지 시간대로 표기)
 현금 흐름표에 대한 상세한 분석을 제공합니다.
-분기별 및 연간 데이터를 포함합니다.
+분기별 및 연간 데이터를 모두 포함합니다.
 사실(FACT) 및 의견(OPINION) 섹션으로 구분합니다.
 마크다운 형식을 사용합니다.
 """

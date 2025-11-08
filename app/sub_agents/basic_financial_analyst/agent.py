@@ -31,15 +31,18 @@ def get_basic_financial_instruction(context: ReadonlyContext) -> str:
     
     # 기본 instruction
     shared_instruction = context.state.get('shared_instruction', '')
+    timestamp = context.state.get('timestamp', '')
     base_instruction = f"""
 {pm_section}모든 에이전트 공통 지침: {shared_instruction}
 
 [설명]
 fmp_key_metrics 및 fmp_financial_ratios 도구를 사용하여 회사의 주요 지표와 재무 비율을 분석합니다.
+반드시 최신 데이터를 사용하기 위해 모든 도구의 최신 파라미터를 사용하여 가장 최근의 데이터를 확보하세요.
 핵심 재무 지표와 재무 비율을 확보합니다.
 가치 평가, 효율성 및 전반적인 성과를 평가합니다.
 
 [예상 출력]
+- 리포트 작성 날짜: {timestamp} (읽기 쉬운 한국 현지 시간대로 표기)
 핵심 지표와 재무 비율에 대한 상세한 분석을 제공합니다.
 사실(FACT) 및 의견(OPINION) 섹션으로 구분합니다.
 마크다운 형식을 사용합니다.

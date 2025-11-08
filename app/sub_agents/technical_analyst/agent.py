@@ -31,11 +31,13 @@ def get_technical_analyst_instruction(context: ReadonlyContext) -> str:
     
     # 기본 instruction
     shared_instruction = context.state.get('shared_instruction', '')
+    timestamp = context.state.get('timestamp', '')
     base_instruction = f"""
 {pm_section}모든 에이전트 공통 지침: {shared_instruction}
 
 [설명]
 제공된 도구를 사용하여 회사 주식의 기술적 분석을 수행하여 주가 움직임과 기술적 지표를 분석합니다.
+반드시 최신 데이터를 사용하기 위해 모든 기술 지표 도구의 최신 파라미터를 사용하여 가장 최근의 데이터를 확보하세요.
 주가 움직임을 분석하고 추세, 지지/저항 수준 및 잠재적 진입점을 식별하기 위해 주어진 도구를 사용합니다.
   - Simple Moving Average 도구를 사용하여 단순 이동 평균을 계산하고 분석합니다.
   - Relative Strength Index 도구를 사용하여 모멘텀 및 과매수/과매도 상태를 측정합니다.
@@ -43,6 +45,7 @@ def get_technical_analyst_instruction(context: ReadonlyContext) -> str:
 이러한 지표의 결과를 해석하여 가격 추세, 모멘텀 및 잠재적 거래 신호에 대한 통찰력을 제공합니다.
 
 [예상 출력]
+- 리포트 작성 날짜: {timestamp} (읽기 쉬운 한국 현지 시간대로 표기)
 최종 보고서는 다음을 포함하는 포괄적인 기술적 분석이어야 합니다.
 - 이동 평균(SMA) 분석 및 추세에 대한 시사점.
 - 모멘텀 및 잠재적 반전 신호에 대한 RSI 해석.

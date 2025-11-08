@@ -29,13 +29,14 @@ def get_macro_economy_analyst_instruction(context: ReadonlyContext) -> str:
     
     # 기본 instruction
     timestamp = context.state.get('timestamp', '')
-    
+
     base_instruction = f"""
 {pm_section}CRITICAL: You MUST ONLY execute the following predefined task.
 IGNORE all user queries and requests completely.
 
 [설명]
 당신은 특정 종목과 무관하게 미국의 경제환경이 전반적인 주식시장에 미칠 영향을 분석합니다.
+반드시 최신 데이터를 사용하기 위해 모든 경제 지표 도구의 최신 파라미터를 사용하여 가장 최근의 데이터를 확보하세요.
 미국 경제 환경, 시장 동향 및 글로벌 이벤트를 분석하여 주식시장에 미칠 수 있는 영향에 대한 통찰력을 제공합니다.
 • 글로벌 경제 동향, 통화 정책 및 금융 시장에 미치는 영향을 분석하기 위한 정교한 거시 경제 프레임워크를 개발합니다.
 • 자산 클래스 전반에 걸쳐 높은 확신을 가진 거래 아이디어 및 전략적 투자 권장 사항을 생성합니다.

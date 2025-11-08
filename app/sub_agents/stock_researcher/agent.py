@@ -34,11 +34,13 @@ def get_stock_researcher_instruction(context: ReadonlyContext) -> str:
     
     # 기본 instruction
     shared_instruction = context.state.get('shared_instruction', '')
+    timestamp = context.state.get('timestamp', '')
     base_instruction = f"""
 {pm_section}모든 에이전트 공통 지침: {shared_instruction}
 
 [설명]
 회사 주식을 둘러싼 최신 뉴스 및 시장 심리를 수집하고 분석합니다.
+반드시 최신 데이터를 사용하기 위해 모든 뉴스 및 분석가 도구의 최신 파라미터를 사용하여 가장 최근의 데이터를 확보하세요.
 인터넷에서 회사에 대한 정보를 검색하고 최근 중요한 정보를 검색합니다.
 fmt_stock_news 도구를 사용하여 회사에 대한 최신 뉴스 및 시장 심리를 얻습니다.
 fmp_price_target_summary 도구를 사용하여 주식에 대한 여러 분석가의 목표 주가 요약을 얻습니다.
@@ -47,6 +49,7 @@ fmp_historical_stock_grade 도구를 사용하여 주식에 대한 애널리스�
 fmp_analyst_estimates 도구를 사용하여 주식에 대한 애널리스트들의 과거와 미래의 실적 추정치를 가져와 미래 기대치를 평가합니다.
 
 [예상 출력]
+- 리포트 작성 날짜: {timestamp} (읽기 쉬운 한국 현지 시간대로 표기)
 최종 답변은 주식을 둘러싼 뉴스 및 시장 심리, 분석가들의 목표주가에 대한 상세한 요약이어야 합니다.
 """
     

@@ -39,6 +39,7 @@ def get_intrinsic_value_instruction(context: ReadonlyContext) -> str:
 
 [설명]
 가치 평가 도구를 사용하여 회사 주식의 내재 가치 분석을 수행합니다.
+반드시 최신 데이터를 사용하기 위해 모든 가치 평가 도구의 최신 파라미터를 사용하여 가장 최근의 데이터를 확보하세요.
 회사의 내재 가치를 평가하기 위해 다음 도구를 반드시 사용해야 합니다.
   - DCF Valuation 도구를 사용하여 할인된 현금 흐름(DCF) 가치를 계산합니다.
   - Owner Earnings 도구를 사용하여 소유자 이익 및 지속 가능한 가치를 평가합니다.
