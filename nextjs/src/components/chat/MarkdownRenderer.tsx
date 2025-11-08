@@ -60,7 +60,7 @@ export const mdComponents: Partial<Components> = {
   ),
   ul: ({ children, ...props }) => (
     <ul
-      className="list-disc list-inside mb-2 space-y-1 text-gray-800"
+      className="list-disc list-outside mb-2 space-y-1 text-gray-800 ml-4"
       {...props}
     >
       {children}
@@ -68,14 +68,14 @@ export const mdComponents: Partial<Components> = {
   ),
   ol: ({ children, ...props }) => (
     <ol
-      className="list-decimal list-inside mb-2 space-y-1 text-gray-800"
+      className="list-decimal list-outside mb-2 space-y-1 text-gray-800 ml-4"
       {...props}
     >
       {children}
     </ol>
   ),
   li: ({ children, ...props }) => (
-    <li className="leading-relaxed text-gray-700" {...props}>
+    <li className="leading-normal text-gray-700" {...props}>
       {children}
     </li>
   ),
