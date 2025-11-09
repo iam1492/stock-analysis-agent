@@ -44,7 +44,10 @@ app/
     ├── growth_analyst/
     ├── intrinsic_value_analyst/
     ├── technical_analyst/
-    ├── stock_researcher/
+    ├── web_researcher/           # Web-based research specialist (Tavily)
+    ├── analyst_opinion_analyst/  # Analyst opinion analysis specialist
+    ├── senior_research_advisor/  # Research results synthesizer
+    ├── stock_research_team/      # Parallel research team coordinator
     ├── macro_economy_analyst/
     ├── senior_financial_advisor/
     ├── senior_quantitative_advisor/
@@ -119,8 +122,8 @@ The system uses a **four-level hierarchy**:
    - Acts as Investment Director coordinating the analysis workflow
 
 3. **Department Level** ([`create_stock_analysis_department`](app/agent.py:123))
-   - Parallel execution of specialized teams
-   - Teams: Stock Research, Financial, Technical, Quantitative, Macro
+    - Parallel execution of specialized teams
+    - Teams: Stock Research (Web + Analyst), Financial, Technical, Quantitative, Macro
 
 4. **Team Level** (Financial Team, Quantitative Team)
    - Sequential execution within teams
@@ -133,11 +136,15 @@ graph TD
     A[User Query] --> B[Investments Director]
     B --> C[Stock Analysis Department]
 
-    C --> D1[Stock Researcher]
+    C --> D1[Stock Research Team]
     C --> D2[Financial Team]
     C --> D3[Technical Analyst]
     C --> D4[Quantitative Team]
     C --> D5[Macro Analyst]
+
+    D1 --> E1[Web Researcher]
+    D1 --> E2[Analyst Opinion Analyst]
+    E1 & E2 --> F1[Senior Research Advisor]
 
     D2 --> E1[Balance Sheet Analyst]
     D2 --> E2[Income Statement Analyst]
@@ -149,7 +156,7 @@ graph TD
     D4 --> G2[Growth Analyst]
     G1 & G2 --> F2[Senior Quantitative Advisor]
 
-    D1 & F1 & D3 & F2 & D5 --> H[Hedge Fund Manager]
+    F1 & F1 & D3 & F2 & D5 --> H[Hedge Fund Manager]
     H --> I[Final Investment Report]
 ```
 

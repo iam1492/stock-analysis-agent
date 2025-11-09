@@ -6,7 +6,15 @@ The Stock Analysis Agent is a **production-ready** web application that provides
 
 ## Recent Work
 
-### Project Manager Agent Integration (Latest)
+### Stock Research Team Architecture Refactoring (Latest)
+- ✅ **Stock Research Team 분리**: 기존 stock_researcher_agent를 web_researcher_agent와 analyst_opinion_analyst_agent로 분리
+- ✅ **Tavily MCP 통합**: Firecrawl 대신 Tavily를 웹 리서치 도구로 채택하여 더 안정적인 성능 확보
+- ✅ **병렬 처리 구조**: Web Researcher + Analyst Opinion Analyst가 병렬로 실행 후 Senior Research Advisor가 결과 통합
+- ✅ **도구 재배치**: analyst_opinion_analyst 전용 tools 폴더 생성 및 FMP 분석가 도구들 이동
+- ✅ **코드 정리**: 불필요한 stock_researcher 폴더 완전 제거 및 import 경로 정리
+- ✅ **Memory Bank 업데이트**: 새로운 아키텍처를 반영하여 문서 업데이트
+
+### Project Manager Agent Integration (Previous)
 - ✅ **Project Manager Agent**: Added Project Manager as the first agent in the workflow
 - ✅ **Customized Instructions**: Project Manager analyzes user queries and generates tailored instructions for each of the 5 analysis teams
 - ✅ **Session State Communication**: Instructions passed through session state to specialized agents using InstructionProvider pattern
@@ -53,11 +61,12 @@ The Stock Analysis Agent is a **production-ready** web application that provides
 ## Current Technical Focus
 
 ### Active Components
-1. **Multi-Agent Analysis System**: 12 specialized agents coordinating stock analysis (including Project Manager)
-2. **Real-Time Streaming**: SSE-based streaming with activity timeline
-3. **Financial Data Integration**: FMP API for comprehensive financial data
-4. **Result Storage**: Filesystem-based agent result archival
-5. **Simplified Infrastructure**: No cloud dependencies, local-first architecture
+1. **Multi-Agent Analysis System**: 13 specialized agents coordinating stock analysis (including Project Manager)
+2. **Stock Research Team**: Web Researcher + Analyst Opinion Analyst (parallel) → Senior Research Advisor (synthesis)
+3. **Real-Time Streaming**: SSE-based streaming with activity timeline
+4. **Financial Data Integration**: FMP API for comprehensive financial data + Tavily for web research
+5. **Result Storage**: Filesystem-based agent result archival
+6. **Simplified Infrastructure**: No cloud dependencies, local-first architecture
 
 ### Known Limitations
 - Financial API (FMP) requires API key configuration
@@ -67,7 +76,11 @@ The Stock Analysis Agent is a **production-ready** web application that provides
 
 ## Removed Components
 
-### Recently Removed (Latest Refactoring)
+### Recently Removed (Stock Research Team Refactoring)
+- **app/sub_agents/stock_researcher/**: Complete directory with all tools and agent
+- **Stock Researcher Tools**: fmp_price_target_summary, fmp_price_target_news, fmp_historical_stock_grade, fmp_analyst_estimates (moved to analyst_opinion_analyst/tools)
+
+### Previously Removed (Infrastructure Simplification)
 - **app/config.py**: Vertex AI initialization and Google Cloud setup
 - **app/tracing_env.py**: OpenTelemetry environment management
 - **app/disable_tracing.py**: Tracing disable configuration
