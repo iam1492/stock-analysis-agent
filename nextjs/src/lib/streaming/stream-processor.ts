@@ -381,15 +381,16 @@ function processThoughts(
 
   // Create user-friendly agent names
   const friendlyAgentNames: Record<string, string> = {
+    'project_manager_agent': '프로젝트 매니저',
     'balance_sheet_agent': '대차대조표 분석가',
     'income_statement_agent': '손익계산서 분석가', 
     'cash_flow_statement_agent': '현금흐름 분석가',
     'basic_financial_analyst_agent': '기본 재무 분석가',
     'growth_analyst_agent': '기업 성장 분석가',
-    'intrinsic_value_agent': '내제가치 분석가',
+    'intrinsic_value_analyst_agent': '내제가치 분석가',
     'technical_analyst_agent': '기술적 분석가',
     'stock_researcher_agent': '기본 종목 분석 연구원',
-    'economic_indiators_agent': '매크로 경제 분석가',
+    'macro_economy_analyst_agent': '매크로 경제 분석가',
     'senior_financial_advisor_agent': '선임 재무 연구원',
     'senior_quantitative_advisor_agent': '선임 퀀트 분석가',
     'hedge_fund_manager_agent': '헤지펀드 매니저',
