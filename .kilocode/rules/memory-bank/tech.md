@@ -2,6 +2,10 @@
 
 ## Core Technologies
 
+### Developement Environment
+- **Window 11**: Operating system
+- **PowerShell 7**: Terminal
+
 ### Backend Stack
 - **Python 3.10-3.13**: Core backend language
 - **Google ADK 1.17.0**: Agent Development Kit for multi-agent orchestration

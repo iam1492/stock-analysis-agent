@@ -8,19 +8,19 @@ import re
 
 def parse_pm_json_output(callback_context: CallbackContext):
     """
-    Project Manager의 JSON 출력을 파싱하여 dict로 변환합니다.
-    이 함수는 project_manager_agent 실행 후 즉시 호출됩니다.
+    Investments Director의 JSON 출력을 파싱하여 dict로 변환합니다.
+    이 함수는 investments_director_agent 실행 후 즉시 호출됩니다.
     """
     pm_output = callback_context.state.get("pm_instructions", "")
-    
+
     if not pm_output or not isinstance(pm_output, str):
-        print("⚠️ Project Manager output이 비어있거나 이미 dict입니다.")
+        print("⚠️ Investments Director output이 비어있거나 이미 dict입니다.")
         if isinstance(pm_output, dict):
             # 이미 dict면 그대로 유지
             return
         callback_context.state["pm_instructions"] = {}
         return
-    
+
     try:
         # JSON 블록 추출 (```json ... ``` 형식)
         json_match = re.search(r'```json\s*(\{.*?\})\s*```', pm_output, re.DOTALL)
@@ -29,35 +29,35 @@ def parse_pm_json_output(callback_context: CallbackContext):
         else:
             # 직접 JSON 파싱 시도
             instructions_dict = json.loads(pm_output)
-        
+
         # 파싱된 instruction을 state에 다시 저장 (dict로)
         callback_context.state["pm_instructions"] = instructions_dict
-        print(f"✅ Project Manager instructions 파싱 완료: {len(instructions_dict)} 개 팀")
-        
+        print(f"✅ Investments Director instructions 파싱 완료: {len(instructions_dict)} 개 팀")
+
         # 각 instruction 미리보기 출력
         for key, value in instructions_dict.items():
             preview = value[:80] + "..." if len(value) > 80 else value
             print(f"  - {key}: {preview}")
-            
+
     except Exception as e:
-        print(f"⚠️ Project Manager instruction 파싱 실패: {e}")
+        print(f"⚠️ Investments Director instruction 파싱 실패: {e}")
         print(f"   원본 출력: {pm_output[:200]}...")
         # 파싱 실패 시 빈 dict로 설정 (에이전트들은 기본 instruction 사용)
         callback_context.state["pm_instructions"] = {}
 
 
-def create_project_manager_agent():
+def create_investments_director_agent():
     return LlmAgent(
-        name="project_manager_agent",
-        model=lite_llm_model("project_manager_agent"),
-        description="""당신은 주식 분석 프로젝트의 총괄 관리자입니다. 
+        name="investments_director_agent",
+        model=lite_llm_model("investments_director_agent"),
+        description="""당신은 주식 분석 회사의 투자 디렉터입니다.
         사용자의 요구사항을 분석하고 각 전문 팀에게 명확한 업무 지시를 내립니다.""",
-        
+
         instruction="""
         모든 에이전트 공통 지침: {shared_instruction}
-        
+
         [역할]
-        당신은 주식 분석 회사의 프로젝트 관리자입니다.
+        당신은 주식 분석 회사의 투자 디렉터입니다.
         사용자의 질문을 분석하고, 5개 전문 팀에게 구체적이고 명확한 업무 지시를 생성합니다.
         
         [분석해야 할 전문 팀]
@@ -176,4 +176,4 @@ def create_project_manager_agent():
     )
 
 
-project_manager_agent = create_project_manager_agent()
+investments_director_agent = create_investments_director_agent()

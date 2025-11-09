@@ -381,7 +381,7 @@ function processThoughts(
 
   // Create user-friendly agent names
   const friendlyAgentNames: Record<string, string> = {
-    'project_manager_agent': '프로젝트 매니저',
+    'investments_director_agent': '투자 디렉터',
     'balance_sheet_agent': '대차대조표 분석가',
     'income_statement_agent': '손익계산서 분석가', 
     'cash_flow_statement_agent': '현금흐름 분석가',

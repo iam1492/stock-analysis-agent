@@ -36,7 +36,7 @@ app/
 ├── agent_results_api.py          # REST API for result operations
 ├── logging_config.py             # Simplified logging setup
 └── sub_agents/                   # Specialized agent implementations
-    ├── project_manager/          
+    ├── investments_director/
     ├── balance_sheet_analyst/
     ├── income_statement_analyst/
     ├── cash_flow_analyst/
@@ -111,9 +111,9 @@ The system uses a **four-level hierarchy**:
 
 1. **Root Agent** ([`create_stock_analysis_company`](app/agent.py:136))
    - Coordinates the entire workflow
-   - Sequential execution: Project Manager → Department → Hedge Fund Manager
+   - Sequential execution: Investments Director → Department → Hedge Fund Manager
 
-2. **Project Manager Level** ([`create_project_manager_agent`](app/sub_agents/project_manager/agent.py))
+2. **Investments Director Level** ([`create_investments_director_agent`](app/sub_agents/investments_director/agent.py))
    - Analyzes user queries and creates customized instructions
    - Generates JSON instructions for each analysis team
    - Acts as Investment Director coordinating the analysis workflow
@@ -130,7 +130,7 @@ The system uses a **four-level hierarchy**:
 
 ```mermaid
 graph TD
-    A[User Query] --> B[Project Manager]
+    A[User Query] --> B[Investments Director]
     B --> C[Stock Analysis Department]
 
     C --> D1[Stock Researcher]
@@ -161,7 +161,7 @@ def create_stock_analysis_company():
     return SequentialAgent(
         name="root_agent",
         sub_agents=[
-            create_project_manager_agent(),      # NEW: Instruction generation
+            create_investments_director_agent(),      # NEW: Instruction generation
             create_stock_analysis_department(),  # Parallel execution
             create_hedge_fund_manager_agent()    # Final synthesis
         ],
