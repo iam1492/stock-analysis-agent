@@ -2,7 +2,7 @@ from google.adk.agents import ParallelAgent, SequentialAgent
 from .sub_agents.balance_sheet_analyst.agent import create_balance_sheet_agent
 from .sub_agents.income_statement_analyst.agent import create_income_statement_agent
 from .sub_agents.cash_flow_analyst.agent import create_cash_flow_statement_agent
-from .sub_agents.stock_researcher.agent import create_stock_researcher_agent
+from .sub_agents.stock_research_team.agent import create_stock_research_team
 from .sub_agents.hedge_fund_manager.agent import create_hedge_fund_manager_agent
 from .sub_agents.senior_financial_advisor.agent import create_senior_financial_advisor_agent
 from .sub_agents.basic_financial_analyst.agent import create_basic_financial_analyst_agent
@@ -123,9 +123,9 @@ def create_quantitative_analysis_team():
 def create_stock_analysis_department():
     return ParallelAgent(
         name = "stock_analysis_department",
-        description = "주식 리서치, 재무팀 분석, 기술적 분석, 정량적 분석 그리고 매크로경제분석을 병렬적으로 수행하는 에이전트 입니다.",
+        description = "주식 리서치 팀, 재무팀 분석, 기술적 분석, 정량적 분석 그리고 매크로경제분석을 병렬적으로 수행하는 에이전트 입니다.",
         sub_agents = [
-            create_stock_researcher_agent(),
+            create_stock_research_team(),
             create_financial_team(),
             create_technical_analyst_agent(),
             create_quantitative_analysis_team(),

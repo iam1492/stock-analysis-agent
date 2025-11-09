@@ -25,7 +25,7 @@ const agentDisplayNames: Record<string, string> = {
   'senior_financial_advisor_agent': '선임 재무 연구원',
   'senior_quantitative_advisor_agent': '선임 퀀트 분석가',
   'technical_analyst_agent': '기술적 분석가',
-  'stock_researcher_agent': '주식 연구원',
+  'senior_research_advisor_agent': '선임 주식 연구원',
   'hedge_fund_manager_agent': '헤지펀드 매니저'
 };
 

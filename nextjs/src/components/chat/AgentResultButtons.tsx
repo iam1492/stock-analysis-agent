@@ -30,8 +30,8 @@ const agentButtonConfig = [
     color: 'bg-green-600 hover:bg-green-700'
   },
   {
-    agentName: 'stock_researcher_agent',
-    label: '주식 연구원 결과보기',
+    agentName: 'senior_research_advisor_agent',
+    label: '선임 주식 연구원 결과보기',
     color: 'bg-orange-600 hover:bg-orange-700'
   }
 ];

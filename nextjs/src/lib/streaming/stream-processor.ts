@@ -389,7 +389,7 @@ function processThoughts(
     'growth_analyst_agent': '기업 성장 분석가',
     'intrinsic_value_analyst_agent': '내제가치 분석가',
     'technical_analyst_agent': '기술적 분석가',
-    'stock_researcher_agent': '기본 종목 분석 연구원',
+    'senior_research_advisor_agent': '선임 종목 분석 연구원',
     'macro_economy_analyst_agent': '매크로 경제 분석가',
     'senior_financial_advisor_agent': '선임 재무 연구원',
     'senior_quantitative_advisor_agent': '선임 퀀트 분석가',
