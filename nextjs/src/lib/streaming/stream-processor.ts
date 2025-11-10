@@ -210,7 +210,7 @@ function processFunctionCall(
     'fmp_enterprise_value': '기업 가치 분석',
     'fmp_owner_earnings': '주주 이익 분석',
     'fmp_economic_indicators': '경제 지표 분석',
-    'fmt_stock_news': '뉴스 분석',
+    'fmp_stock_news': '뉴스 분석',
     'fmp_price_target_summary': '목표 주가 분석',
     'fmp_price_target_news': '목표 주가 뉴스 분석',
     'fmp_historical_stock_grade': '주식 등급 분석',
@@ -224,7 +224,7 @@ function processFunctionCall(
     'fmp_key_metrics_ttm':'12개월 핵심 지표 분석',
     'fmp_analyst_estimates':'애널리스트 미래 실적 추정치 분석',
     'fmp_average_directional_index':'추세 강도 데이터 분석',
-
+    'tavily-search': '주식 정보 검색'
   };
 
   const friendlyName = friendlyFunctionNames[functionCall.name] || functionCall.name;
@@ -275,7 +275,7 @@ function processFunctionResponse(
     'fmp_enterprise_value': '기업 가치 분석',
     'fmp_owner_earnings': '주주 이익 분석',
     'fmp_economic_indicators': '경제 지표 분석',
-    'fmt_stock_news': '뉴스 분석',
+    'fmp_stock_news': '뉴스 분석',
     'fmp_price_target_summary': '목표 주가 분석',
     'fmp_price_target_news': '목표 주가 뉴스 분석',
     'fmp_historical_stock_grade': '주식 등급 분석',
@@ -289,6 +289,7 @@ function processFunctionResponse(
     'fmp_key_metrics_ttm':'12개월 핵심 지표 분석',
     'fmp_analyst_estimates':'애널리스트 미래 실적 추정치 분석',
     'fmp_average_directional_index':'추세 강도 데이터 분석',
+    'tavily-search':'주식 검색 엔진 분석'
   };
 
   const friendlyName = friendlyFunctionNames[functionResponse.name] || functionResponse.name;
@@ -394,7 +395,9 @@ function processThoughts(
     'senior_financial_advisor_agent': '선임 재무 연구원',
     'senior_quantitative_advisor_agent': '선임 퀀트 분석가',
     'hedge_fund_manager_agent': '헤지펀드 매니저',
-    'goal_planning_agent': '목표 계획 에이전트'
+    'goal_planning_agent': '목표 계획 에이전트',
+    'web_researcher_agent': '종목 정보 검색 및 분석 에이전트',
+    'analyst_opinion_analyst_agent': '애널리스트 의견 분석 에이전트'
   };
 
   const friendlyAgentName = friendlyAgentNames[agent] || agent;

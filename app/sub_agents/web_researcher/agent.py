@@ -1,8 +1,9 @@
 from google.adk.agents import LlmAgent
 from google.adk.agents.callback_context import ReadonlyContext
 from google.adk.tools.mcp_tool.mcp_toolset import McpToolset
+from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
 from mcp import StdioServerParameters
-from ..stock_researcher.tools.fmp_stock_news import fmt_stock_news
+from .tools.fmp_stock_news import fmp_stock_news
 from ..utils.llm_model import lite_llm_model
 from google.genai import types
 from google.adk.planners import BuiltInPlanner
@@ -69,15 +70,18 @@ senior_research_advisor가 이 보고서를 활용하여 hedge_fund_manager에�
 def create_web_researcher_agent():
     tavily_api_key = os.environ.get("TAVILY_API_KEY")
     tavily_toolset = McpToolset(
-        connection_params=StdioServerParameters(
-            command="npx",
-            args=[
-                "-y",
-                "tavily-mcp@latest",
-            ],
-            env={
-                "TAVILY_API_KEY": tavily_api_key,
-            }
+        connection_params=StdioConnectionParams(
+            server_params=StdioServerParameters(
+                command="npx",
+                args=[
+                    "-y",
+                    "tavily-mcp@latest",
+                ],
+                env={
+                    "TAVILY_API_KEY": tavily_api_key,
+                }
+            ),
+            timeout=30,
         ),
         tool_filter=['tavily-search', 'tavily-extract'] 
     )
@@ -89,7 +93,7 @@ def create_web_researcher_agent():
         Tavily Mcp를 도구를 활용하여 뉴스, 블로그, 소셜 미디어, 보고서 등 다양한 웹 콘텐츠를 분석합니다.
         시장 심리, 여론 동향, 투자자 의견 등을 심층적으로 파악하는 데 특화되어 있습니다.""",
         instruction=get_web_researcher_instruction,
-        tools=[fmt_stock_news, tavily_toolset],
+        tools=[fmp_stock_news, tavily_toolset],
         output_key="web_researcher_result",
         planner=BuiltInPlanner(
             thinking_config=types.ThinkingConfig(

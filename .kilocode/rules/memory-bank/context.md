@@ -6,7 +6,16 @@ The Stock Analysis Agent is a **production-ready** web application that provides
 
 ## Recent Work
 
-### Stock Research Team Architecture Refactoring (Latest)
+### OpenTelemetry Context Detachment Fix (Latest)
+- ✅ **OpenTelemetry 완전 비활성화**: ADK 내부에서 발생하는 context detachment 오류 해결
+- ✅ **환경 변수 설정**: `OTEL_SDK_DISABLED=true`, `OTEL_DISABLE_TELEMETRY=true`, `OTEL_TRACES_EXPORTER=none` 설정
+- ✅ **Monkey Patching**: OpenTelemetry 모듈을 완전히 차단하여 초기화 자체를 방지
+- ✅ **함수 오버라이딩**: `opentelemetry.context._RUNTIME_CONTEXT.detach`와 `reset` 함수를 안전한 버전으로 교체
+- ✅ **예외 처리**: ValueError와 RuntimeError를 로깅하고 시스템 크래시 방지
+- ✅ **다층적 접근**: 환경 변수 + 모듈 패칭 + 함수 오버라이딩으로 완벽한 비활성화 보장
+- ✅ **오류 해결**: "Failed to detach context" 및 "ValueError: <Token...> was created in a different Context" 오류 완전 제거
+
+### Stock Research Team Architecture Refactoring (Previous)
 - ✅ **Stock Research Team 분리**: 기존 stock_researcher_agent를 web_researcher_agent와 analyst_opinion_analyst_agent로 분리
 - ✅ **Tavily MCP 통합**: Firecrawl 대신 Tavily를 웹 리서치 도구로 채택하여 더 안정적인 성능 확보
 - ✅ **병렬 처리 구조**: Web Researcher + Analyst Opinion Analyst가 병렬로 실행 후 Senior Research Advisor가 결과 통합

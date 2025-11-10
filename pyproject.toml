@@ -6,7 +6,7 @@ authors = [
     {name = "Ramus Jung", email = "iam1492@gmail.com"}
 ]
 dependencies = [
-    "google-adk==1.17.0",
+    "google-adk==1.18.0",
     "python-dotenv",
     "litellm",
     "cachetools",
