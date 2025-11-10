@@ -6,7 +6,15 @@ The Stock Analysis Agent is a **production-ready** web application that provides
 
 ## Recent Work
 
-### OpenTelemetry Context Detachment Fix (Latest)
+### Hedge Fund Manager Decision Framework Enhancement (Latest)
+- ✅ **6단계 체계적 의사결정 프로세스 구현**: 시장 체제 식별 → 동적 가중치 적용 → 주식 유형 판단 → 점수화 → 안전장치 점검 → 최종 등급 결정
+- ✅ **시장 체제별 동적 가중치 매트릭스**: 확장기/둔화기/수축기/회복기별로 최적화된 가중치 배분 (총합 100%)
+- ✅ **주식 유형별 평가 조정**: 가치주(재무+DCF 우선) vs 성장주(성장률 우선, DCF 보수적 적용)
+- ✅ **시스템적 안전장치 트리거**: 파산 위험, 회계 부정, 고평가, 악재 뉴스 감지 시 자동 등급 조정
+- ✅ **점수화된 의사결정 프레임워크**: 0-100점 척도로 모든 분석 영역 평가, 총점 기반 등급 결정
+- ✅ **Memory Bank 업데이트**: 새로운 의사결정 프레임워크를 반영하여 문서 업데이트
+
+### OpenTelemetry Context Detachment Fix (Previous)
 - ✅ **OpenTelemetry 완전 비활성화**: ADK 내부에서 발생하는 context detachment 오류 해결
 - ✅ **환경 변수 설정**: `OTEL_SDK_DISABLED=true`, `OTEL_DISABLE_TELEMETRY=true`, `OTEL_TRACES_EXPORTER=none` 설정
 - ✅ **Monkey Patching**: OpenTelemetry 모듈을 완전히 차단하여 초기화 자체를 방지

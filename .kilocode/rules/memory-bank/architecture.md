@@ -157,7 +157,14 @@ graph TD
     G1 & G2 --> F2[Senior Quantitative Advisor]
 
     F1 & F1 & D3 & F2 & D5 --> H[Hedge Fund Manager]
-    H --> I[Final Investment Report]
+
+    H --> H1[6단계 체계적 프로세스]
+    H1 --> H2[1단계: 시장 체제 식별]
+    H2 --> H3[2단계: 동적 가중치 적용]
+    H3 --> H4[3단계: 주식 유형 판단]
+    H4 --> H5[4단계: 점수화 및 1차 등급]
+    H5 --> H6[5단계: 시스템적 안전장치 점검]
+    H6 --> I[Final Investment Report]
 ```
 
 ### Key Implementation Details
