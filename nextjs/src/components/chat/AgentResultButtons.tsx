@@ -33,6 +33,11 @@ const agentButtonConfig = [
     agentName: 'senior_research_advisor_agent',
     label: '선임 주식 연구원 결과보기',
     color: 'bg-orange-600 hover:bg-orange-700'
+  },
+  {
+    agentName: 'macro_economy_analyst_agent',
+    label: '매크로 경제 분석가 결과보기',
+    color: 'bg-indigo-600 hover:bg-indigo-700'
   }
 ];
 

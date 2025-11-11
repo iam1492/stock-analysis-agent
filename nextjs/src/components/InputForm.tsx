@@ -41,7 +41,7 @@ export function InputForm({
     }
   };
 
-  const placeholderText = "분석하고 싶은 종목을 입력해주세요. (ex: Apple(APPL) 종목 분석해줘)"
+  const placeholderText = "분석하고 싶은 회사를 입력해주세요. (ex: Apple 종목 분석해줘, 장기투자하고 싶어)"
 
   return (
     <div className="w-full">

@@ -26,7 +26,8 @@ const agentDisplayNames: Record<string, string> = {
   'senior_quantitative_advisor_agent': '선임 퀀트 분석가',
   'technical_analyst_agent': '기술적 분석가',
   'senior_research_advisor_agent': '선임 주식 연구원',
-  'hedge_fund_manager_agent': '헤지펀드 매니저'
+  'hedge_fund_manager_agent': '헤지펀드 매니저',
+  'macro_economy_analyst_agent': '매크로 경제 분석가'
 };
 
 export function AgentResultModal({
