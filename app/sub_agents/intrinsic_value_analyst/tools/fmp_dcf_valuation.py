@@ -2,6 +2,7 @@ from ...utils.fmp_api_client import make_fmp_api_request
 
 def fmp_dcf_valuation(ticker: str):
     """
+    도구명: fmp_dcf_valuation
     할인된 현금 흐름(DCF) 가치 평가 API를 사용하여 회사의 내재 가치를 추정합니다. 
     예상 미래 현금 흐름 및 할인율을 기반으로 DCF 가치 평가를 계산합니다.
     입력 매개변수:

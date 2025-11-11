@@ -4,6 +4,7 @@ from .tools.fmp_dcf_valuation import fmp_dcf_valuation
 from .tools.fmp_owner_earnings import fmp_owner_earnings
 from .tools.fmp_enterprise_value import fmp_enterprise_value
 from .tools.fmp_key_metrics_ttm import fmp_key_metrics_ttm
+from .tools.gurufocus_dcf_valuation import gurufocus_dcf
 from ..utils.llm_model import lite_llm_model
 from google.genai import types
 from google.adk.planners import BuiltInPlanner
@@ -41,10 +42,11 @@ def get_intrinsic_value_instruction(context: ReadonlyContext) -> str:
 가치 평가 도구를 사용하여 회사 주식의 내재 가치 분석을 수행합니다.
 반드시 최신 데이터를 사용하기 위해 모든 가치 평가 도구의 최신 파라미터를 사용하여 가장 최근의 데이터를 확보하세요.
 회사의 내재 가치를 평가하기 위해 다음 도구를 반드시 사용해야 합니다.
-  - DCF Valuation 도구를 사용하여 할인된 현금 흐름(DCF) 가치를 계산합니다.
-  - Owner Earnings 도구를 사용하여 소유자 이익 및 지속 가능한 가치를 평가합니다.
-  - Enterprise Value 도구를 사용하여 기업 가치 지표를 결정합니다.
-  - TTM Key Metrics 도구를 사용하여 기업의 최근 12개월 주요 성과지표를 종합적으로 검색합니다.
+- DCF Valuation(gurufocus_dcf) 도구를 사용하여 할인된 현금 흐름(DCF) 가치를 계산합니다.
+- gurufocus_dcf 도구 사용후 결과를 못받아온 경우에만 fmp_dcf_valuation로 다시 시도. 
+- Owner Earnings 도구를 사용하여 소유자 이익 및 지속 가능한 가치를 평가합니다.
+- Enterprise Value 도구를 사용하여 기업 가치 지표를 결정합니다.
+- TTM Key Metrics 도구를 사용하여 기업의 최근 12개월 주요 성과지표를 종합적으로 검색합니다.
 이러한 도구의 결과를 분석하여 주식의 내재 가치를 결정합니다.
 내재 가치를 현재 시장 가격과 비교하여 주식이 저평가되었는지 또는 고평가되었는지 평가합니다.
 
@@ -68,7 +70,7 @@ def create_intrinsic_value_agent():
         model = lite_llm_model("intrinsic_value_analyst_agent"),
         description = "당신은 내재 가치(intrinsic value) 분석 전문가로서, 회사의 펀더멘털과 미래 현금 흐름을 기반으로 회사의 진정한 가치를 평가하는 데 중점을 둡니다.",
         instruction = get_intrinsic_value_instruction,
-        tools = [fmp_dcf_valuation, fmp_owner_earnings, fmp_enterprise_value, fmp_key_metrics_ttm],
+        tools = [gurufocus_dcf, fmp_dcf_valuation, fmp_owner_earnings, fmp_enterprise_value, fmp_key_metrics_ttm],
         output_key = "intrinsic_value_result",
         planner=BuiltInPlanner(
             thinking_config=types.ThinkingConfig(
